@@ -8,7 +8,7 @@ I've previously interned at Traction on Demand under the Marketing Automation di
 
 This repository serves as an introduction, and a portfolio into my foray in web design and development. Currently in its early stages, the portfolio is meant to be a mix of different visual methods of web design, including different generative art.
 
-The main framework is React.
+The main framework is React. 
 
 <!--
 **darkocejkov/darkocejkov** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
