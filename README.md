@@ -1,4 +1,14 @@
-### Hi there 👋
+### Howdy 🤠
+
+Darko Cejkov (DARK-o chey-kov): I am a developer with many interests, but am currently based in Web Design + Development. 
+
+Currently, I'm working with Van Valkenburg Communications (VVC), a multi-media A/V production company, to create a fresh, responsive, and accessible way to attend live meetings and events.
+
+I've previously interned at Traction on Demand under the Marketing Automation discipline, learning how to build emails that are personalized and follow marketing journeys that tailor to customers.
+
+This repository serves as an introduction, and a portfolio into my foray in web design and development. Currently in its early stages, the portfolio is meant to be a mix of different visual methods of web design, including different generative art.
+
+The main framework is React.
 
 <!--
 **darkocejkov/darkocejkov** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
