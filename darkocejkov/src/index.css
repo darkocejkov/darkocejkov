@@ -1,3 +1,223 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+::-webkit-scrollbar {
+  width: 10px;
+  margin-right: 10rem;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: rgba(255,255,255, 0.5);
+  border-radius: 10px;
+  margin-right: 10rem;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #888; 
+  border-radius: 10px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  /* background: #555;  */
+  background-color: black;
+}
+
+@font-face {
+  font-family: "CosiTimes";
+  src: url("../public/fonts/CosiTimes-Bold.ttf");
+}
+
+@font-face {
+  font-family: 'GT Maru';
+  src: url('../public/fonts/maru/GTMaru-Bold.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+  font-display: auto;
+}
+
+@font-face {
+  font-family: 'GT Maru';
+  src: url('../public/fonts/maru/GTMaru-Black.ttf') format('truetype');
+  font-weight: 900;
+  font-style: normal;
+  font-display: auto;
+}
+
+@font-face {
+  font-family: 'GT Maru';
+  src: url('../public/fonts/maru/GTMaru-BlackOblique.ttf') format('truetype');
+  font-weight: 900;
+  font-style: italic;
+  font-display: auto;
+}
+
+@font-face {
+  font-family: 'GT Maru';
+  src: url('../public/fonts/maru/GTMaru-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: auto;
+}
+
+@font-face {
+  font-family: 'GT Maru';
+  src: url('../public/fonts/maru/GTMaru-LightOblique.ttf') format('truetype');
+  font-weight: 300;
+  font-style: italic;
+  font-display: auto;
+}
+
+@font-face {
+  font-family: 'GT Maru';
+  src: url('../public/fonts/maru/GTMaru-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: auto;
+}
+
+@font-face {
+  font-family: 'GT Maru';
+  src: url('../public/fonts/maru/GTMaru-RegularOblique.ttf') format('truetype');
+  font-weight: normal;
+  font-style: italic;
+  font-display: auto;
+}
+
+@font-face {
+  font-family: 'GT Maru';
+  src: url('../public/fonts/maru/GTMaru-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: auto;
+}
+
+@font-face {
+  font-family: 'GT Maru';
+  src: url('../public/fonts/maru/GTMaru-BoldOblique.ttf') format('truetype');
+  font-weight: bold;
+  font-style: italic;
+  font-display: auto;
+}
+
+@font-face {
+  font-family: 'GT Maru';
+  src: url('../public/fonts/maru/GTMaru-MediumOblique.ttf') format('truetype');
+  font-weight: 500;
+  font-style: italic;
+  font-display: auto;
+}
+
+@font-face {
+  font-family: 'GT Maru Mega';
+  src: url('../public/fonts/maru/GTMaruMega-Mini.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'GT Maru Mega';
+  src: url('../public/fonts/maru/GTMaruMega-Midi.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'GT Maru Mega';
+  src: url('../public/fonts/maru/GTMaruMega-Maxi.ttf') format('truetype');
+  font-weight: bolder;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'GT Sectra Display';
+  src: url('../public/fonts/sectra/GT-Sectra-LCGV-Display-Super.ttf') format('truetype');
+  font-weight: 900;
+  font-style: normal;
+  font-display: auto;
+}
+
+@font-face {
+  font-family: 'GT Sectra Display';
+  src: url('../public/fonts/sectra/GT-Sectra-LCGV-Display-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: auto;
+}
+
+@font-face {
+  font-family: 'GT Sectra Display';
+  src: url('../public/fonts/sectra/GT-Sectra-LCGV-Display-Medium-Italic.ttf') format('truetype');
+  font-weight: 500;
+  font-style: italic;
+  font-display: auto;
+}
+
+@font-face {
+  font-family: 'GT Sectra Display';
+  src: url('../public/fonts/sectra/GT-Sectra-LCGV-Display-Super-Italic.ttf') format('truetype');
+  font-weight: 900;
+  font-style: italic;
+  font-display: auto;
+}
+
+@font-face {
+  font-family: 'GT Sectra Display';
+  src: url('../public/fonts/sectra/GT-Sectra-LCGV-Display-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: auto;
+}
+
+@font-face {
+  font-family: 'GT Sectra Display';
+  src: url('../public/fonts/sectra/GT-Sectra-LCGV-Display-Regular-Italic.ttf') format('truetype');
+  font-weight: normal;
+  font-style: italic;
+  font-display: auto;
+}
+
+@font-face {
+  font-family: 'GT Sectra Fine';
+  src: url('../public/fonts/sectra/GT-Sectra-LCGV-Fine-Black.ttf') format('truetype');
+  font-weight: 900;
+  font-style: bold;
+}
+
+@font-face {
+  font-family: 'GT Sectra Fine';
+  src: url('../public/fonts/sectra/GT-Sectra-LCGV-Fine-Black-Italic.ttf') format('truetype');
+  font-weight: 900;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'GT Sectra Fine';
+  src: url('../public/fonts/sectra/GT-Sectra-LCGV-Fine-Bold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: bold;
+}
+
+@font-face {
+  font-family: 'Tabi';
+  src: url('../public/fonts/tabi/Tabi-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Tabi';
+  src: url('../public/fonts/tabi/Tabi-Super.ttf') format('truetype');
+  font-weight: 900;
+  font-style: bold;
+}
+
+@font-face {
+  font-family: 'Wulkan Display';
+  src: url('../public/fonts/wulkan/WulkanDisplay-Black.ttf') format('truetype');
+  font-weight: 900;
+  font-style: bold;
+}
