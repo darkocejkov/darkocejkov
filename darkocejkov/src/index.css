@@ -2,6 +2,182 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer components{
+  .white-shadow{
+    box-shadow: 5px 5px rgba(255,255,255,100);
+  }
+
+  .white-shadow-open{
+    animation-name: white-shadow-open;
+    animation-duration: .25s;
+    animation-timing-function: ease-in-out;
+    animation-fill-mode: forwards
+  }
+
+  .multi-shadow-open-br{
+    animation-name: multi-shadow-open-br;
+    animation-duration: .25s;
+    animation-timing-function: ease-in-out;
+    animation-fill-mode: forwards
+  }
+
+  .multi-shadow-open-t{
+    animation-name: multi-shadow-open-t;
+    animation-duration: .25s;
+    animation-timing-function: ease-in-out;
+    animation-fill-mode: forwards
+  }
+
+  .fade-in-left{
+    animation-name: fade-in-left;
+    animation-timing-function: ease-in-out;
+    animation-duration: .15s;
+    animation-fill-mode: forwards
+  }
+
+  .fade-out-left{
+    animation-name: fade-in-left;
+    animation-timing-function: ease-in-out;
+    animation-duration: .15s;
+    animation-fill-mode: forwards;
+    animation-direction: reverse;
+  }
+
+  .fade-in-top{
+    animation-name: fade-in-top;
+    animation-timing-function: ease-in-out;
+    animation-duration: .15s;
+    animation-fill-mode: forwards
+  }
+
+  .linear-progressive-blur{
+    -webkit-mask-image: linear-gradient(to bottom,black 10%,transparent 80%);
+    mask-image: linear-gradient(to bottom,black 10%,transparent 80%);
+    /* backdrop-filter: blur(64px); */
+    /* mask: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0) 87.5%,
+      rgba(0, 0, 0, 1) 100%
+    ); */
+  }
+}
+
+@keyframes fade-in-top{
+  0% {
+    opacity: 0;
+    transform: translate(0%, -25%);
+    filter: blur(1rem);
+  }
+  50%{
+    opacity: 1;
+    transform: translate(0%, 0%);
+    filter: blur(.5rem);
+  }
+  100%{
+    opacity: 1;
+    transform: translate(0%, 0%);
+    filter: blur(0);
+  }
+}
+
+@keyframes fade-in-left{
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 0%)
+  }
+  100%{
+    opacity: 1;
+    transform: translate(0%, 0%)
+  }
+}
+
+@keyframes multi-shadow-open-t {
+  0% {
+    box-shadow: 0px 0px rgba(127, 176, 105,0), 
+    0px 0px rgba(255, 251, 189,0), 
+    0px 0px rgba(230, 170, 104,0), 
+    0px 0px rgba(202, 60, 37,0), 
+    0px 0px rgba(29, 26, 5,0);
+  }
+  100% {
+    box-shadow: 0px -5px rgba(127, 176, 105,1), 
+    0px -10px rgba(255, 251, 189,1), 
+    0px -15px rgba(230, 170, 104,1), 
+    0px -20px rgba(202, 60, 37,1), 
+    0px -25px rgba(29, 26, 5,1);
+  }
+}
+
+
+@keyframes multi-shadow-open-br {
+  0% {
+    box-shadow: 0px 0px rgba(127, 176, 105,0), 
+    0px 0px rgba(255, 251, 189,0), 
+    0px 0px rgba(230, 170, 104,0), 
+    0px 0px rgba(202, 60, 37,0), 
+    0px 0px rgba(29, 26, 5,0);
+  }
+  100% {
+    box-shadow: 5px 5px rgba(127, 176, 105,1), 
+    10px 10px rgba(255, 251, 189,1), 
+    15px 15px rgba(230, 170, 104,1), 
+    20px 20px rgba(202, 60, 37,1), 
+    25px 25px rgba(29, 26, 5,1);
+  }
+}
+
+@keyframes multi-shadow-open-many {
+  0% {
+    box-shadow: 0px 0px rgba(127, 176, 105,0), 
+    0px 0px rgba(255, 251, 189,0), 
+    0px 0px rgba(230, 170, 104,0), 
+    0px 0px rgba(202, 60, 37,0), 
+    1px 1px rgba(29, 26, 5,0);
+  }
+  20% {
+    box-shadow: 0px 0px rgba(127, 176, 105,0.2), 
+    0px 0px rgba(255, 251, 189,0.2), 
+    0px 0px rgba(230, 170, 104,0.2), 
+    1px 1px rgba(202, 60, 37,0.2),
+    2px 2px rgba(29, 26, 5,0.2);
+  }
+  40% {
+    box-shadow: 0px 0px rgba(127, 176, 105,0.4), 
+    0px 0px rgba(255, 251, 189,0.4), 
+    1px 1px rgba(230, 170, 104,0.4), 
+    2px 2px rgba(202, 60, 37,0.4), 
+    3px 3px rgba(29, 26, 5,0.4);
+  }
+  60% {
+    box-shadow: 0px 0px rgba(127, 176, 105,0.6), 
+    1px 1px rgba(255, 251, 189,0.6), 
+    2px 2px rgba(230, 170, 104,0.6), 
+    3px 3px rgba(202, 60, 37,0.6), 
+    4px 4px rgba(29, 26, 5,0.6);
+  }
+  80% {
+    box-shadow: 1px 1px rgba(127, 176, 105,0.8), 
+    2px 2px rgba(255, 251, 189,0.8), 
+    3px 3px rgba(230, 170, 104,0.8), 
+    4px 4px rgba(202, 60, 37,0.8), 
+    5px 5px rgba(29, 26, 5,0.8);
+  }
+  100% {
+    box-shadow: 1px 1px rgba(127, 176, 105,1), 
+    2px 2px rgba(255, 251, 189,1), 
+    5px 5px rgba(230, 170, 104,1), 
+    10px 10px rgba(202, 60, 37,1), 
+    15px 15px rgba(29, 26, 5,1);
+  }
+}
+
+@keyframes white-shadow-open {
+  0% {box-shadow: 0px 0px rgba(255,255,255,0);}
+  25% {box-shadow: 1px 1px rgba(255,255,255,0.25);}
+  50% {box-shadow: 3px 3px rgba(255,255,255,0.50);}
+  100% {box-shadow: 10px 10px rgba(255,255,255,100);}
+}
+
 ::-webkit-scrollbar {
   width: 10px;
   margin-right: 10rem;
