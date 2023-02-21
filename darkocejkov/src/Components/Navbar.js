@@ -52,7 +52,7 @@ export default function Navbar(props){
 
 
     return(
-        <div className="fixed bg-gradient-to-r from-cyan-100 to-blue-500 opacity-25 hover:opacity-50 transition-all bottom-0 w-full h-24 flex items-center justify-evenly text-2xl">
+        <div className=" fixed bg-gradient-to-r from-cyan-100 to-blue-500 opacity-25 hover:opacity-50 transition-all bottom-0 w-full h-24 flex items-center justify-evenly text-2xl">
 
 
                 {/* nav */}
@@ -108,10 +108,26 @@ export default function Navbar(props){
                             </>
                         )
                     }
+                    
+                    {props.showFront === true
+                        ? (
+                            <div onClick={() => props.setShowFront(false)} className={`rounded-lg w-10 h-10 flex justify-center items-center hover:white-shadow hover:bg-slate-900 hover:text-white transition-all group ${hidden === true && '-translate-x-10 opacity-0 invisible'} ${hiding === true && '-translate-x-10 opacity-0'} ${opening === true && 'translate-x-32 opacity-100'}`} >
+                                <span className="font-tabi absolute text-white  top-0 -m-10 scale-0 group-hover:scale-100 select-none transition-all">To Back</span>
+                                <i class="fa-solid fa-send-backward"></i>
+                            </div>
+                        )
+                        : (
+                            <div onClick={() => props.setShowFront(true)} className={`rounded-lg w-10 h-10 flex justify-center items-center hover:white-shadow hover:bg-slate-900 hover:text-white transition-all group ${hidden === true && '-translate-x-10 opacity-0 invisible'} ${hiding === true && '-translate-x-10 opacity-0'} ${opening === true && 'translate-x-24 opacity-100'}`} >
+                                <span className="font-tabi absolute text-white  top-0 -m-10 scale-0 group-hover:scale-100 select-none transition-all">To Front</span>
+                                <i class="fa-solid fa-bring-forward"></i>
+                            </div>
+                        )}
+
                     <div className={`rounded-lg w-10 h-10 flex justify-center items-center hover:white-shadow hover:bg-slate-900 hover:text-white transition-all group ${hidden === true && '-translate-x-10 opacity-0 invisible'} ${hiding === true && '-translate-x-10 opacity-0'} ${opening === true && 'translate-x-24 opacity-100'}`} >
-                    <span className="font-tabi absolute text-white  top-0 -m-10 scale-0 group-hover:scale-100 select-none transition-all">Previous</span>
+                        <span className="font-tabi absolute text-white  top-0 -m-10 scale-0 group-hover:scale-100 select-none transition-all">Previous</span>
                         <i class="fa-solid fa-chevron-left"></i>
                     </div>
+
                     <div className={`rounded-lg w-10 h-10 flex justify-center items-center hover:white-shadow hover:bg-slate-900 hover:text-white transition-all group ${hidden === true && '-translate-x-10 opacity-0 invisible'} ${hiding === true && '-translate-x-10 opacity-0'} ${opening === true && 'translate-x-11 opacity-100'}`} >
                         {props.playing === true
                             ? (

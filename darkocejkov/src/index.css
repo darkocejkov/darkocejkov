@@ -50,6 +50,10 @@
     animation-fill-mode: forwards
   }
 
+  .height-minus-nav{
+    height: calc(100vh - 6rem)
+  }
+
   .linear-progressive-blur{
     -webkit-mask-image: linear-gradient(to bottom,black 10%,transparent 80%);
     mask-image: linear-gradient(to bottom,black 10%,transparent 80%);

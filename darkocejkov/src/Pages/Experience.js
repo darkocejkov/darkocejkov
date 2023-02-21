@@ -17,42 +17,6 @@ export default function Experience(props){
                         </a>
                         <i class="fa-duotone fa-cloud-rainbow mx-2"></i>
                     </h1>
-                    <h1 className="dark:text-white light:text-dark text-2xl mb-3 flex justify-center">
-                        <a href="https://www.linkedin.com/company/traction-on-demand/" className="font-tabi underline">
-                        Traction on Demand. (Now acquired by Salesforce)
-                        </a>
-                        <i class="fa-duotone fa-cloud-rainbow mx-2"></i>
-                    </h1>
-                    <h1 className="dark:text-white light:text-dark text-2xl mb-3 flex justify-center">
-                        <a href="https://www.linkedin.com/company/traction-on-demand/" className="font-tabi underline">
-                        Traction on Demand. (Now acquired by Salesforce)
-                        </a>
-                        <i class="fa-duotone fa-cloud-rainbow mx-2"></i>
-                    </h1>
-                    <h1 className="dark:text-white light:text-dark text-2xl mb-3 flex justify-center">
-                        <a href="https://www.linkedin.com/company/traction-on-demand/" className="font-tabi underline">
-                        Traction on Demand. (Now acquired by Salesforce)
-                        </a>
-                        <i class="fa-duotone fa-cloud-rainbow mx-2"></i>
-                    </h1>
-                    <h1 className="dark:text-white light:text-dark text-2xl mb-3 flex justify-center">
-                        <a href="https://www.linkedin.com/company/traction-on-demand/" className="font-tabi underline">
-                        Traction on Demand. (Now acquired by Salesforce)
-                        </a>
-                        <i class="fa-duotone fa-cloud-rainbow mx-2"></i>
-                    </h1>
-                    <h1 className="dark:text-white light:text-dark text-2xl mb-3 flex justify-center">
-                        <a href="https://www.linkedin.com/company/traction-on-demand/" className="font-tabi underline">
-                        Traction on Demand. (Now acquired by Salesforce)
-                        </a>
-                        <i class="fa-duotone fa-cloud-rainbow mx-2"></i>
-                    </h1>
-                    <h1 className="dark:text-white light:text-dark text-2xl mb-3 flex justify-center">
-                        <a href="https://www.linkedin.com/company/traction-on-demand/" className="font-tabi underline">
-                        Traction on Demand. (Now acquired by Salesforce)
-                        </a>
-                        <i class="fa-duotone fa-cloud-rainbow mx-2"></i>
-                    </h1>
                 </div>
             }
         />

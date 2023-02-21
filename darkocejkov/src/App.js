@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect, useDebugValue, useLayoutEffect} from 'react';
 import {BrowserRouter, Routes, Route, Link} from 'react-router-dom'
 
 import Title from './Components/Title'
@@ -11,24 +11,22 @@ import Personal from './Pages/Personal';
 
 function App() {
 
-	// npm run start
-
 	useEffect(() => {
 		document.title = "Darko Cejkov"
 	}, [])
-
 
 	const [page, setPage] = useState('home')
 	const [pull, setPull] = useState(false)
 	
 	const [playing, setPlaying] = useState(false)
 	const [hideBg, setHideBg] = useState(false)
+	const [showFront, setShowFront] = useState(false)
 
 	return (
 		<div className='h-screen w-screen fixed top-0 bg-gradient-to-r from-cyan-500 to-blue-500'>
 
 			{hideBg === false &&
-				<Background play={playing} hide={hideBg}/>
+				<Background play={playing} hide={hideBg} showFront={showFront}/>
 			}
 			
 			
@@ -56,7 +54,7 @@ function App() {
 
 				</div>
 
-				<Navbar setPull={setPull} playing={playing} setPlaying={setPlaying} hideBg={hideBg} setHideBg={setHideBg}/>
+				<Navbar setPull={setPull} playing={playing} setPlaying={setPlaying} hideBg={hideBg} setHideBg={setHideBg} setShowFront={setShowFront} showFront={showFront}/>
 
 			</BrowserRouter>
 		</div>
