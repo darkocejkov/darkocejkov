@@ -8,6 +8,7 @@ import Background from './Components/Background';
 import Education from './Pages/Education';
 import Experience from './Pages/Experience';
 import Personal from './Pages/Personal';
+import {Banner} from "./Components/Basics";
 
 function App() {
 
@@ -28,7 +29,8 @@ function App() {
 			{hideBg === false &&
 				<Background play={playing} hide={hideBg} showFront={showFront}/>
 			}
-			
+
+			<Banner />
 			
 			<BrowserRouter>
 

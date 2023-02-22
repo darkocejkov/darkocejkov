@@ -36,12 +36,12 @@ export default function Education(props){
                     Honors BSc.&nbsp;
                         <span className="group hover:bg-opacity-80 bg-black bg-opacity-20 rounded-lg p-2 transition-colors hover:multi-shadow-open-br">Computer Science
                             <span className="group-hover:opacity-100 opacity-0 transition-opacity absolute right-[43%] -mt-14 ">
-                                GPA: <span className="font-sectraDisplay">8.3</span> of <span className="font-sectraDisplay">12</span>
+                                GPA: <span className="font-sectraDisplay">8.9</span> of <span className="font-sectraDisplay">12</span>
                             </span>
                         </span> +&nbsp;
                         <span className="group hover:bg-opacity-80 bg-black bg-opacity-20 rounded-lg p-2 transition-colors hover:multi-shadow-open-br">Psychology
                             <span className="group-hover:opacity-100 opacity-0 transition-opacity absolute right-[25%] -mt-14">
-                                GPA: <span className="font-sectraDisplay">9</span> of <span className="font-sectraDisplay">12</span>
+                                GPA: <span className="font-sectraDisplay">8.3</span> of <span className="font-sectraDisplay">12</span>
                             </span>
                         </span>
                     </h1>
