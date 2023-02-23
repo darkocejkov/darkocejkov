@@ -15,6 +15,8 @@ export const smoothScrollId = (id) => {
             behavior: 'smooth'
         })
     }
+}
 
-
+export function last(array){
+    return array[array.length - 1]
 }

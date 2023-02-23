@@ -1,4 +1,5 @@
-import React, {useState} from 'react'
+import React, {useRef, useState} from 'react'
+import {useInView} from "framer-motion";
 
 export const CustomLink = ({}) => {
     return null
@@ -20,4 +21,23 @@ export const Button = ({}) => {
         <button></button>
     )
 
+}
+
+export const InfoBox = ({id, children}) => {
+
+    const ref = useRef()
+    const inView = useInView(ref)
+
+    return(
+        <div ref={ref} id={id}
+             style={{
+                 opacity: inView ? 1 : 0,
+                 transform: inView ? "none" : "translateY(-200px)",
+                 filter: inView ? 'blur(0px)' : 'blur(5px)',
+                 transition: 'all 0.5s ease-in-out 0.2s'
+             }}
+             className={'h-screen info-box p-5 rounded-lg shadow'}>
+            {children}
+        </div>
+    )
 }
