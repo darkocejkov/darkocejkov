@@ -9,10 +9,8 @@ import Education from './Pages/Education';
 import Experience from './Pages/Experience';
 import Personal from './Pages/Personal';
 import {Banner} from "./Components/Basics";
-import {LegacyView} from "./Views/legacy/legacy";
-import {ScrollView} from "./Views/Scroll";
-import {motion, useScroll} from "framer-motion";
 
+import {ScrollView} from "./Views/Scroll";
 function App() {
 
 	useEffect(() => {

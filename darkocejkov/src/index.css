@@ -150,7 +150,7 @@
     position: static;
     margin: 3px;
     height: 98.5%;
-    width: 99.%;
+    width: 99%;
     border: 4px solid;
     /*background-image: url('./src/Views/legacy/bg/bg3.jpg');*/
     /*background-image: url("bg4.jpg");*/
@@ -234,7 +234,7 @@
   }
 
   .linear-progressive-blur{
-    -webkit-mask-image: linear-gradient(to bottom,black 10%,transparent 80%);
+    /*-webkit-mask-image: linear-gradient(to bottom,black 10%,transparent 80%);*/
     mask-image: linear-gradient(to bottom,black 10%,transparent 80%);
     /* backdrop-filter: blur(64px); */
     /* mask: linear-gradient(
@@ -527,7 +527,7 @@
 @font-face {
   font-family: 'GT Maru Mega';
   src: url('../public/fonts/maru/GTMaruMega-Maxi.ttf') format('truetype');
-  font-weight: bolder;
+  font-weight: bold;
   font-style: normal;
 }
 
@@ -583,7 +583,6 @@
   font-family: 'GT Sectra Fine';
   src: url('../public/fonts/sectra/GT-Sectra-LCGV-Fine-Black.ttf') format('truetype');
   font-weight: 900;
-  font-style: bold;
 }
 
 @font-face {
@@ -597,7 +596,6 @@
   font-family: 'GT Sectra Fine';
   src: url('../public/fonts/sectra/GT-Sectra-LCGV-Fine-Bold.ttf') format('truetype');
   font-weight: 600;
-  font-style: bold;
 }
 
 @font-face {
@@ -611,12 +609,10 @@
   font-family: 'Tabi';
   src: url('../public/fonts/tabi/Tabi-Super.ttf') format('truetype');
   font-weight: 900;
-  font-style: bold;
 }
 
 @font-face {
   font-family: 'Wulkan Display';
   src: url('../public/fonts/wulkan/WulkanDisplay-Black.ttf') format('truetype');
   font-weight: 900;
-  font-style: bold;
 }
