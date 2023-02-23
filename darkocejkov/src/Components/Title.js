@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-export default function Title(props){
+export default function Title({pull}){
 
     const title = "Darko Cejkov"
     
@@ -114,28 +114,28 @@ export default function Title(props){
 
     return(
 
-        <div className={`flex justify-center items-center select-none light:text-black dark:text-white transition-transform  ${props.pull ? '-translate-y-1/4' : 'translate-y-1/2'}`}>
+        <div className={`flex justify-center items-center select-none light:text-black dark:text-white transition-transform text-center ${pull ? '' : 'translate-y-1/2'}`}>
             <div className="w-fit h-fit overflow-hidden">
-                {/* <h1 className=" font-sectraDisplay text-8xl break-word">
+                <h1 className="font-tabi md:text-8xl text-4xl break-word">
                     Darko Cejkov
-                </h1> */}
+                </h1>
                 {/* {renderByCharacter(title, "font-sectra hover:font-sectraDisplay hover:bg-sky-700 text-8xl p-2 rounded-lg transition-all hover:rotate-45")} */}
-                {chars !== null
-                    ? (
-                        renderByCharacter()
-                    )
-                    : (
-                        <i class="fa-solid fa-asterisk fa-spin text-8xl transition-all"></i>
-                    )}
+                {/*{chars !== null*/}
+                {/*    ? (*/}
+                {/*        renderByCharacter()*/}
+                {/*    )*/}
+                {/*    : (*/}
+                {/*        <i class="fa-solid fa-asterisk fa-spin text-8xl transition-all"></i>*/}
+                {/*    )}*/}
 
             </div>
             
 
-            <div className="w-50 h-6 absolute top-[70%] opacity-50 hover:opacity-100">
-                <button>
-                    <i class="fa-duotone fa-shuffle" onClick={() => randomize()}></i>
-                </button>
-            </div>
+            {/*<div className="w-50 h-6 absolute top-[70%] opacity-50 hover:opacity-100">*/}
+            {/*    <button>*/}
+            {/*        <i class="fa-duotone fa-shuffle" onClick={() => randomize()}></i>*/}
+            {/*    </button>*/}
+            {/*</div>*/}
         </div>
     )
 }

@@ -52,7 +52,7 @@ export default function Navbar(props){
 
 
     return(
-        <div className=" fixed bg-gradient-to-r from-cyan-100 to-blue-500 opacity-25 hover:opacity-50 transition-all bottom-0 w-full h-24 flex items-center justify-evenly text-2xl">
+        <div className="backdrop-blur-lg flex-wrap p-3 fixed bg-gradient-to-r from-cyan-100 to-blue-500 opacity-25 hover:opacity-50 transition-all bottom-0 w-full flex items-center justify-evenly text-2xl">
 
 
                 {/* nav */}
@@ -89,7 +89,7 @@ export default function Navbar(props){
                     </div>
                 </div>
 
-                <div className="flex justify-around opacity-100 gap-10">
+                <div className="flex justify-around opacity-100 gap-5">
                     {hidden === true
                         ? (
                             <div className={`rounded-lg w-10 h-10 flex justify-center items-center hover:white-shadow ${hiding === true && 'opacity-0'} hover:bg-slate-900 hover:text-white transition-all group`} onClick={() => handleHide(false)}>
