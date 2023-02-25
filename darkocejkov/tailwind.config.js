@@ -12,9 +12,13 @@ module.exports = {
         sectraDisplay: ['GT Sectra Display', 'serif'],
         sectra: ['GT Sectra Fine', 'serif'],
         tabi: ['Tabi', 'serif'],
-        wulkan: ['Wulkan Display', 'serif']
+        wulkan: ['Wulkan Display', 'serif'],
+        rubik: ['Rubik', 'sans-serif'],
+        aeonik: ['Aeonik TRIAL', 'sans-serif']
       }
     },
   },
-  plugins: [],
+  plugins: [
+      require('@tailwindcss/line-clamp')
+  ],
 }

@@ -52,7 +52,7 @@ export default function Navbar(props){
 
 
     return(
-        <div className="backdrop-blur-lg flex-wrap p-3 fixed bg-gradient-to-r from-cyan-100 to-blue-500 opacity-25 hover:opacity-50 transition-all bottom-0 w-full flex items-center justify-evenly text-2xl">
+        <div className="backdrop-blur-lg z-40 flex-wrap p-3 fixed bg-gradient-to-r from-cyan-100 to-blue-500 opacity-25 hover:opacity-50 transition-all bottom-0 w-full flex items-center justify-evenly text-2xl">
 
 
                 {/* nav */}

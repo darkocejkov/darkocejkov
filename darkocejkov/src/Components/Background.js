@@ -21,7 +21,7 @@ export default function Background({showFront, play, hide, blind}){
 
 
     return(
-        <div className={`height-minus-nav w-screen fixed top-0 ${showFront === false ? '-' : ''}z-10 transition-opacity ${hide === true && 'opacity-100'}`}>
+        <div className={`height-minus-nav w-screen fixed top-0 ${showFront === false ? 'z-0' : 'z-50'} transition-opacity ${hide === true && 'opacity-100'}`}>
             <Canvas >
                 <Scene blind={blind}>
                     <ambientLight />
