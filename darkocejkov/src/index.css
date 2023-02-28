@@ -344,7 +344,30 @@
     -webkit-mask-image: -webkit-linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(2,0,0,1) 5%, rgba(0,0,0,1) 95%, rgba(20,0,0,0) 100%);
   }
 
+  /*.tree h3{*/
+  /*  font-weight: bold;*/
+  /*}*/
+
+  .tree ul{
+    margin-left: 1rem;
+  }
+
+  .tree ul li{
+    margin-left: 2rem;
+    margin-bottom: 1rem;
+  }
+
+  body:has(.modal.show){
+    overflow: hidden;
+  }
+
+  /*.modal.show body{*/
+  /*  overflow: hidden;*/
+  /*}*/
+
 }
+
+
 
 @keyframes fade-in-top{
   0% {
@@ -654,7 +677,7 @@ button > .button-download:hover{
 ::-webkit-scrollbar-track {
   background: rgba(255,255,255, 0.1);
   /*border-radius: 10px;*/
-  margin-right: 10rem;
+  /*margin-right: 10rem;*/
 }
 
 /* Handle */
@@ -1002,4 +1025,37 @@ button > .button-download:hover{
   font-style: italic;
 }
 
+@font-face {
+  font-family: 'Fira Code';
+  src: url('../public/fonts/firaCode/FiraCode-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+}
 
+@font-face {
+  font-family: 'Fira Code';
+  src: url('../public/fonts/firaCode/FiraCode-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Fira Code';
+  src: url('../public/fonts/firaCode/FiraCode-Bold.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Fira Code';
+  src: url('../public/fonts/firaCode/FiraCode-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Fira Code';
+  src: url('../public/fonts/firaCode/FiraCode-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+}

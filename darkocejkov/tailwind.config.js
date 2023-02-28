@@ -14,7 +14,8 @@ module.exports = {
         tabi: ['Tabi', 'serif'],
         wulkan: ['Wulkan Display', 'serif'],
         rubik: ['Rubik', 'sans-serif'],
-        aeonik: ['Aeonik TRIAL', 'sans-serif']
+        aeonik: ['Aeonik TRIAL', 'sans-serif'],
+        fira: ['Fira Code', 'sans-serif']
       }
     },
   },

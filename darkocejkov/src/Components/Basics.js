@@ -2,6 +2,7 @@ import React, {Suspense, useEffect, useRef, useState} from 'react'
 import {useInView, motion, useScroll, useDragControls, useMotionValueEvent, useTransform} from "framer-motion";
 import {byteSized, getFileInfo, humanFileSize, mimeType} from "../GlobalFunctions";
 import {useDragScroll} from "../Hooks/CustomHooks";
+
 export const TitleLetters = ({title}) => {
 
     let array = []
@@ -98,6 +99,60 @@ export const FillLink = ({}) => {
     )
 }
 
+export const OffcanvasDrawer = ({show, setShow, children}) => {
+
+    // const [show, setShow] = useState(false)
+
+    const handleKeyDown = (e) => {
+        console.log(e)
+        if(e.key === "Escape"){
+            setShow(false)
+            window.removeEventListener("keyup", handleKeyDown)
+        }
+    }
+
+    useEffect(() => {
+        if(show){
+            window.addEventListener("keyup", handleKeyDown)
+        }
+    }, [show])
+
+
+
+    return(
+
+        <>
+            <motion.div
+                animate={{
+                    translateX: show ? '0' : '100%'
+                    // width: show ? '100vw' : '0'
+                }}
+                transition={{
+                    type: 'spring'
+                }}
+
+
+                className={`modal ${show ? 'show' : ''} z-[70] w-screen bg-gray-50 h-screen fixed right-0 top-0 lg:max-w-[50%]`}>
+
+                {children}
+            </motion.div>
+
+            <motion.div
+                animate={{
+                    opacity: show ? 1 : 0,
+                    zIndex: show ? 60 : 0
+                }}
+
+                onClick={() => setShow(false)}
+
+                className={'modal-backdrop backdrop-blur-sm fixed top-0 left-0 h-screen w-screen bg-slate-900/60 overflow-hidden'}
+            />
+        </>
+
+
+    )
+}
+
 export const LoadingSpinner = ({}) => {
     return(
         <div className={'h-screen w-screen flex items-center justify-center'}>
@@ -114,9 +169,37 @@ export const Spinner = () => {
 
 export const TextBox = ({children, className = ''}) => {
     return(
-        <div className={`bg-slate-900/10 max-h-[50vh] overflow-y-auto p-4 vertical-fade ${className}`}>
+        <p className={`bg-slate-900/10 max-h-[50vh] overflow-y-auto p-4 rounded-tl-xl rounded-bl-xl ${className}`}>
             {children}
+        </p>
+    )
+}
+
+export const Accordion = ({className, children, data}) => {
+
+    return(
+        <div className={`bg-slate-900/10 rounded-2xl ${className}`}>
+            {data && data.map((x, i) => {
+                return(
+                    <>
+                        <div key={x.key}>
+                            <div className={'text-3xl font-bold text-center p-3'}>{x.title}</div>
+                        </div>
+
+                        {i !== data.length - 1 &&
+                            <div className={`w-full h-[1px] bg-slate-900/20 self-center`} />
+                        }
+                    </>
+
+                )
+            })}
         </div>
+    )
+}
+
+export const Rule = ({className}) => {
+    return (
+        <div className={`w-full h-[1px] ${className} self-center`} />
     )
 }
 
@@ -229,7 +312,7 @@ export const BoxCarousel = ({children, className, id}) => {
     const {mouseDownHandler, hasScroll} = useDragScroll({container: carouselRef, id})
 
     useEffect(() => {
-        console.log(`[carousel] ${id} hasScroll: `, hasScroll)
+        // console.log(`[carousel] ${id} hasScroll: `, hasScroll)
 
         if(hasScroll === false){
             setShowL(false)
@@ -379,6 +462,14 @@ export const CustomButton = ({onClick, children, className}) => {
     )
 }
 
+export const BorderDiv = ({children, className = ''}) => {
+    return(
+        <div className={`flex link-background-to-r bg-gradient-to-r from-amber-400 ${className} to-amber-400 z-20`}>
+            {children}
+        </div>
+    )
+}
+
 export const MenuWrapper = ({children, items = [], open = false}) => {
 
     const [show, setShow] = useState(false)
@@ -516,7 +607,7 @@ export const Tooltip = ({children}) => {
     )
 }
 
-export const TooltipWrapper = ({children, className, tooltip, fit = false, position = 'tm'}) => {
+export const TooltipWrapper = ({children, className = '', tooltip, fit = false, position = 'tm'}) => {
 
     let positionClass = null
 

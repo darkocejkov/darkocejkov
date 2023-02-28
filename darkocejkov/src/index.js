@@ -6,6 +6,7 @@ import reportWebVitals from './reportWebVitals';
 
 // import '../node_modules/font-awesome/css/font-awesome.min.css';
 import './fontawesome.min.css'
+import 'github-calendar/dist/github-calendar-responsive.css'
 
 import {BrowserRouter as Router} from 'react-router-dom'
 

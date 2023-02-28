@@ -13,18 +13,23 @@ import {
 import {downloadFile, getFileInfo, smoothScrollId} from "../GlobalFunctions";
 import Background from "../Components/Background";
 import {
+    Accordion, BorderDiv,
     BoxCarousel, CardBox,
     CustomButton,
     CustomLink,
     FillLink, FunLink,
     InfoBox,
-    Link, MenuWrapper,
+    Link, MenuWrapper, Rule,
     StatBox, SubtitleRule, TextBox,
     TitleLetters,
     TitleRule,
     Tooltip,
     TooltipWrapper
 } from "../Components/Basics";
+
+import {Tree} from 'antd'
+import GitHubCalendar from "react-github-calendar";
+
 import Marquee from "react-fast-marquee";
 
 const minResume = require('../assets/files/V3 MIN Darko Cejkov Fullstack Developer 2023.pdf')
@@ -76,13 +81,63 @@ export const ScrollView = ({}) => {
         },
     ]
 
+    const vvcDescription = [
+        {
+            title: 'Project Lead',
+            key: '0',
+            children: [
+                {title: 'a', key: '0-0'},
+                {title: 'a', key: '0-1'},
+                {title: 'a', key: '0-2'},
+                {title: 'a', key: '0-3'},
+            ]
+        },
+        {
+            title: 'Frontend Developer',
+            key: '1',
+            children: [
+                {title: 'b', key: '1-0'},
+                {title: 'b', key: '1-1'},
+                {title: 'b', key: '1-2'},
+                {title: 'b', key: '1-3'},
+            ]
+        },
+        {
+            title: 'Backend Engineer',
+            key: '2',
+            children: [
+                {title: 'c', key: '2-0'},
+                {title: 'c', key: '2-1'},
+                {title: 'c', key: '2-2'},
+                {title: 'c', key: '2-3'},
+            ]
+        },
+    ]
+
+
     const sceneRef = useRef()
 
+    const [play, setPlay] = useState(true)
+    const [front, setFront] = useState(false)
+
     return(
-
         <>
+            <Background play={play} showFront={front} blind={blind} className={'h-screen'}/>
 
-            <Background showFront={false} blind={blind} className={'h-screen'}/>
+            <div className={'fixed right-[5%] top-[50%] -translate-y-1/2 z-50 flex flex-col gap-2 select-none'}>
+                <div>
+                    <button onClick={() => smoothScrollId('experience')}>💼</button>
+                </div>
+                <div>
+                    <button onClick={() => smoothScrollId('education')}>🎓</button>
+                </div>
+                <div>
+                    <button onClick={() => smoothScrollId('links')}>🔗</button>
+                </div>
+                <div>
+                    <button onClick={() => smoothScrollId('files')}>📁</button>
+                </div>
+            </div>
 
             <div className={'z-30 pointer-events-none'}>
                 <motion.div
@@ -116,22 +171,105 @@ export const ScrollView = ({}) => {
                 />
 
                 <motion.div
-                    className={`fixed bottom-0 z-20 p-5`}
+                    className={`fixed bottom-0 z-50 p-5`}
                     drag
+                    dragElastic={0.1}
+                    dragConstraints={{
+                        left: 0,
+                        top: 0,
+                        right: 0,
+                        bottom: 0
+                    }}
                     ref={titleView}
                     // animate={{
                     //     opacity: [0, 1],
                     //     y: [-100, 0]
                     // }}
                 >
-                    <h1 className={`font-tabi text-center text-3xl md:text-6xl p-2`}>
-                        Darko Cejkov
-                    </h1>
+                    <BorderDiv className={'font-tabi font-bold text-center text-3xl sm:text-6xl pointer-events-auto flex flex-col flex-nowrap items-center justify-center gap-2 p-4 backdrop-blur-md rounded-md shadow-lg relative'}>
+                        <h1>
+                            Darko Cejkov
+                        </h1>
+                        <div className={'flex self-center gap-0 text-sm hover:gap-6 font-normal transition-all'}>
+
+                            {front
+                                ? (
+                                    <button onClick={() => setFront(false)} className={'bg-transparent hover:bg-slate-600/10 p-3 rounded-md group'}>
+                                        <i className="fa-solid fa-send-backward fa-xl"></i>
+
+
+                                        <span className={'text-white bg-slate-700/20 p-2 rounded-lg text-2xl group-hover:scale-100 scale-0 absolute -top-1/2 left-1/2 transition-all'}>
+                                    Send Sketch Backwards
+                                </span>
+
+                                    </button>
+
+                                )
+                                : (
+                                    <button onClick={() => setFront(true)} className={'bg-transparent hover:bg-slate-600/10 p-3 rounded-md group'}>
+                                        <i className="fa-solid fa-bring-forward fa-xl"></i>
+
+
+                                        <span className={'text-white bg-slate-700/20 p-2 rounded-lg text-2xl group-hover:scale-100 scale-0 absolute -top-1/2 left-1/2 transition-all'}>
+                                    Bring Sketch Forwards
+                                </span>
+
+                                    </button>
+
+                                )}
+
+                            <button className={'bg-transparent hover:bg-slate-600/10 p-3 rounded-md group'}>
+                                <i className="fa-solid fa-chevron-left fa-xl"></i>
+
+
+                                <span className={'text-white bg-slate-700/20 p-2 rounded-lg text-2xl group-hover:scale-100 scale-0 absolute -top-1/2 left-1/2 transition-all'}>
+                                    Previous Sketch
+                                </span>
+
+                            </button>
+
+                            {play
+                                ? (
+                                    <button onClick={() => setPlay(false)} className={'bg-transparent hover:bg-slate-600/10 p-3 rounded-md group'}>
+                                        <i className="fa-solid fa-pause fa-xl"></i>
+
+                                        <span className={'text-white bg-slate-700/20 p-2 rounded-lg text-2xl group-hover:scale-100 scale-0 absolute -top-1/2 left-1/2 transition-all'}>
+                                    Pause Sketch
+                                </span>
+                                    </button>
+                                )
+                                : (
+                                    <button onClick={() => setPlay(true)} className={'bg-transparent hover:bg-slate-600/10 p-3 rounded-md group'}>
+                                        <i className="fa-solid fa-play fa-xl"></i>
+
+                                        <span className={'text-white bg-slate-700/20 p-2 rounded-lg text-2xl group-hover:scale-100 scale-0 absolute -top-1/2 left-1/2 transition-all'}>
+                                    Play Sketch
+                                </span>
+                                    </button>
+                                )}
+
+
+
+                            {/*<button>*/}
+                            {/*    <i className="fa-solid fa-pause fa-2xl"></i>*/}
+                            {/*</button>*/}
+
+                            <button className={'bg-transparent hover:bg-slate-600/10 p-3 rounded-md group'}>
+                                <i className="fa-solid fa-chevron-right fa-xl"></i>
+
+                                <span className={'text-white bg-slate-700/20 p-2 rounded-lg text-2xl group-hover:scale-100 scale-0 absolute -top-1/2 left-1/2 transition-all'}>
+                                    Next Sketch
+                                </span>
+                            </button>
+
+                        </div>
+                    </BorderDiv>
+
                 </motion.div>
             </div>
 
 
-            <div ref={sceneRef} className='min-h-screen z-0 overflow-x-clip bg-gradient-to-b to-cyan-200 from-blue-500 flex flex-col flex-1 gap-5 pt-24 md:p-12 p-6 items-center justify-evenly select-none perspective-none'>
+            <div ref={sceneRef} className='min-h-screen z-0 overflow-x-clip bg-gradient-to-b to-cyan-200 from-blue-500 flex flex-col flex-1 gap-5 pt-24 p-12 items-center justify-evenly select-none perspective-none'>
 
                 <InfoBox sceneRef={sceneRef} id={'experience'}>
 
@@ -190,17 +328,165 @@ export const ScrollView = ({}) => {
                             <div className={'flex flex-col gap-2 mt-5'}>
                                 <h3 className={'font-aeonik font-bold'}>Description, Responsibilities, Achievements</h3>
 
-                                <TextBox className={'font-rubik font-thin'}>
-                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec justo lacus, dignissim ut sagittis a, cursus id urna. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Mauris sed ligula a ligula tristique volutpat sed nec leo. Praesent a felis at eros pellentesque aliquet. Phasellus sit amet urna cursus, cursus enim ut, commodo ligula. Ut imperdiet sit amet ligula sed vehicula. Sed egestas gravida leo, eget eleifend arcu tincidunt non. In laoreet lectus ut ex posuere, non fermentum velit dapibus. Nunc sagittis nisl dui, id egestas sem venenatis ut. Maecenas lacinia vitae erat sit amet sodales. Donec ut odio leo. Etiam imperdiet fringilla tellus, quis luctus urna fringilla eget. Duis congue neque a nibh mollis rhoncus.
+                                <TextBox className={'font-fira md:p-6 font-thin flex flex-col gap-5'}>
 
-                                    Aliquam non arcu quis neque malesuada varius. Aenean in nisl at mauris placerat molestie. Duis sem nisi, mollis vestibulum tortor quis, laoreet egestas neque. Ut felis felis, consectetur ut augue id, semper molestie ligula. Curabitur tempor enim est, sit amet sollicitudin elit malesuada ut. Nunc placerat mauris ante, vel tincidunt urna viverra ac. Fusce faucibus ornare magna, tincidunt cursus tortor accumsan at. Nam eleifend ac ex et maximus. Phasellus ultrices tortor libero, eget semper magna venenatis nec. Praesent malesuada turpis massa, eu pharetra urna dapibus ut. Vestibulum dictum mattis odio sit amet tempor. Duis viverra cursus eros in fermentum.
+                                    <div className={'tree'}>
+                                        <SubtitleRule classes={'text-xl text-center font-bold'} textPos={'center'}>
+                                            Project Lead
+                                        </SubtitleRule>
+                                        <ul>
+                                            <li>Formalized system design process through visualization methods, such as Lucidchart, incorporating the use of UML and architecture diagrams</li>
+                                            <li>Fostered novel ideas such as self-serve, utilizing subscription and billing features to promote</li>
+                                            <li>Documenting solutions, designs, ideas, packages, and software stack</li>
+                                            <li>Performed weekly and daily AGILE sprint cycles to manage project expectations, progress, and roadblocks with team of testers and managers</li>
+                                            <li>Used "nifty" project management tool to document bugs, tickets, milestones and gotcha's - and to delegate work to appropriate teammates when sprints are finished</li>
+                                            <li>Rebased Git tree for organization, and enabled the use of feature branches to work around pushing incomplete reworks and unfinished features</li>
+                                            <li>Introduced shell scripts to automate webpack build and deployment for 3 seperate deployment branches on cloud servers, which heavily reduced pull/push conflicts between other developers</li>
 
-                                    Etiam id dolor porta, bibendum dui ut, dignissim est. Cras eleifend maximus enim mattis faucibus. Nullam tincidunt pharetra porta. Duis non dolor leo. Donec accumsan sed felis sed iaculis. Donec vulputate ultrices tortor, non condimentum enim blandit a. Suspendisse quis viverra tellus. Proin ultricies gravida lorem, et euismod urna suscipit at.
+                                            <li>Performed data-driven cross-references between dependent packages and lists of known vulnerabilities to reduce the risk of future security breaches</li>
 
-                                    Aenean et dui dictum, tincidunt magna vitae, tempor quam. In facilisis vestibulum neque ac dictum. Suspendisse tempus arcu tincidunt, feugiat lacus quis, maximus urna. Duis bibendum dictum vulputate. Etiam sit amet sem id est elementum tristique vitae eu dolor. Maecenas placerat orci at metus pulvinar, ullamcorper elementum diam vulputate. Donec vulputate aliquet felis, at finibus augue facilisis eu. Ut varius nibh sagittis aliquam gravida. Donec varius, sem non egestas convallis, purus magna pellentesque neque, vitae consectetur turpis nibh non massa. Morbi consectetur rutrum facilisis. Aliquam urna metus, pharetra in purus eget, rhoncus blandit felis.
+                                            <li>Monitored and analyzed large-scale UAT beta testing with clients and upwards of 1000 concurrent users, to find large flaws in scalability, data models, and in-place solutions</li>
+                                        </ul>
 
-                                    Pellentesque non laoreet tortor, at volutpat ligula. Pellentesque sed neque lectus. Aliquam ac mattis libero. Sed venenatis arcu lorem, vel imperdiet nulla pretium at. Pellentesque ac tincidunt justo, vel viverra mi. Nulla elementum in velit sit amet ultrices. Pellentesque venenatis semper nibh eget maximus. Praesent ut ipsum ut lorem dapibus bibendum.
+                                        <div className={'text-center font-italic my-2 max-w-[50%]'}>
+                                            AGILE, design-driven, system design, UAT, security, Git, documentation, CI/CD
+                                        </div>
+                                    </div>
+
+                                    <div className={'tree'}>
+                                        <SubtitleRule classes={'text-xl text-center'} textPos={'center'}>
+                                            Frontend Development
+                                        </SubtitleRule>
+
+                                        <h2>Structure</h2>
+                                        <ul>
+                                            <li>
+                                                Developed and maintained 30+ integrated pages, components, and displays for both end-user and administrator function.
+                                            </li>
+                                            <li>
+                                                Used Classless/Functional React principles to create large component hierarchies for a wide variety of modules, such as controlled input, display, translation
+                                            </li>
+                                            <li>
+                                                Mastered react-router v5 to control Single-page Application (SPA) navigation, and display custom UI to block navigation on dirty form states
+                                            </li>
+                                            <li>
+                                                Created over 10 custom higher-order-components (HOCs) to properly motivate encapsulation and code-reusability between forms
+                                            </li>
+                                            <li>
+                                                Leveraged suspenseful loading techniques to display status of UI as well as lifecycle hooks to maximize data fetching process.
+                                            </li>
+                                            <li>
+                                                Refined the process of parent-child hierarchy for complex components by developing custom hooks to parent the logic, while passing children appropriate render functions
+                                            </li>
+                                            <li>
+                                                Innovated previous design constraints by refactoring previous solutions to evolve features into well-designed systems, with room for additional growth
+                                            </li>
+                                        </ul>
+
+                                        <h2>Style</h2>
+                                        <ul>
+                                            <li>
+                                                Elevated UI/UX with Bootstrap 5 and SCSS, as well as styled-components
+                                            </li>
+                                            <li>
+                                                Developed dynamic and responsive UI through mobile-first Bootstrap-based principles, taking into consideration dynamic user-submitted data
+                                            </li>
+                                        </ul>
+
+                                        <h2>Features</h2>
+                                        <ul>
+                                            <h3>
+                                                Real-time Chat and Messaging
+                                            </h3>
+                                            <ul>
+                                                <li>
+                                                    Enabled real-time communication between any users, facilitating WebSockets and its channels to provide all users with data as created, without requiring further database connections
+                                                </li>
+                                                <li>
+                                                    Went above and beyond the scoped rework to enable direct (private) messaging system, and relational message-to-message reply system
+                                                </li>
+                                            </ul>
+
+                                            <h3>
+                                                Voting/Polling
+                                            </h3>
+                                            <ul>
+                                                <li>
+                                                    Designed and implemented large-scale formal voting (Robert's Rules) and polling systems to capture user data while honoring the amendment and seconding process in real-time
+                                                </li>
+
+                                            </ul>
+
+                                            <h3>
+                                                Analytics & Reporting
+                                            </h3>
+                                            <ul>
+                                                <li>
+                                                    Leveraged customized Nivo charts to develop high-level real-time analytics reporting graphs, with custom D3 layers for adding event-triggered display
+                                                </li>
+                                                <li>
+                                                    Developed manual and automated custom javascript-powered CSV, PDF and JSON exports of current, and aggregated event data for client
+                                                </li>
+                                                <li>
+                                                    Utilized Ant Design to outsource difficult component work such as data tables, with full sorting, filtering, and selection ability
+                                                </li>
+                                            </ul>
+
+                                            <h3>
+                                                Reusable Form Components
+                                            </h3>
+                                            <ul>
+                                                <li>
+                                                    Refactored state-based form handlers to use
+                                                    react-hook-form to promote simple scalability, modularity, and form-based validation rules
+                                                </li>
+                                                <li>
+                                                    Forms could use basic HTML inputs, or custom external package components such as DraftJS
+                                                </li>
+                                                <li>
+                                                    Created responsive, large-scale WYSIWYG object editors with components, complete with translation forms to help users manage translations of dynamically entered content
+                                                </li>
+                                            </ul>
+
+                                            <h3>
+                                                Diverse Video/Stream Player
+                                            </h3>
+                                            <ul>
+                                                <li>
+                                                    Customized video player components using plyr.js and HLS.js to enable a wide variety of input, and especially integrating with AWS streaming with multi-channel captions
+                                                </li>
+                                            </ul>
+
+                                            <h3>
+                                                Administration
+                                            </h3>
+                                            <ul>
+                                                <li>
+                                                    Drove large quality-of-life updates by creating administration dashboard for site admins to view site-wide information, such as the number of active users, CPU performance, and simple graphical views of activity per webpage
+                                                </li>
+                                            </ul>
+
+                                        </ul>
+
+                                        <h2>Accessibility & Internationalization</h2>
+                                        <ul>
+                                            <li>
+                                                Integrated i18n for multilingual translations, with site-wide support for a11y principles for accessibility
+                                            </li>
+                                            <li>
+                                                Simplified the headache of timezone translation by using moment.js to handle all datetime data
+                                            </li>
+                                        </ul>
+
+                                        <div className={'text-center font-italic my-2'}>
+                                            React, stateless, components, lifecycle hooks, parent-child hierarchy, encapsulation, modularity, react-hook-form, form validation, draftjs, Bootstrap, SPA, HOC, Ant Design, Nivo, D3, Plyr, HLS, WebSockets, Responsive, Mobile-first, Analytics, Dashboards, a11y, CI/CD
+                                        </div>
+                                    </div>
+
+
                                 </TextBox>
+
+                                {/*<Accordion data={vvcDescription} />*/}
 
                             </div>
 
@@ -238,16 +524,44 @@ export const ScrollView = ({}) => {
                                 <div className={'flex flex-col gap-2 mt-5'}>
                                     <h3 className={'font-aeonik font-bold'}>Description, Responsibilities, Achievements</h3>
 
-                                    <TextBox className={'font-rubik font-thin'}>
-                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec justo lacus, dignissim ut sagittis a, cursus id urna. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Mauris sed ligula a ligula tristique volutpat sed nec leo. Praesent a felis at eros pellentesque aliquet. Phasellus sit amet urna cursus, cursus enim ut, commodo ligula. Ut imperdiet sit amet ligula sed vehicula. Sed egestas gravida leo, eget eleifend arcu tincidunt non. In laoreet lectus ut ex posuere, non fermentum velit dapibus. Nunc sagittis nisl dui, id egestas sem venenatis ut. Maecenas lacinia vitae erat sit amet sodales. Donec ut odio leo. Etiam imperdiet fringilla tellus, quis luctus urna fringilla eget. Duis congue neque a nibh mollis rhoncus.
+                                    <TextBox className={'font-fira font-thin p-3 flex flex-col gap-5'}>
+                                        <div className={'tree'}>
+                                            <SubtitleRule classes={'text-xl text-center'} textPos={'center'}>
+                                                Teamwork
+                                            </SubtitleRule>
+                                            <ul>
+                                                <li>Collaborated within a large 20+ person team to shadow, learn, and apply hands-on knowledge of Salesforce Marketing Cloud</li>
+                                                <li>Trained as a Ranger, preparing and advising other interns for Salesforce Adminstrator certifications</li>
+                                            </ul>
+                                        </div>
 
-                                        Aliquam non arcu quis neque malesuada varius. Aenean in nisl at mauris placerat molestie. Duis sem nisi, mollis vestibulum tortor quis, laoreet egestas neque. Ut felis felis, consectetur ut augue id, semper molestie ligula. Curabitur tempor enim est, sit amet sollicitudin elit malesuada ut. Nunc placerat mauris ante, vel tincidunt urna viverra ac. Fusce faucibus ornare magna, tincidunt cursus tortor accumsan at. Nam eleifend ac ex et maximus. Phasellus ultrices tortor libero, eget semper magna venenatis nec. Praesent malesuada turpis massa, eu pharetra urna dapibus ut. Vestibulum dictum mattis odio sit amet tempor. Duis viverra cursus eros in fermentum.
+                                        <div className={'tree'}>
+                                            <SubtitleRule classes={'text-xl text-center'} textPos={'center'}>
+                                                Core Salesforce
+                                            </SubtitleRule>
+                                            <ul>
+                                                <li>Trained in SOQL language to perform object-model queries</li>
+                                                <li>Trained in the APEX object-oriented language to perform Salesforce object manipulation</li>
+                                            </ul>
+                                        </div>
 
-                                        Etiam id dolor porta, bibendum dui ut, dignissim est. Cras eleifend maximus enim mattis faucibus. Nullam tincidunt pharetra porta. Duis non dolor leo. Donec accumsan sed felis sed iaculis. Donec vulputate ultrices tortor, non condimentum enim blandit a. Suspendisse quis viverra tellus. Proin ultricies gravida lorem, et euismod urna suscipit at.
+                                        <div className={'tree'}>
+                                            <SubtitleRule classes={'text-xl text-center'} textPos={'center'}>
+                                                Salesforce Marketing Cloud
+                                            </SubtitleRule>
+                                            <ul>
+                                                <li>Learnt of important legal marketing constraints such as the GDPR and the various tasks to fulfill the requirements</li>
+                                                <li>Learnt and utilized AMPScript as a templating language within emails and webpages to personalize through referential data</li>
+                                                <li>Used HTML, JavaScript, AMPScript, and CSS to create responsive communication preference centers</li>
+                                                <li>Developed UAT scripts for clients based on the theoretical outputs of AMPScript and overall marketing Journey flows</li>
+                                                <li>Trained clients in user-handoff in areas such as the concepts of AMPScript</li>
+                                            </ul>
+                                        </div>
 
-                                        Aenean et dui dictum, tincidunt magna vitae, tempor quam. In facilisis vestibulum neque ac dictum. Suspendisse tempus arcu tincidunt, feugiat lacus quis, maximus urna. Duis bibendum dictum vulputate. Etiam sit amet sem id est elementum tristique vitae eu dolor. Maecenas placerat orci at metus pulvinar, ullamcorper elementum diam vulputate. Donec vulputate aliquet felis, at finibus augue facilisis eu. Ut varius nibh sagittis aliquam gravida. Donec varius, sem non egestas convallis, purus magna pellentesque neque, vitae consectetur turpis nibh non massa. Morbi consectetur rutrum facilisis. Aliquam urna metus, pharetra in purus eget, rhoncus blandit felis.
+                                        <div className={'text-center font-italic my-2'}>
+                                            Apex, SOQL, AMPScript, HTML, JS, CSS, Marketing Automation, Marketing Journeys, GDPR
+                                        </div>
 
-                                        Pellentesque non laoreet tortor, at volutpat ligula. Pellentesque sed neque lectus. Aliquam ac mattis libero. Sed venenatis arcu lorem, vel imperdiet nulla pretium at. Pellentesque ac tincidunt justo, vel viverra mi. Nulla elementum in velit sit amet ultrices. Pellentesque venenatis semper nibh eget maximus. Praesent ut ipsum ut lorem dapibus bibendum.
                                     </TextBox>
 
                                 </div>
@@ -371,7 +685,7 @@ export const ScrollView = ({}) => {
                         Links
                     </TitleRule>
 
-                    <div className={'h-fit mt-2 flex gap-12 md:flex-nowrap flex-wrap relative'}>
+                    <div className={'h-fit mt-2 flex gap-12 lg:flex-nowrap justify-center items-center flex-wrap relative'}>
 
                         {links.map((x, i) => {
                             return(
@@ -393,7 +707,7 @@ export const ScrollView = ({}) => {
                     {/*<h2 className="md:text-4xl text-2xl font-tabi">*/}
                     {/*    Links*/}
                     {/*</h2>*/}
-                    <SubtitleRule textPos={'right'} classes={'md:text-4xl text-2xl font-tabi'}>
+                    <SubtitleRule textPos={'left'} classes={'md:text-4xl text-2xl font-tabi'}>
                         Files
                     </SubtitleRule>
 
@@ -423,23 +737,10 @@ export const ScrollView = ({}) => {
 
                 </InfoBox>
 
-                <div className={'md:hidden mb-24'}/>
+                <div className={'mb-24'}/>
             </div>
 
-            <div className={'fixed right-[10%] top-[50%] -translate-y-1/2 z-20 flex flex-col gap-2 select-none'}>
-                <div>
-                    <button onClick={() => smoothScrollId('experience')}>💼</button>
-                </div>
-                <div>
-                    <button onClick={() => smoothScrollId('education')}>🎓</button>
-                </div>
-                <div>
-                    <button onClick={() => smoothScrollId('links')}>🔗</button>
-                </div>
-                <div>
-                    <button onClick={() => smoothScrollId('files')}>📁</button>
-                </div>
-            </div>
+
         </>
     )
 }

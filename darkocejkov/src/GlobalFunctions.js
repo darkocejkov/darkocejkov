@@ -116,3 +116,16 @@ export const hasScrollLeft = (elem) => {
 export const maxScrollLeft = (elem) => {
    return elem.scrollWidth - elem.clientWidth
 }
+
+const icons = [
+    'bolt',
+    'grid-2',
+    'circle-xmark',
+    'heart',
+    'circle-half-stroke',
+    'folder',
+    'plus',
+    'minus',
+    'terminal',
+    'cube',
+]

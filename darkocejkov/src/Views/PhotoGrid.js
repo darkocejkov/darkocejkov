@@ -189,7 +189,7 @@ export const PhotoGrid = () => {
     // TM5M2C6AKD5QlcSrJ8JLFWnmKtESXHgb8gHNQmsa
     //      ex:  https://api.nasa.gov/planetary/apod?api_key=TM5M2C6AKD5QlcSrJ8JLFWnmKtESXHgb8gHNQmsa
     const getPhotos = async () => {
-        await axios.get(`https://api.nasa.gov/planetary/apod?count=10&api_key=TM5M2C6AKD5QlcSrJ8JLFWnmKtESXHgb8gHNQmsa`)
+        await axios.get(`https://api.nasa.gov/planetary/apod?count=100&api_key=TM5M2C6AKD5QlcSrJ8JLFWnmKtESXHgb8gHNQmsa`)
             .then(data => {
                 console.log(`getPhotos: `, data)
                 setPhotoData(data.data)
@@ -201,7 +201,7 @@ export const PhotoGrid = () => {
 
     useEffect(() => {
         // getPhotos()
-        console.log(photos)
+        // console.log(photos)
     }, [])
 
     return(
