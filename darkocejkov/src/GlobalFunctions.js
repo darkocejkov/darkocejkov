@@ -82,3 +82,37 @@ export function humanFileSize(bytes, si=false, dp=1) {
 
     return bytes.toFixed(dp) + ' ' + units[u];
 }
+
+function isInViewport(element) {
+    const rect = element.getBoundingClientRect();
+    return (
+        rect.top >= 0 &&
+        rect.left >= 0 &&
+        rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+        rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+    );
+}
+
+const isVisible = function (ele, container) {
+    const eleTop = ele.offsetTop;
+    const eleBottom = eleTop + ele.clientHeight;
+
+    const containerTop = container.scrollTop;
+    const containerBottom = containerTop + container.clientHeight;
+
+    // The element is fully visible in the container
+    return (
+        (eleTop >= containerTop && eleBottom <= containerBottom) ||
+        // Some part of the element is visible in the container
+        (eleTop < containerTop && containerTop < eleBottom) ||
+        (eleTop < containerBottom && containerBottom < eleBottom)
+    );
+};
+
+export const hasScrollLeft = (elem) => {
+    return !!elem.scrollLeft
+}
+
+export const maxScrollLeft = (elem) => {
+   return elem.scrollWidth - elem.clientWidth
+}

@@ -1,6 +1,7 @@
 import React, {Suspense, useEffect, useRef, useState} from 'react'
-import {useInView, motion} from "framer-motion";
+import {useInView, motion, useScroll, useDragControls, useMotionValueEvent, useTransform} from "framer-motion";
 import {byteSized, getFileInfo, humanFileSize, mimeType} from "../GlobalFunctions";
+import {useDragScroll} from "../Hooks/CustomHooks";
 export const TitleLetters = ({title}) => {
 
     let array = []
@@ -111,37 +112,218 @@ export const Spinner = () => {
     )
 }
 
-
-export const InfoBox = ({id, children, classes}) => {
-
-    const ref = useRef()
-    const inView = useInView(ref)
-
+export const TextBox = ({children, className = ''}) => {
     return(
-        <div ref={ref} id={id}
-             style={{
-                 opacity: inView ? 1 : 0,
-                 transform: inView ? "none" : "translateY(-200px)",
-                 filter: inView ? 'blur(0px)' : 'blur(5px)',
-                 transition: 'all 0.5s ease-in-out 0.2s'
-             }}
-             className={`info-box p-5 md:max-w-[80%] max-w-full rounded-lg shadow ${classes}`}>
+        <div className={`bg-slate-900/10 max-h-[50vh] overflow-y-auto p-4 vertical-fade ${className}`}>
             {children}
         </div>
     )
 }
 
-export const StatBox = ({title, stat}) => {
+export const InfoBox = ({id, children, classes = '', sceneRef}) => {
+
+    const ref = useRef()
+    const inView = useInView(ref)
+
+    // const {scrollYProgress} = useScroll({
+    //     target: ref,
+    //     offset: ["end end", "start start"]
+    // })
+
+    const dragControls = useDragControls()
+
+    function startDrag(event) {
+        console.log(event)
+        dragControls.start(event, { snapToCursor: true })
+    }
+
+    return(
+        <motion.div ref={ref} id={id}
+                // drag
+                dragElastic={0.15}
+                    whileDrag={{
+                        backgroundColor: 'rgba(7, 89, 133, 0.1)'
+                        // backgroundColor: 'rgba(255,255,255,0.1)'
+                        // className: `bg-slate-900/30`
+                        // scale: 1.05
+                    }}
+                    dragControls={dragControls}
+                // dragListener={false}
+                    // dragConstraints={sceneRef}
+                dragConstraints={{
+                    left: 0,
+                    right: 0,
+                    top: 0,
+                    bottom: 0
+                }}
+                animate={{
+                    opacity: inView ? 1 : 0,
+                    translateX: inView ? '0px' : '-200px',
+                    rotateZ: inView ? '0deg' : '12deg',
+                    // transitionDelay: '0.1s'
+                }}
+                style={{
+                    // transform: inView ? "none" : "translateX(-200px) rotate3d(1,1,1, 12deg)",
+                    filter: inView ? 'blur(0px)' : 'blur(5px)',
+                }}
+                transition={{ type: 'spring' }}
+                className={`info-box p-5 relative md:max-w-[80%] origin-center max-w-full rounded-lg shadow ${classes}`}>
+            {children}
+
+
+            <div className={'absolute right-1 top-0 p-2'} onPointerDown={startDrag}>
+                <i className="fa-solid fa-grip-dots"></i>
+            </div>
+        </motion.div>
+
+    )
+}
+
+export const BoxCarousel = ({children, className, id}) => {
+
+    const carouselRef = useRef()
+
+    const scrollLeft = () => {
+        if(carouselRef.current){
+            carouselRef.current.scrollBy({
+                left: -150,
+                behavior: 'smooth'
+            })
+        }
+    }
+
+    const scrollRight = () => {
+        if(carouselRef.current){
+            carouselRef.current.scrollBy({
+                left: 150,
+                behavior: 'smooth'
+            })
+        }
+    }
+
+
+    const {scrollXProgress, scrollX} = useScroll({container: carouselRef})
+
+    const [showL, setShowL] = useState(false)
+    const [showR, setShowR] = useState(true)
+
+    useMotionValueEvent(scrollXProgress, 'change', (latest) => {
+        // console.log(`[scrollXProgress]`, latest)
+
+
+
+        if((latest >= 1 || (1 - latest <= 1/100)) && showR === true){
+            setShowR(false)
+        }else if(showR === false){
+            setShowR(true)
+        }
+
+        if(latest === 0 && showL === true){
+            setShowL(false)
+        }else if(showL === false){
+            setShowL(true)
+        }
+
+    })
+
+    const {mouseDownHandler, hasScroll} = useDragScroll({container: carouselRef, id})
+
+    useEffect(() => {
+        console.log(`[carousel] ${id} hasScroll: `, hasScroll)
+
+        if(hasScroll === false){
+            setShowL(false)
+            setShowR(false)
+        }
+    }, [hasScroll])
+
+    return(
+
+            <div className={`flex flex-nowrap justify-center gap-3 relative ${className ? className : ''}`}>
+
+                <motion.div
+                    animate={{
+                        opacity: hasScroll === false ? 0 : 1,
+                    }}
+                    className={'absolute alien-gradient -top-[5px] rounded-sm gr left-0 w-full h-[2px]'}
+                    style={{
+                        scaleX: scrollXProgress
+                    }}
+                />
+
+
+                {/*absolute left-0 bottom-0*/}
+                <motion.button
+                    animate={{
+                        opacity: showL === true ? 1 : 0,
+                        translateX: showL === true ? '0%' : '-20%'
+                    }}
+                    transition={{ type: 'spring' }}
+                    className={`bg-slate-900/20 p-2 rounded-full`}
+                    onClick={() => scrollLeft()}>
+                    <i className="fa-solid fa-chevron-left "></i>
+                </motion.button>
+
+                <motion.div
+                    // animate={{
+                    //     borderRadius:  showL === false || showR === false ? '10%' : '20%'
+                    // }}
+                    onMouseDown={mouseDownHandler} id={id} ref={carouselRef} className={'rounded-xl scrollbar-none flex overflow-x-auto flex-nowrap gap-2'}>
+                    {children}
+                </motion.div>
+
+                {/*absolute right-0 bottom-0*/}
+                {/*{scrollXProgress < 1 &&*/}
+                    <motion.button
+                        animate={{
+                            opacity: showR === true ? 1 : 0,
+                            translateX: showR === true ? '0%' : '20%'
+                        }}
+                        transition={{ type: 'spring' }}
+                        className={`bg-slate-900/20 p-2 rounded-full`} onClick={() => scrollRight()}>
+                        <i className="fa-solid fa-chevron-right"></i>
+                    </motion.button>
+                {/*}*/}
+
+
+
+            </div>
+
+
+    )
+}
+
+export const CardBox = ({children, className}) => {
 
     return(
         <motion.div
             animate={{
-                opacity: [0, 1]
+                opacity: [0, 1],
             }}
-            className={'flex flex-col h-full items-center bg-slate-700/10 p-2 rounded-xl'}
+            className={`flex flex-col h-full items-center justify-center bg-slate-700/10 md:p-2 p-1 rounded-xl ${className ? className : ''}`}
         >
-            <h4 className={'font-bold md:text-xl text-sm overflow-y-auto'}>{title}</h4>
-            <p className={'italic'}>{stat}</p>
+            {children}
+        </motion.div>
+    )
+
+}
+
+export const StatBox = ({title, stat, children, className}) => {
+
+    return(
+        <motion.div
+            animate={{
+                opacity: [0, 1],
+            }}
+            className={`flex flex-col h-full items-center bg-slate-700/10 p-2 rounded-xl ${className ? className : ''}`}
+        >
+            {children}
+            {title &&
+                <h4 className={'font-bold md:text-xl md:whitespace-nowrap text-sm overflow-y-auto text-center'}>{title}</h4>
+            }
+            {stat &&
+                <p className={'italic'}>{stat}</p>
+            }
         </motion.div>
     )
 }
@@ -156,7 +338,9 @@ export const Link = ({url, children, className}) => {
 
     return(
         <a target={"_blank"} className={`hover:underline z-20  ${className ? className : 'text-xl font-rubik normal-case'}`} href={url}>
-            {children}
+            {children
+                ? (children)
+                : (url?.split('/')[2])}
             {isExternalLink(url) &&
                 <i className="fa-solid fa-square-arrow-up-right ml-2"></i>
             }
@@ -168,11 +352,19 @@ export const CustomLink = ({url, children, className}) => {
 
     // link-background
     return(
-        <a target={"_blank"} className={`p-2 hover:scale-125 hover:rotate-2  rounded-sm link-background bg-gradient-to-b from-amber-400 to-amber-400 z-20  ${className ? className : 'text-xl font-rubik normal-case'}`} href={url}>
+        <a target={"_blank"} tabIndex={0} className={`p-2 hover:scale-125 hover:rotate-2  rounded-sm link-background bg-gradient-to-b from-amber-400 to-amber-400 z-20  ${className ? className : 'text-xl font-rubik normal-case'}`} href={url}>
             {children}
             {isExternalLink(url) &&
                 <i className="fa-solid fa-square-arrow-up-right ml-2 fa-xs"></i>
             }
+        </a>
+    )
+}
+
+export const FunLink = ({url, className}) => {
+    return(
+        <a href={url} className={`p-2 flex link-background-to-r rounded-sm bg-gradient-to-r from-amber-400 to-amber-400 z-20  ${className ? className : 'text-xl font-rubik normal-case'}`}>
+            {url && url.split('/')[2]}
         </a>
     )
 }
@@ -191,9 +383,9 @@ export const MenuWrapper = ({children, items = [], open = false}) => {
 
     const [show, setShow] = useState(false)
 
-    useEffect(() => {
-        console.log(items)
-    }, [])
+    // useEffect(() => {
+    //     console.log(items)
+    // }, [])
 
     return(
         <div className={'relative'} onClick={() => setShow(!show)} onMouseLeave={() => setShow(false)}>
@@ -261,6 +453,16 @@ const MenuItem = ({label, onEffect, onClick, file}) => {
 
 }
 
+export const FlexList = ({items}) => {
+
+    return(
+        <div className={'flex flex-wrap flex-1 gap-2 mt-2 font-aeonik'}>
+
+        </div>
+    )
+
+}
+
 export const TitleRule = ({children, classes, ruleClass}) => {
 
     return(
@@ -299,6 +501,8 @@ export const SubtitleRule = ({children, classes, ruleClass, textPos = 'left'}) =
         </h3>
     )
 }
+
+
 
 export const Tooltip = ({children}) => {
 

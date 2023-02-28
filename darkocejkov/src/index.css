@@ -335,6 +335,15 @@
     z-index: 10;
     scroll-behavior: smooth;
   }
+
+  .horizontal-fade{
+    -webkit-mask-image: -webkit-linear-gradient(0deg, rgba(0,0,0,0) 0%, rgba(2,0,0,1) 2%, rgba(0,0,0,1) 98%, rgba(20,0,0,0) 100%);
+  }
+
+  .vertical-fade{
+    -webkit-mask-image: -webkit-linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(2,0,0,1) 5%, rgba(0,0,0,1) 95%, rgba(20,0,0,0) 100%);
+  }
+
 }
 
 @keyframes fade-in-top{
@@ -596,6 +605,10 @@ button > .button-download:hover{
   background-position: 50% 100px;
 }
 
+.scrollbar-none::-webkit-scrollbar{
+  display: none;
+}
+
 .link-background-to-r{
   background-position: 0 0;
   background-repeat: repeat-y;
@@ -620,6 +633,14 @@ button > .button-download:hover{
 
 .link-background:hover{
   background-size: 4px 100%;
+}
+
+.perspective-lg{
+  perspective: 800px;
+}
+
+.perspective-none{
+  perspective: none;
 }
 
 ::-webkit-scrollbar {

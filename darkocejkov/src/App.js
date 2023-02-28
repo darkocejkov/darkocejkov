@@ -52,7 +52,7 @@ function App() {
 
 				<div className={'flex flex-col p-2 gap-2'}>
 
-					<div className={'rounded-xl overflow-hidden backdrop-blur-sm p-2 bg-slate-900/70 text-white flex justify-center lg:items-center uppercase'}>
+					<div className={'rounded-xl overflow-hidden backdrop-blur-sm p-1 bg-slate-900/70 text-white flex justify-center lg:items-center uppercase'}>
 
 						<Marquee gradient={false} className={'flex gap-5'}>
 							<div className={'flex gap-5'}>
@@ -81,19 +81,19 @@ function App() {
 
 						<div className={'w-fit flex gap-4 flex-col font-maru pointer-events-auto'}>
 
-							<LabelledButton dir={'right'} active={view === 0} onClick={() => setView(0)} label={'Scroll Design'}>
+							<LabelledButton dir={'right'} tabIndex={1} active={view === 0} onClick={() => setView(0)} label={'Scroll Design'}>
 								<small>0</small>
 							</LabelledButton>
-							<LabelledButton dir={'right'} active={view === 1} onClick={() => setView(1)} label={'Original Design'}>
+							<LabelledButton dir={'right'} tabIndex={1} active={view === 1} onClick={() => setView(1)} label={'Original Design'}>
 								<small>1</small>
 							</LabelledButton>
-							<LabelledButton dir={'right'} active={view === 2} onClick={() => setView(2)} label={'Image Grid'}>
+							<LabelledButton dir={'right'} tabIndex={1} active={view === 2} onClick={() => setView(2)} label={'Image Grid'}>
 								<small>2</small>
 							</LabelledButton>
-							<LabelledButton dir={'right'} active={view === 3} onClick={() => setView(3)} label={'Reference Sheet'}>
+							<LabelledButton dir={'right'} tabIndex={1} active={view === 3} onClick={() => setView(3)} label={'Reference Sheet'}>
 								<small>3</small>
 							</LabelledButton>
-							{/*<LabelledButton dir={'right'} active={view === 3} onClick={() => setView(3)} label={'Original'}>*/}
+							{/*<LabelledButton dir={'right'} tabIndex=1 active={view === 3} onClick={() => setView(3)} label={'Original'}>*/}
 							{/*	<small>3</small>*/}
 							{/*</LabelledButton>*/}
 
@@ -132,7 +132,7 @@ function App() {
 				<div className='h-screen w-screen fixed top-0 bg-gradient-to-r from-cyan-500 to-blue-500'>
 
 					{hideBg === false &&
-						<Background play={playing} hide={hideBg} showFront={showFront}/>
+						<Background play={playing} hide={hideBg} showFront={showFront} className={'height-minus-nav'}/>
 					}
 
 					<BrowserRouter>

@@ -8,17 +8,18 @@ import {
     useMotionValueEvent,
     useMotionValue,
     useSpring,
-    useTime
+    useTime, useVelocity
 } from "framer-motion";
 import {downloadFile, getFileInfo, smoothScrollId} from "../GlobalFunctions";
 import Background from "../Components/Background";
 import {
+    BoxCarousel, CardBox,
     CustomButton,
     CustomLink,
-    FillLink,
+    FillLink, FunLink,
     InfoBox,
     Link, MenuWrapper,
-    StatBox, SubtitleRule,
+    StatBox, SubtitleRule, TextBox,
     TitleLetters,
     TitleRule,
     Tooltip,
@@ -29,6 +30,12 @@ import Marquee from "react-fast-marquee";
 const minResume = require('../assets/files/V3 MIN Darko Cejkov Fullstack Developer 2023.pdf')
 const resume = require('../assets/files/V3 Darko Cejkov Fullstack Developer 2023.pdf')
 
+const springSettings = {
+    stiffness: 30,
+    damping: 50,
+    restDelta: 0.001
+}
+
 export const ScrollView = ({}) => {
 
     const {scrollYProgress, scrollY} = useScroll()
@@ -37,27 +44,16 @@ export const ScrollView = ({}) => {
 
     const titleView = useRef()
 
-    const eduY = useTransform(scrollYProgress, [0, 1], ['0vh','80vh'], {clamp: false})
-    const eduX = useTransform(scrollYProgress, [0, .25,.5, .75, 1], ['0vw','12vw','15vw','12vw','0vw'], {clamp: false})
-    const eduScale = useTransform(scrollYProgress, [0, .5, 1], [1, .7, 1], {clamp: false})
-
-    const expY = useTransform(scrollYProgress, [0, 1], ['10vh','70vh'], {clamp: false})
-    const expX = useTransform(scrollYProgress, [0, .25,.5, .75, 1], ['0vw','7vw','10vw','7vw','0vw'], {clamp: false})
-    const expScale = useTransform(scrollYProgress, [0, .5, 1], [1, .8, 1], {clamp: false})
-
-    const linY = useTransform(scrollYProgress, [0, 1], ['20vh','60vh'], {clamp: false})
-    const linX = useTransform(scrollYProgress, [0, .25,.5, .75, 1], ['0vw','2vw','5vw','2vw','0vw'], {clamp: false})
-    const linScale = useTransform(scrollYProgress, [0, .5, 1], [1, .9, 1], {clamp: false})
-
-    const fileY = useTransform(scrollYProgress, [0, 1], ['30vh','50vh'], {clamp: false})
-    const fileX = useTransform(scrollYProgress, [0, .25,.5, .75, 1], ['0vw','0vw','0vw','0vw','0vw'], {clamp: false})
-    const fileScale = useTransform(scrollYProgress, [0, .5, 1], [1, 1, 1], {clamp: false})
+    // const bottomProgress = useSpring(useTransform(scrollYProgress, [0, .3], [0, 1]), springSettings)
+    // const sideProgress = useSpring(useTransform(scrollYProgress, [.3, .6], [0, 1]), springSettings)
+    // const topProgress = useSpring(useTransform(scrollYProgress, [.6, 1], [0, 1]), springSettings)
 
     const bottomProgress = useTransform(scrollYProgress, [0, .3], [0, 1])
     const sideProgress = useTransform(scrollYProgress, [.3, .6], [0, 1])
     const topProgress = useTransform(scrollYProgress, [.6, 1], [0, 1])
 
-    const [activeLink, setActiveLink] = useState(0)
+    const scrollVelocity = useVelocity(scrollY)
+    const scrollDirection = useRef(1)
 
     const links = [
         {label: 'GitHub', link: 'https://github.com/darkocejkov'},
@@ -72,15 +68,21 @@ export const ScrollView = ({}) => {
         ]}
     ]
 
-    useEffect(() => {
+    const sections = [
+        {
+            id: "experience",
+            label: "Experience",
 
-    }, [])
+        },
+    ]
+
+    const sceneRef = useRef()
 
     return(
 
         <>
 
-            <Background showFront={false} blind={blind}/>
+            <Background showFront={false} blind={blind} className={'h-screen'}/>
 
             <div className={'z-30 pointer-events-none'}>
                 <motion.div
@@ -102,6 +104,7 @@ export const ScrollView = ({}) => {
 
                 <motion.div
                     className={'fixed bg-orange-500 h-[5px] top-0 left-0 z-20 w-[50vw] origin-left'}
+                    transition={{type: 'spring'}}
                     // className={'progress-bar'}
                     style={{ scaleX: topProgress }}
                 />
@@ -114,28 +117,154 @@ export const ScrollView = ({}) => {
 
                 <motion.div
                     className={`fixed bottom-0 z-20 p-5`}
+                    drag
                     ref={titleView}
-                    animate={{
-                        opacity: [0, 1],
-                        y: [-100, 0]
-                    }}
+                    // animate={{
+                    //     opacity: [0, 1],
+                    //     y: [-100, 0]
+                    // }}
                 >
-                    <h1 className={`font-tabi text-center text-6xl`}>
+                    <h1 className={`font-tabi text-center text-3xl md:text-6xl p-2`}>
                         Darko Cejkov
                     </h1>
                 </motion.div>
             </div>
 
 
-            <div className='min-h-screen z-0 overflow-x-clip bg-gradient-to-b to-cyan-200 from-blue-500 flex flex-col flex-1 gap-5 pt-24 md:p-12 p-6 items-center justify-evenly select-none'>
+            <div ref={sceneRef} className='min-h-screen z-0 overflow-x-clip bg-gradient-to-b to-cyan-200 from-blue-500 flex flex-col flex-1 gap-5 pt-24 md:p-12 p-6 items-center justify-evenly select-none perspective-none'>
+
+                <InfoBox sceneRef={sceneRef} id={'experience'}>
+
+                    <div className={'flex flex-col gap-3'}>
+                        <div>
+                            <TooltipWrapper fit tooltip={
+                                // <FunLink url={'https://www.vvc.ca'} />
+                                <Link url={'https://www.vvc.ca'} />
+                            }>
+                                <h2 className="md:text-4xl text-2xl font-tabi">
+                                    Van Valkenburg Communications (VVC)
+                                </h2>
+                                <SubtitleRule textPos={'right'} classes={'md:text-2xl text-xl font-maru font-bold uppercase'}>
+                                    Fullstack Developer
+                                    <div className={`lg:flex-1 w-full h-[1px] bg-slate-900 self-center`} />
+                                    April 2021 - March 2023
+                                </SubtitleRule>
+                                {/*<TitleRule classes={'md:text-2xl text-xl font-maru font-bold uppercase'}>*/}
+                                {/*    April 2021 - Present*/}
+                                {/*</TitleRule>*/}
+                            </TooltipWrapper>
+
+                            <div className={'flex flex-wrap gap-2'}>
+                                <div className={'w-full lg:w-[49%]'}>
+                                    <h3 className={'font-aeonik font-bold text-center'}>Front-end Technologies</h3>
+                                    <BoxCarousel className={'mt-2 font-aeonik'} id={'frontend'}>
+                                        <CardBox className={'whitespace-nowrap snap-center '}>React.js</CardBox>
+
+                                        <CardBox className={'whitespace-nowrap snap-center'}>Bootstrap 5</CardBox>
+                                        <CardBox className={'whitespace-nowrap snap-center'}>Nivo + D3</CardBox>
+                                        <CardBox className={'whitespace-nowrap snap-center'}>Draft.js</CardBox>
+                                        <CardBox className={'whitespace-nowrap snap-center'}>Ant Design</CardBox>
+
+                                        <CardBox className={'whitespace-nowrap snap-center'}>react-router</CardBox>
+                                        <CardBox className={'whitespace-nowrap snap-center'}>react-hook-form</CardBox>
+                                        <CardBox className={'whitespace-nowrap snap-center'}>react-select</CardBox>
+                                        <CardBox className={'whitespace-nowrap snap-center'}>plyr.js</CardBox>
+                                        <CardBox className={'whitespace-nowrap snap-center'}>HLS.js</CardBox>
+                                    </BoxCarousel>
+                                </div>
+
+                                <div className={'w-full lg:w-[49%]'} >
+                                    <h3 className={'font-aeonik font-bold text-center'}>Back-end Technologies</h3>
+                                    <BoxCarousel className={'mt-2 font-aeonik'} id={'backend'}>
+                                        <CardBox className={'whitespace-nowrap snap-center '}>Node.js</CardBox>
+                                        <CardBox className={'whitespace-nowrap snap-center'}>Redis</CardBox>
+                                        <CardBox className={'whitespace-nowrap snap-center'}>Node.js</CardBox>
+                                        <CardBox className={'whitespace-nowrap snap-center'}>Express.js</CardBox>
+                                        <CardBox className={'whitespace-nowrap snap-center'}>Passport.js</CardBox>
+                                        <CardBox className={'whitespace-nowrap snap-center'}>WebSockets</CardBox>
+                                        <CardBox className={'whitespace-nowrap snap-center'}>Redis</CardBox>
+                                    </BoxCarousel>
+                                </div>
+                            </div>
+
+                            <div className={'flex flex-col gap-2 mt-5'}>
+                                <h3 className={'font-aeonik font-bold'}>Description, Responsibilities, Achievements</h3>
+
+                                <TextBox className={'font-rubik font-thin'}>
+                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec justo lacus, dignissim ut sagittis a, cursus id urna. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Mauris sed ligula a ligula tristique volutpat sed nec leo. Praesent a felis at eros pellentesque aliquet. Phasellus sit amet urna cursus, cursus enim ut, commodo ligula. Ut imperdiet sit amet ligula sed vehicula. Sed egestas gravida leo, eget eleifend arcu tincidunt non. In laoreet lectus ut ex posuere, non fermentum velit dapibus. Nunc sagittis nisl dui, id egestas sem venenatis ut. Maecenas lacinia vitae erat sit amet sodales. Donec ut odio leo. Etiam imperdiet fringilla tellus, quis luctus urna fringilla eget. Duis congue neque a nibh mollis rhoncus.
+
+                                    Aliquam non arcu quis neque malesuada varius. Aenean in nisl at mauris placerat molestie. Duis sem nisi, mollis vestibulum tortor quis, laoreet egestas neque. Ut felis felis, consectetur ut augue id, semper molestie ligula. Curabitur tempor enim est, sit amet sollicitudin elit malesuada ut. Nunc placerat mauris ante, vel tincidunt urna viverra ac. Fusce faucibus ornare magna, tincidunt cursus tortor accumsan at. Nam eleifend ac ex et maximus. Phasellus ultrices tortor libero, eget semper magna venenatis nec. Praesent malesuada turpis massa, eu pharetra urna dapibus ut. Vestibulum dictum mattis odio sit amet tempor. Duis viverra cursus eros in fermentum.
+
+                                    Etiam id dolor porta, bibendum dui ut, dignissim est. Cras eleifend maximus enim mattis faucibus. Nullam tincidunt pharetra porta. Duis non dolor leo. Donec accumsan sed felis sed iaculis. Donec vulputate ultrices tortor, non condimentum enim blandit a. Suspendisse quis viverra tellus. Proin ultricies gravida lorem, et euismod urna suscipit at.
+
+                                    Aenean et dui dictum, tincidunt magna vitae, tempor quam. In facilisis vestibulum neque ac dictum. Suspendisse tempus arcu tincidunt, feugiat lacus quis, maximus urna. Duis bibendum dictum vulputate. Etiam sit amet sem id est elementum tristique vitae eu dolor. Maecenas placerat orci at metus pulvinar, ullamcorper elementum diam vulputate. Donec vulputate aliquet felis, at finibus augue facilisis eu. Ut varius nibh sagittis aliquam gravida. Donec varius, sem non egestas convallis, purus magna pellentesque neque, vitae consectetur turpis nibh non massa. Morbi consectetur rutrum facilisis. Aliquam urna metus, pharetra in purus eget, rhoncus blandit felis.
+
+                                    Pellentesque non laoreet tortor, at volutpat ligula. Pellentesque sed neque lectus. Aliquam ac mattis libero. Sed venenatis arcu lorem, vel imperdiet nulla pretium at. Pellentesque ac tincidunt justo, vel viverra mi. Nulla elementum in velit sit amet ultrices. Pellentesque venenatis semper nibh eget maximus. Praesent ut ipsum ut lorem dapibus bibendum.
+                                </TextBox>
+
+                            </div>
+
+                        </div>
+
+                        <div className={'flex flex-col gap-3'}>
+                            <div>
+                                <TooltipWrapper fit tooltip={
+                                    <Link url={'https://www.linkedin.com/company/traction-on-demand'} />
+                                }>
+                                    <h2 className="md:text-4xl text-2xl font-tabi">
+                                        Traction on Demand
+                                    </h2>
+                                    <TitleRule classes={'md:text-2xl text-xl font-maru font-bold uppercase'}>
+                                        Marketing Automation Intern
+                                        <div className={`lg:flex-1 w-full h-[1px] bg-slate-900 self-center`} />
+                                        May 2021 - September 2021
+                                    </TitleRule>
+                                </TooltipWrapper>
+
+                                <div className={'flex flex-wrap gap-2'}>
+                                    <div className={'w-full'}>
+                                        <h3 className={'font-aeonik font-bold text-center'}>Marketing Automation</h3>
+                                        <BoxCarousel className={'mt-2 font-aeonik w-full'} id={'marketingAutomation'}>
+                                            <CardBox className={'whitespace-nowrap snap-center '}>Salesforce</CardBox>
+
+                                            <CardBox className={'whitespace-nowrap snap-center'}>Marketing Cloud</CardBox>
+                                            <CardBox className={'whitespace-nowrap snap-center'}>AMPScript</CardBox>
+                                            <CardBox className={'whitespace-nowrap snap-center'}>APEX</CardBox>
+
+                                        </BoxCarousel>
+                                    </div>
+                                </div>
+
+                                <div className={'flex flex-col gap-2 mt-5'}>
+                                    <h3 className={'font-aeonik font-bold'}>Description, Responsibilities, Achievements</h3>
+
+                                    <TextBox className={'font-rubik font-thin'}>
+                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec justo lacus, dignissim ut sagittis a, cursus id urna. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Mauris sed ligula a ligula tristique volutpat sed nec leo. Praesent a felis at eros pellentesque aliquet. Phasellus sit amet urna cursus, cursus enim ut, commodo ligula. Ut imperdiet sit amet ligula sed vehicula. Sed egestas gravida leo, eget eleifend arcu tincidunt non. In laoreet lectus ut ex posuere, non fermentum velit dapibus. Nunc sagittis nisl dui, id egestas sem venenatis ut. Maecenas lacinia vitae erat sit amet sodales. Donec ut odio leo. Etiam imperdiet fringilla tellus, quis luctus urna fringilla eget. Duis congue neque a nibh mollis rhoncus.
+
+                                        Aliquam non arcu quis neque malesuada varius. Aenean in nisl at mauris placerat molestie. Duis sem nisi, mollis vestibulum tortor quis, laoreet egestas neque. Ut felis felis, consectetur ut augue id, semper molestie ligula. Curabitur tempor enim est, sit amet sollicitudin elit malesuada ut. Nunc placerat mauris ante, vel tincidunt urna viverra ac. Fusce faucibus ornare magna, tincidunt cursus tortor accumsan at. Nam eleifend ac ex et maximus. Phasellus ultrices tortor libero, eget semper magna venenatis nec. Praesent malesuada turpis massa, eu pharetra urna dapibus ut. Vestibulum dictum mattis odio sit amet tempor. Duis viverra cursus eros in fermentum.
+
+                                        Etiam id dolor porta, bibendum dui ut, dignissim est. Cras eleifend maximus enim mattis faucibus. Nullam tincidunt pharetra porta. Duis non dolor leo. Donec accumsan sed felis sed iaculis. Donec vulputate ultrices tortor, non condimentum enim blandit a. Suspendisse quis viverra tellus. Proin ultricies gravida lorem, et euismod urna suscipit at.
+
+                                        Aenean et dui dictum, tincidunt magna vitae, tempor quam. In facilisis vestibulum neque ac dictum. Suspendisse tempus arcu tincidunt, feugiat lacus quis, maximus urna. Duis bibendum dictum vulputate. Etiam sit amet sem id est elementum tristique vitae eu dolor. Maecenas placerat orci at metus pulvinar, ullamcorper elementum diam vulputate. Donec vulputate aliquet felis, at finibus augue facilisis eu. Ut varius nibh sagittis aliquam gravida. Donec varius, sem non egestas convallis, purus magna pellentesque neque, vitae consectetur turpis nibh non massa. Morbi consectetur rutrum facilisis. Aliquam urna metus, pharetra in purus eget, rhoncus blandit felis.
+
+                                        Pellentesque non laoreet tortor, at volutpat ligula. Pellentesque sed neque lectus. Aliquam ac mattis libero. Sed venenatis arcu lorem, vel imperdiet nulla pretium at. Pellentesque ac tincidunt justo, vel viverra mi. Nulla elementum in velit sit amet ultrices. Pellentesque venenatis semper nibh eget maximus. Praesent ut ipsum ut lorem dapibus bibendum.
+                                    </TextBox>
+
+                                </div>
+
+                            </div>
+                        </div>
+
+
+                    </div>
+
+                </InfoBox>
 
                 <InfoBox id={'education'}>
 
 
                     <TooltipWrapper position={'tl'} fit tooltip={
-                        <Link url={'https://www.wlu.ca'}>
-                            wlu.ca
-                        </Link>
+                        <Link url={'https://www.wlu.ca'} />
                     }>
                         <h2 className="md:text-4xl text-2xl font-tabi">
                             Honors BSc. Computer Science & Psychology
@@ -159,11 +288,6 @@ export const ScrollView = ({}) => {
                             </TooltipWrapper>
                         </div>
                     </TitleRule>
-
-
-
-
-
 
                     <h3 className={'mt-2 font-aeonik font-bold'}>Courses</h3>
                     <div className={'flex flex-wrap flex-1 gap-2 mt-2 font-aeonik'}>
@@ -225,10 +349,10 @@ export const ScrollView = ({}) => {
                             <StatBox title={'Research in Perception'} stat={'A-'}/>
                         </TooltipWrapper>
                         <TooltipWrapper className={'flex-1'} tooltip={'Pursuing contemporary research in perception.'}>
-                            <StatBox title={'Seminar in Perception'} stat={'A'}/>
+                            <StatBox title={'Sem. in Perception'} stat={'A'}/>
                         </TooltipWrapper>
                         <TooltipWrapper className={'flex-1'} tooltip={'Pursuing contemporary research in cognitive neuroscience.'}>
-                            <StatBox title={'Seminar in Cognitive Neuroscience'} stat={'B-'}/>
+                            <StatBox title={'Sem. in Cog. Neuroscience'} stat={'B-'}/>
                         </TooltipWrapper>
 
                     </div>
@@ -236,43 +360,7 @@ export const ScrollView = ({}) => {
 
                 </InfoBox>
 
-                <InfoBox id={'experience'}>
 
-                    <div className={'flex flex-col gap-3'}>
-                        <TooltipWrapper fit tooltip={
-                            <Link url={'https://www.vvc.ca'}>
-                                vvc.ca
-                            </Link>
-                        }>
-                            <h2 className="md:text-4xl text-2xl font-tabi">
-                                Van Valkenburg Communications (VVC)
-                            </h2>
-                            <SubtitleRule textPos={'right'} classes={'md:text-2xl text-xl font-maru font-bold uppercase'}>
-                                April 2021 - Present
-                            </SubtitleRule>
-                            {/*<TitleRule classes={'md:text-2xl text-xl font-maru font-bold uppercase'}>*/}
-                            {/*    April 2021 - Present*/}
-                            {/*</TitleRule>*/}
-                        </TooltipWrapper>
-
-                        <TooltipWrapper fit tooltip={
-                            <Link url={'https://www.linkedin.com/company/traction-on-demand'}>
-                                traction on demand linkedin
-                            </Link>
-                        }>
-                            <h2 className="md:text-4xl text-2xl font-tabi">
-                                Traction on Demand
-                            </h2>
-                            <TitleRule classes={'md:text-2xl text-xl font-maru font-bold uppercase'}>
-                                May 2021 - September 2021
-                            </TitleRule>
-                        </TooltipWrapper>
-                    </div>
-
-
-
-
-                </InfoBox>
 
                 <InfoBox id={'links'}>
 
@@ -283,24 +371,20 @@ export const ScrollView = ({}) => {
                         Links
                     </TitleRule>
 
-                    <div className={'h-fit flex flex-row flex-nowrap gap-3 mt-2'}>
+                    <div className={'h-fit mt-2 flex gap-12 md:flex-nowrap flex-wrap relative'}>
 
-                        <div className={'flex gap-12 relative'}>
+                        {links.map((x, i) => {
+                            return(
+                                <CustomLink className={'text-4xl z-10 font-rubik font-medium'} url={x.link}>
+                                    {x.label}
+                                </CustomLink>
+                            )
 
-                            {links.map((x, i) => {
-                                return(
-                                    <CustomLink className={'text-4xl z-10 font-rubik font-medium'} url={x.link}>
-                                        {x.label}
-                                    </CustomLink>
-                                )
-
-                            })}
-
-                        </div>
-
-
+                        })}
 
                     </div>
+
+
 
                 </InfoBox>
 
@@ -338,14 +422,16 @@ export const ScrollView = ({}) => {
                     </div>
 
                 </InfoBox>
+
+                <div className={'md:hidden mb-24'}/>
             </div>
 
             <div className={'fixed right-[10%] top-[50%] -translate-y-1/2 z-20 flex flex-col gap-2 select-none'}>
                 <div>
-                    <button onClick={() => smoothScrollId('education')}>🎓</button>
+                    <button onClick={() => smoothScrollId('experience')}>💼</button>
                 </div>
                 <div>
-                    <button onClick={() => smoothScrollId('experience')}>💼</button>
+                    <button onClick={() => smoothScrollId('education')}>🎓</button>
                 </div>
                 <div>
                     <button onClick={() => smoothScrollId('links')}>🔗</button>
@@ -354,62 +440,6 @@ export const ScrollView = ({}) => {
                     <button onClick={() => smoothScrollId('files')}>📁</button>
                 </div>
             </div>
-
-            {/*<div className={'fixed bottom-20 right-5 -rotate-90'}>*/}
-            {/*    <input type="range" min=".1" max="1" step={.1} value={blind} onChange={(e) => setBlind(e.target.value)}/>*/}
-            {/*</div>*/}
-
-
-            {/*<div className={`fixed inset-y-0 p-2 mt-10`}>*/}
-            {/*    <motion.button*/}
-            {/*        onClick={() => smoothScrollId('education')}*/}
-            {/*        style={{*/}
-            {/*            translateY: eduY,*/}
-            {/*            translateX: eduX,*/}
-            {/*            scale: eduScale,*/}
-            {/*            // borderRadius: buttonRadius*/}
-
-            {/*        }}*/}
-            {/*        className={'md:h-20 md:w-20 md:text-3xl text-xl absolute flex items-center rounded-3xl hover:rounded-full justify-center bg-slate-900/50 hover:bg-slate-900/70'}>*/}
-            {/*        🎓*/}
-            {/*    </motion.button>*/}
-            {/*    <motion.button*/}
-            {/*        onClick={() => smoothScrollId('experience')}*/}
-            {/*        style={{*/}
-            {/*            translateY: expY,*/}
-            {/*            translateX: expX,*/}
-            {/*            scale: expScale,*/}
-
-            {/*            // borderRadius: buttonRadius*/}
-            {/*        }}*/}
-            {/*        className={'md:h-20 md:w-20 md:text-3xl text-xl absolute flex items-center rounded-3xl hover:rounded-full justify-center bg-slate-900/50 hover:bg-slate-900/70'}>*/}
-            {/*        💼*/}
-            {/*    </motion.button>*/}
-            {/*    <motion.button*/}
-            {/*        onClick={() => smoothScrollId('links')}*/}
-            {/*        style={{*/}
-            {/*            translateY: linY,*/}
-            {/*            translateX: linX,*/}
-            {/*            scale: linScale,*/}
-            {/*            // borderRadius: buttonRadius*/}
-            {/*        }}*/}
-            {/*        className={'md:h-20 md:w-20 md:text-3xl text-xl absolute flex items-center rounded-3xl hover:rounded-full justify-center bg-slate-900/50 hover:bg-slate-900/70'}>*/}
-            {/*        🔗*/}
-            {/*    </motion.button>*/}
-
-            {/*    <motion.button*/}
-            {/*        onClick={() => smoothScrollId('files')}*/}
-            {/*        style={{*/}
-            {/*            translateY: fileY,*/}
-            {/*            translateX: fileX,*/}
-            {/*            scale: fileScale*/}
-
-            {/*            // borderRadius: buttonRadius*/}
-            {/*        }}*/}
-            {/*        className={'md:h-20 md:w-20 md:text-3xl text-xl absolute flex items-center rounded-3xl hover:rounded-full justify-center bg-slate-900/50 hover:bg-slate-900/70'}>*/}
-            {/*        📁*/}
-            {/*    </motion.button>*/}
-            {/*</div>*/}
         </>
     )
 }
