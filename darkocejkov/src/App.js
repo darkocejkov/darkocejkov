@@ -17,33 +17,19 @@ import {PhotoGrid, SuspenseGrid} from "./Views/PhotoGrid";
 import {CheatSheet} from "./Views/CheatSheet";
 
 import GitHubCalendar from "react-github-calendar";
+import {FlexView} from "./Views/Flex";
+import {OriginalView} from "./Views/Original";
 
 function App() {
 
 	useEffect(() => {
-		document.title = "Darko Cejkov"
+		document.title = "Darko Cejkov → Fullstack Developer"
 	}, [])
 
-	const [page, setPage] = useState('home')
-	const [pull, setPull] = useState(false)
-	
-	const [playing, setPlaying] = useState(false)
-	const [hideBg, setHideBg] = useState(false)
-	const [showFront, setShowFront] = useState(false)
 
 	const [view, setView] = useState(0)
 
-	// const views = {
-	// 	[]
-	// }
-
-	const handleView = (v) => {
-
-	}
-
-
 	const [showOffcanvas, setShowOffcanvas] = useState(false)
-
 
 	return (
 		<>
@@ -53,11 +39,15 @@ function App() {
 			{/*</Banner>*/}
 
 			<OffcanvasDrawer show={showOffcanvas} setShow={setShowOffcanvas}>
-				<GitHubCalendar username={'darkocejkov'} />
+				<div className={'p-12 flex flex-col items-center justify-center'}>
+
+					<GitHubCalendar username={'darkocejkov'} />
+
+				</div>
 			</OffcanvasDrawer>
 
 
-			<div className={'fixed top-0 left-0 z-20 h-screen w-screen pointer-events-none'}>
+			<div className={'fixed top-0 left-0 z-[100] h-screen w-screen pointer-events-none'}>
 
 				<div className={'flex flex-col p-2 gap-2'}>
 
@@ -101,6 +91,9 @@ function App() {
 						<LabelledButton dir={'right'} tabIndex={1} active={view === 3} onClick={() => setView(3)} label={'Reference Sheet'}>
 							<small>3</small>
 						</LabelledButton>
+						<LabelledButton dir={'right'} tabIndex={1} active={view === 4} onClick={() => setView(4)} label={'Flexbox Playground'}>
+							<small>4</small>
+						</LabelledButton>
 					</div>
 
 					<div className={'w-fit mt-6 flex gap-4 flex-col font-maru pointer-events-auto'}>
@@ -111,62 +104,12 @@ function App() {
 
 						</button>
 					</div>
-
-
 				</div>
-
-
-
 			</div>
 
 
-			{/*<div className={'fixed top-[4rem] left-[.5rem] z-50 flex gap-4 flex-col md:flex-row'}>*/}
-			{/*	<button onClick={() => setView(0)} className={`${view === 0 ? 'rounded-xl' : 'rounded-sm'} flex items-center justify-center hover:rounded-3xl transition-rounded bg-slate-900 opacity-70 text-white md:h-10 md:w-10 h-5 w-5`}>*/}
-			{/*		<small>0</small>*/}
-			{/*	</button>*/}
-			{/*	<button onClick={() => setView(1)} className={`${view === 1 ? 'rounded-xl' : 'rounded-sm'} flex items-center justify-center hover:rounded-3xl transition-rounded bg-slate-900 opacity-70 text-white md:h-10 md:w-10 h-5 w-5`}>*/}
-			{/*		<small>1</small>*/}
-			{/*	</button>*/}
-			{/*	<button onClick={() => setView(2)} className={`${view === 2 ? 'rounded-xl' : 'rounded-sm'} flex items-center justify-center hover:rounded-3xl transition-rounded bg-slate-900 opacity-70 text-white md:h-10 md:w-10 h-5 w-5`}>*/}
-			{/*		<small>2</small>*/}
-			{/*	</button>*/}
-			{/*</div>*/}
-
 			{view === 1 &&
-				<div className='h-screen w-screen fixed top-0 bg-gradient-to-r from-cyan-500 to-blue-500'>
-
-					{hideBg === false &&
-						<Background play={playing} hide={hideBg} showFront={showFront} className={'height-minus-nav'}/>
-					}
-
-					<BrowserRouter>
-
-						<div className="grid grid-cols-1 grid-rows-2 h-full w-full transition-all z-50">
-
-							<Title pull={pull}/>
-
-							<Routes>
-
-								<Route exact path="/education" element={
-									<Education />
-								} />
-
-								<Route exact path="/experience" element={
-									<Experience />
-								} />
-
-								<Route exact path="/personal" element={
-									<Personal />
-								} />
-
-							</Routes>
-
-						</div>
-
-						<Navbar setPull={setPull} playing={playing} setPlaying={setPlaying} hideBg={hideBg} setHideBg={setHideBg} setShowFront={setShowFront} showFront={showFront}/>
-
-					</BrowserRouter>
-				</div>
+				<OriginalView />
 			}
 
 			{view === 0 &&
@@ -179,6 +122,10 @@ function App() {
 
 			{view === 3 &&
 				<CheatSheet />
+			}
+
+			{view === 4 &&
+				<FlexView />
 			}
 
 		</>

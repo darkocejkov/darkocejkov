@@ -1,5 +1,6 @@
 import React, {useState, useEffect, Suspense} from "react";
 import {LoadingSpinner} from "../Components/Basics";
+import {smoothScrollId} from "../GlobalFunctions";
 
 
 export const CheatSheet = ({}) => {
@@ -108,6 +109,8 @@ export const CheatSheet = ({}) => {
         'font-aeonik',
     ]
 
+
+
     const [activeFont, setActiveFont] = useState('')
     const [previewText, setPreviewText] = useState('')
 
@@ -115,16 +118,16 @@ export const CheatSheet = ({}) => {
         <div className={'min-h-screen z-0 overflow-x-clip bg-gradient-to-b to-cyan-200 from-blue-500 flex flex-col gap-5 p-12 items-center justify-evenly select-none'}>
 
             <div className={'fixed z-10 bottom-0 left-0 flex flex-col gap-6 p-2 bg-slate-900/30 rounded-xl m-2'}>
-                <a href={'#1'}>
+                <a onClick={() => smoothScrollId('1')}>
                     <code>px</code> Length
                 </a>
-                <a href={'#2'}>
+                <a onClick={() => smoothScrollId('2')}>
                     <code>rem</code> Length
                 </a>
-                <a href={'#3'}>
+                <a onClick={() => smoothScrollId('3')}>
                     <code>rem</code> font-size
                 </a>
-                <a href={'#4'}>
+                <a onClick={() => smoothScrollId('4')}>
                     <code>rem</code> border-radius
                 </a>
             </div>

@@ -2,6 +2,7 @@ import React, {Suspense, useEffect, useRef, useState} from 'react'
 import {useInView, motion, useScroll, useDragControls, useMotionValueEvent, useTransform} from "framer-motion";
 import {byteSized, getFileInfo, humanFileSize, mimeType} from "../GlobalFunctions";
 import {useDragScroll} from "../Hooks/CustomHooks";
+import {useControls} from "leva";
 
 export const TitleLetters = ({title}) => {
 
@@ -99,6 +100,30 @@ export const FillLink = ({}) => {
     )
 }
 
+const ControlsStats = () => {
+
+    const {} = useControls('Metadata', {
+        showLighting: true,
+        showStats: true
+    })
+
+}
+
+export const SketchControls = ({sketchDetails}) => {
+
+    const { name, aNumber } = useControls({ name: 'World', aNumber: 0})
+
+
+
+    return (
+        <>
+            <ControlsStats />
+        </>
+    )
+}
+
+const effectDelay = 3000
+
 export const OffcanvasDrawer = ({show, setShow, children}) => {
 
     // const [show, setShow] = useState(false)
@@ -118,21 +143,24 @@ export const OffcanvasDrawer = ({show, setShow, children}) => {
     }, [show])
 
 
+    //bg-gray-50/80
+    // bg-gradient-to-b  from-orange-500/80 to-orange-500/20
 
     return(
 
         <>
+
             <motion.div
                 animate={{
                     translateX: show ? '0' : '100%'
                     // width: show ? '100vw' : '0'
                 }}
                 transition={{
+                    mass: .5,
                     type: 'spring'
                 }}
 
-
-                className={`modal ${show ? 'show' : ''} z-[70] w-screen bg-gray-50 h-screen fixed right-0 top-0 lg:max-w-[50%]`}>
+                className={`modal ${show ? 'show' : ''} z-[70] w-screen bg-cyan-50/90 h-screen fixed right-0 top-0 lg:max-w-[33%] border-l-4 border-orange-500/80`}>
 
                 {children}
             </motion.div>
@@ -140,7 +168,27 @@ export const OffcanvasDrawer = ({show, setShow, children}) => {
             <motion.div
                 animate={{
                     opacity: show ? 1 : 0,
-                    zIndex: show ? 60 : 0
+                    translateY: show ? '-100%' : '100%',
+                    zIndex: show ? 80 : 0
+                }}
+                transition={{
+                    duration: 1,
+                    repeat: show ? 1 : 0,
+                    repeatDelay: 1,
+                    repeatType: show ? 'reverse' : '',
+                    type: 'spring'
+                }}
+
+
+                className={'p-2 w-fit select-none text-2xl h-fit bg-slate-900/20 bottom-1/2 fixed left-1/2 -translate-1/2 rounded-xl text-center text-white'}>
+                Press ESC to close
+            </motion.div>
+
+            <motion.div
+                animate={{
+                    opacity: show ? 1 : 0,
+                    zIndex: show ? 60 : 0,
+                    pointerEvents: show ? 'auto' : 'none'
                 }}
 
                 onClick={() => setShow(false)}
@@ -249,7 +297,10 @@ export const InfoBox = ({id, children, classes = '', sceneRef}) => {
                     // transform: inView ? "none" : "translateX(-200px) rotate3d(1,1,1, 12deg)",
                     filter: inView ? 'blur(0px)' : 'blur(5px)',
                 }}
-                transition={{ type: 'spring' }}
+                transition={{
+                    type: 'spring',
+                    mass: 2,
+                }}
                 className={`info-box p-5 relative md:max-w-[80%] origin-center max-w-full rounded-lg shadow ${classes}`}>
             {children}
 
@@ -259,6 +310,122 @@ export const InfoBox = ({id, children, classes = '', sceneRef}) => {
             </div>
         </motion.div>
 
+    )
+}
+
+export const Box = ({i = null, h, w, grow, shrink, controls}) => {
+
+    const [personalGrow, setPersonalGrow] = useState(0)
+    const [personalShrink, setPersonalShrink] = useState(0)
+
+    useEffect(() => {
+        setPersonalGrow(grow)
+    }, [grow])
+
+    useEffect(() => {
+        setPersonalShrink(shrink)
+    }, [shrink])
+
+    const max = 5
+
+    const increment = (v, i) => {
+        console.log(typeof v, v + i)
+
+        if((v + i) < 0){
+            return v
+        }else if((v + i) > max){
+            return v
+        }
+
+        return v + i
+    }
+
+    return(
+        <div
+            style={{
+                height: `${h}px`,
+                width: `${w}px`,
+                flexGrow: personalGrow,
+                flexShrink: personalShrink,
+                flexBasis: `auto`
+            }}
+            className={`bg-gradient-to-b from-slate-900/40 to-slate-900/10 relative`}>
+
+            {i !== null &&
+                <div className={'absolute top-0 left-0 h-full w-full flex justify-center items-center'}>
+                    {i + 1}
+                </div>
+
+            }
+
+            {controls &&
+                <div className={'absolute top-0 left-0 h-full w-full flex flex-wrap gap-0'}>
+                    <TooltipWrapper className={'w-full flex flex-nowrap justify-center'} tooltip={'Grow'}>
+                        <button onClick={() => setPersonalGrow(increment(personalGrow, -1))} className={'w-full bg-slate-900/50 text-white'}
+                                style={{
+                                    height: `${h/3}px`
+                                }}
+                        >-</button>
+
+                        <button onClick={() => setPersonalGrow(increment(personalGrow, 1))} className={'w-full bg-slate-900/50 text-white'}
+                                style={{
+                                    height: `${h/3}px`
+                                }}
+                        >+</button>
+                    </TooltipWrapper>
+
+                    <div className={'flex w-full flex-row justify-evenly'}
+                         style={{
+                             height: `${h/3}px`
+                         }}
+                    >
+                        <TooltipWrapper fit={false} tooltip={'Grow'}>
+                            <small>{personalGrow}</small>
+                        </TooltipWrapper>
+                        <TooltipWrapper fit={false} tooltip={'Shrink'}>
+                            <small>{personalShrink}</small>
+                        </TooltipWrapper>
+                    </div>
+
+                    <TooltipWrapper className={'w-full flex flex-nowrap justify-center'} tooltip={'Shrink'}>
+                        <button onClick={() => setPersonalShrink(increment(personalShrink, -1))} className={'w-full bg-slate-900/50 text-white'}
+                                style={{
+                                    height: `${h/3}px`
+                                }}
+                        >-</button>
+                        <button onClick={() => setPersonalShrink(increment(personalShrink, 1))} className={'w-full bg-slate-900/50 text-white'}
+                                style={{
+                                    height: `${h/3}px`
+                                }}
+                        >+</button>
+                    </TooltipWrapper>
+                </div>
+            }
+
+
+        </div>
+    )
+}
+
+export const Range = ({}) => {
+    return(
+        <input type={'range'}/>
+    )
+}
+
+export const Toggle = ({set, value, children}) => {
+    return(
+        <button onClick={() => set(!value)} className={`p-2 transition-all  rounded-xl ${value ? 'bg-amber-500/80 hover:bg-amber-500/30' : 'bg-amber-500/30 hover:bg-amber-500/80'}`}>
+            {children}
+        </button>
+    )
+}
+
+export const FunctionButton = ({fn, children}) => {
+    return(
+        <button onClick={() => fn()} className={`p-2 transition-all rounded-xl bg-amber-500/80 hover:bg-amber-500/30`}>
+            {children}
+        </button>
     )
 }
 

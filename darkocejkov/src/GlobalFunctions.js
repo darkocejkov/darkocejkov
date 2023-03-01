@@ -117,6 +117,14 @@ export const maxScrollLeft = (elem) => {
    return elem.scrollWidth - elem.clientWidth
 }
 
+export function getRandomArbitrary(min, max) {
+    return Math.random() * (max - min) + min;
+}
+
+export function getRandom(min, max){
+    return (Math.floor(Math.random() * max) + min)
+}
+
 const icons = [
     'bolt',
     'grid-2',

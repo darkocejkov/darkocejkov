@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef} from 'react'
+import React, {useState, useEffect, useRef, useMemo} from 'react'
 
 import {
     useScroll,
@@ -114,15 +114,16 @@ export const ScrollView = ({}) => {
         },
     ]
 
-
     const sceneRef = useRef()
 
     const [play, setPlay] = useState(true)
     const [front, setFront] = useState(false)
+    const [hide, setHide] = useState(false)
+    const [controls, setControls] = useState(false)
 
     return(
         <>
-            <Background play={play} showFront={front} blind={blind} className={'h-screen'}/>
+            <Background play={play} hide={hide} showFront={front} blind={blind} controls={controls} className={'h-screen'}/>
 
             <div className={'fixed right-[5%] top-[50%] -translate-y-1/2 z-50 flex flex-col gap-2 select-none'}>
                 <div>
@@ -186,11 +187,35 @@ export const ScrollView = ({}) => {
                     //     y: [-100, 0]
                     // }}
                 >
-                    <BorderDiv className={'font-tabi font-bold text-center text-3xl sm:text-6xl pointer-events-auto flex flex-col flex-nowrap items-center justify-center gap-2 p-4 backdrop-blur-md rounded-md shadow-lg relative'}>
+                    <BorderDiv className={'font-tabi font-bold text-center text-3xl sm:text-6xl pointer-events-auto flex flex-col flex-nowrap items-center justify-center gap-3 p-4 backdrop-blur-md rounded-md shadow-lg relative'}>
                         <h1>
                             Darko Cejkov
                         </h1>
                         <div className={'flex self-center gap-0 text-sm hover:gap-6 font-normal transition-all'}>
+
+                            {hide
+                                ? (
+                                    <button onClick={() => setHide(false)} className={'bg-transparent hover:bg-slate-600/10 p-3 rounded-md group'}>
+                                        <i className="fa-solid fa-eye fa-xl"></i>
+
+
+                                        <span className={'text-white bg-slate-700/20 p-2 rounded-lg text-2xl group-hover:scale-100 scale-0 absolute -top-1/2 left-0 transition-all'}>
+                                            Show Sketch
+                                        </span>
+
+                                    </button>
+                                )
+                                : (
+                                    <button onClick={() => setHide(true)} className={'bg-transparent hover:bg-slate-600/10 p-3 rounded-md group'}>
+                                        <i className="fa-solid fa-eye-low-vision fa-xl"></i>
+
+
+                                        <span className={'text-white bg-slate-700/20 p-2 rounded-lg text-2xl group-hover:scale-100 scale-0 absolute -top-1/2 left-0 transition-all'}>
+                                            Hide Sketch
+                                        </span>
+
+                                    </button>
+                                )}
 
                             {front
                                 ? (
@@ -198,9 +223,9 @@ export const ScrollView = ({}) => {
                                         <i className="fa-solid fa-send-backward fa-xl"></i>
 
 
-                                        <span className={'text-white bg-slate-700/20 p-2 rounded-lg text-2xl group-hover:scale-100 scale-0 absolute -top-1/2 left-1/2 transition-all'}>
-                                    Send Sketch Backwards
-                                </span>
+                                        <span className={'text-white bg-slate-700/20 p-2 rounded-lg text-2xl group-hover:scale-100 scale-0 absolute -top-1/2 left-0 transition-all'}>
+                                            Send Sketch Backwards
+                                        </span>
 
                                     </button>
 
@@ -210,19 +235,47 @@ export const ScrollView = ({}) => {
                                         <i className="fa-solid fa-bring-forward fa-xl"></i>
 
 
-                                        <span className={'text-white bg-slate-700/20 p-2 rounded-lg text-2xl group-hover:scale-100 scale-0 absolute -top-1/2 left-1/2 transition-all'}>
-                                    Bring Sketch Forwards
-                                </span>
+                                        <span className={'text-white bg-slate-700/20 p-2 rounded-lg text-2xl group-hover:scale-100 scale-0 absolute -top-1/2 left-0 transition-all'}>
+                                            Bring Sketch Forwards
+                                        </span>
 
                                     </button>
 
                                 )}
 
+                            {controls
+                                ? (
+                                    <button onClick={() => setControls(false)} className={'bg-transparent hover:bg-slate-600/10 p-3 rounded-md group text-center'}>
+
+                                        <i className="fa-solid fa-circle-half-stroke fa-xl transition-all"></i>
+
+                                        <span className={'text-white bg-slate-700/20 p-2 rounded-lg text-2xl group-hover:scale-100 scale-0 absolute -top-1/2 left-0 transition-all'}>
+                                            Close Controls
+                                        </span>
+
+                                    </button>
+                                )
+                                : (
+                                    <button onClick={() => setControls(true)} className={'bg-transparent hover:bg-slate-600/10 p-3 rounded-md group text-center'}>
+
+                                        <i className="self-center fa-duotone fa-circle-half-stroke fa-xl fa-rotate-180 transition-all"></i>
+
+
+                                        <span className={'text-white bg-slate-700/20 p-2 rounded-lg text-2xl group-hover:scale-100 scale-0 absolute -top-1/2 left-0 transition-all'}>
+                                            Open Controls
+                                        </span>
+
+                                    </button>
+                                )
+                            }
+
+
+
                             <button className={'bg-transparent hover:bg-slate-600/10 p-3 rounded-md group'}>
                                 <i className="fa-solid fa-chevron-left fa-xl"></i>
 
 
-                                <span className={'text-white bg-slate-700/20 p-2 rounded-lg text-2xl group-hover:scale-100 scale-0 absolute -top-1/2 left-1/2 transition-all'}>
+                                <span className={'text-white bg-slate-700/20 p-2 rounded-lg text-2xl group-hover:scale-100 scale-0 absolute -top-1/2 left-0 transition-all'}>
                                     Previous Sketch
                                 </span>
 
@@ -233,7 +286,7 @@ export const ScrollView = ({}) => {
                                     <button onClick={() => setPlay(false)} className={'bg-transparent hover:bg-slate-600/10 p-3 rounded-md group'}>
                                         <i className="fa-solid fa-pause fa-xl"></i>
 
-                                        <span className={'text-white bg-slate-700/20 p-2 rounded-lg text-2xl group-hover:scale-100 scale-0 absolute -top-1/2 left-1/2 transition-all'}>
+                                        <span className={'text-white bg-slate-700/20 p-2 rounded-lg text-2xl group-hover:scale-100 scale-0 absolute -top-1/2 left-0 transition-all'}>
                                     Pause Sketch
                                 </span>
                                     </button>
@@ -242,7 +295,7 @@ export const ScrollView = ({}) => {
                                     <button onClick={() => setPlay(true)} className={'bg-transparent hover:bg-slate-600/10 p-3 rounded-md group'}>
                                         <i className="fa-solid fa-play fa-xl"></i>
 
-                                        <span className={'text-white bg-slate-700/20 p-2 rounded-lg text-2xl group-hover:scale-100 scale-0 absolute -top-1/2 left-1/2 transition-all'}>
+                                        <span className={'text-white bg-slate-700/20 p-2 rounded-lg text-2xl group-hover:scale-100 scale-0 absolute -top-1/2 left-0 transition-all'}>
                                     Play Sketch
                                 </span>
                                     </button>
@@ -257,7 +310,7 @@ export const ScrollView = ({}) => {
                             <button className={'bg-transparent hover:bg-slate-600/10 p-3 rounded-md group'}>
                                 <i className="fa-solid fa-chevron-right fa-xl"></i>
 
-                                <span className={'text-white bg-slate-700/20 p-2 rounded-lg text-2xl group-hover:scale-100 scale-0 absolute -top-1/2 left-1/2 transition-all'}>
+                                <span className={'text-white bg-slate-700/20 p-2 rounded-lg text-2xl group-hover:scale-100 scale-0 absolute -top-1/2 left-0 transition-all'}>
                                     Next Sketch
                                 </span>
                             </button>

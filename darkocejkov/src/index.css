@@ -232,6 +232,10 @@
     transition: border-radius 0.24s ease-in-out;
   }
 
+  .text-white-shadow{
+    text-shadow: 0.1em 0.15em transparent;
+  }
+
   .white-shadow{
     box-shadow: 5px 5px rgba(255,255,255,100);
   }
@@ -361,9 +365,23 @@
     overflow: hidden;
   }
 
-  /*.modal.show body{*/
-  /*  overflow: hidden;*/
-  /*}*/
+  .radial-gradient{
+    background: rgb(131,58,180);
+    background: -moz-radial-gradient(circle, rgba(131,58,180,1) 0%, rgba(253,29,29,1) 50%, rgba(252,176,69,1) 100%);
+    background: -webkit-radial-gradient(circle, rgba(131,58,180,1) 0%, rgba(253,29,29,1) 50%, rgba(252,176,69,1) 100%);
+    background: radial-gradient(circle, rgba(131,58,180,1) 0%, rgba(253,29,29,1) 50%, rgba(252,176,69,1) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#833ab4",endColorstr="#fcb045",GradientType=1);
+  }
+
+
+
+  .row{
+
+  }
+
+  .col{
+
+  }
 
 }
 
