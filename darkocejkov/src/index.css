@@ -161,7 +161,9 @@
 
 @layer components{
 
-
+  :root{
+    --alien-gradient: linear-gradient(90deg, rgba(228,49,66,1) 0%, rgba(217,206,66,1) 25%, rgba(75,147,206,1) 48%, rgba(186,130,179,1) 75%, rgba(166,106,106,1) 100%);
+  }
 
   .text-shadow{
     text-shadow: 2px 2px 2px #000000;
@@ -514,6 +516,12 @@
   border-color: rgb(15 23 42 / 0.6) transparent transparent transparent;
 }
 
+.curved-text{
+  offset-path: path('M.5 122.7s24.7-275 276.9 0c327.1 356.7 266.1-330.3 548-33.3 256.9 270.7 271.1 0 271.1 0');
+  offset-distance: calc(1.75rem);
+  position: absolute;
+}
+
 .scroll-text-b {
   -moz-animation: scroll-b 15s ease-in-out alternate infinite;
   -webkit-animation: scroll-b 15s ease-in-out alternate infinite;
@@ -645,6 +653,37 @@ button > .button-download{
 button > .button-download:hover{
   background-position: 50% 100px;
 }
+
+button:disabled{
+  opacity: 0.2;
+}
+
+
+
+.gradient-background{
+  background: var(--alien-gradient);
+  background-size: 400% 400%;
+  animation: shifting-gradient 15s ease infinite;
+}
+
+.gradient-bgcolor{
+  background-color: var(--alien-gradient);
+  background-size: 400% 400%;
+  animation: shifting-gradient 15s ease infinite;
+}
+
+@keyframes shifting-gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
 
 .scrollbar-none::-webkit-scrollbar{
   display: none;

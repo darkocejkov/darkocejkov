@@ -5,7 +5,7 @@ import Marquee from "react-fast-marquee";
 
 import Title from './Components/Title'
 import Navbar from './Components/Navbar'
-import Background from './Components/Background';
+import Background, {useSketch} from './Components/Background';
 
 import Education from './Pages/Education';
 import Experience from './Pages/Experience';
@@ -31,18 +31,38 @@ function App() {
 
 	const [showOffcanvas, setShowOffcanvas] = useState(false)
 
+
+
+	const views = [
+		{
+			title: 'Scroll Design',
+			component: <ScrollView  />,
+			icon: <i className="fa-thin fa-scroll"></i>,
+		},
+		{
+			title: 'Image Grids',
+			component: <PhotoGrid />,
+			icon: <i className="fa-thin fa-grid"></i>,
+		},
+		{
+			title: 'Reference Sheet',
+			component: <CheatSheet />,
+			icon: <i className="fa-thin fa-cookie"></i>,
+		},
+		{
+			title: 'Flexbox Playground',
+			component: <FlexView />,
+			icon: <i className="fa-thin fa-boxes-stacked"></i>,
+		},
+	]
+
+
 	return (
 		<>
 
-			{/*<Banner>*/}
-			{/*	⚒️ This application is under active construction ⚒️*/}
-			{/*</Banner>*/}
-
 			<OffcanvasDrawer show={showOffcanvas} setShow={setShowOffcanvas}>
 				<div className={'p-12 flex flex-col items-center justify-center'}>
-
 					<GitHubCalendar username={'darkocejkov'} />
-
 				</div>
 			</OffcanvasDrawer>
 
@@ -58,76 +78,32 @@ function App() {
 								<span className={'font-tabi'}>
 								This application is under active construction ⚒️
 								</span>
-								{/*<span className={'font-aeonik'}>*/}
-								{/*	This application is under active construction ⚒️*/}
-								{/*</span>*/}
-								{/*	<span className={'font-rubik'}>*/}
-								{/*	This application is under active construction ⚒️*/}
-								{/*</span>*/}
-								{/*	<span className={'font-maru'}>*/}
-								{/*	This application is under active construction ⚒️*/}
-								{/*</span>*/}
 							</div>
 						</Marquee>
-						{/*<ScrollingText text={"This application is under active construction ⚒️"}/>*/}
-						{/*<ScrollingText>*/}
-						{/*	<span>*/}
-						{/*		This application is under active construction ⚒️*/}
-						{/*	</span>*/}
-						{/*</ScrollingText>*/}
-						{/*⚒️ This application is under active construction ⚒️*/}
 					</div>
 
 					<div className={'w-fit flex gap-4 flex-col font-maru pointer-events-auto'}>
-						<LabelledButton dir={'right'} tabIndex={1} active={view === 0} onClick={() => setView(0)} label={'Scroll Design'}>
-							<small>0</small>
-						</LabelledButton>
-						<LabelledButton dir={'right'} tabIndex={1} active={view === 1} onClick={() => setView(1)} label={'Original Design'}>
-							<small>1</small>
-						</LabelledButton>
-						<LabelledButton dir={'right'} tabIndex={1} active={view === 2} onClick={() => setView(2)} label={'Image Grid'}>
-							<small>2</small>
-						</LabelledButton>
-						<LabelledButton dir={'right'} tabIndex={1} active={view === 3} onClick={() => setView(3)} label={'Reference Sheet'}>
-							<small>3</small>
-						</LabelledButton>
-						<LabelledButton dir={'right'} tabIndex={1} active={view === 4} onClick={() => setView(4)} label={'Flexbox Playground'}>
-							<small>4</small>
-						</LabelledButton>
+						{views.map((x, i) => {
+							return(
+								<LabelledButton dir={'right'} tabIndex={1} active={view === i} onClick={() => setView(i)} label={x.title || `View ${i}`}>
+									<small>
+										{x.icon || i}
+									</small>
+								</LabelledButton>
+							)
+						})}
 					</div>
 
 					<div className={'w-fit mt-6 flex gap-4 flex-col font-maru pointer-events-auto'}>
-						<button onClick={() => setShowOffcanvas(true)} className={'bg-orange-400 text-black md:h-10 md:w-10 h-5 w-5 relative group'}>
+						<button onClick={() => setShowOffcanvas(true)} className={'bg-orange-400 text-black h-10 w-10 relative group'}>
 							<i className="fa-solid fa-terminal fa-sm"></i>
-
 							<span className={`font-tabi p-2 rounded-xl bg-slate-900/30 text-shadow absolute text-white -top-1/2 right-0 group-hover:translate-x-[110%] scale-0 group-hover:scale-100 -translate-x-full transition-all`}>Git Commits & Activity</span>
-
 						</button>
 					</div>
 				</div>
 			</div>
 
-
-			{view === 1 &&
-				<OriginalView />
-			}
-
-			{view === 0 &&
-				<ScrollView />
-			}
-
-			{view === 2 &&
-				<PhotoGrid />
-			}
-
-			{view === 3 &&
-				<CheatSheet />
-			}
-
-			{view === 4 &&
-				<FlexView />
-			}
-
+			{views[view].component}
 		</>
 	);
 }

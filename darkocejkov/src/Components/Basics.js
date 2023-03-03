@@ -1,4 +1,4 @@
-import React, {Suspense, useEffect, useRef, useState} from 'react'
+import React, {Suspense, useEffect, useMemo, useRef, useState} from 'react'
 import {useInView, motion, useScroll, useDragControls, useMotionValueEvent, useTransform} from "framer-motion";
 import {byteSized, getFileInfo, humanFileSize, mimeType} from "../GlobalFunctions";
 import {useDragScroll} from "../Hooks/CustomHooks";
@@ -75,10 +75,10 @@ export const LabelledButton = ({label, children, dir = 'right', active = false, 
 
     return(
         // ${view === 0 ? 'rounded-xl' : 'rounded-sm'}
-        <button onClick={() => onClick()} className={`${active ? 'rounded-xl' : 'rounded-sm'} relative group flex items-center justify-center hover:rounded-3xl transition-rounded bg-slate-900 opacity-70 text-white md:h-10 md:w-10 h-5 w-5`}>
+        <button onClick={() => onClick()} className={`${active ? 'rounded-xl' : 'rounded-sm'} relative group flex items-center justify-center hover:rounded-3xl transition-rounded bg-slate-900 opacity-70 text-white h-10 w-10`}>
             {children}
 
-            <span className={`font-tabi p-2 rounded-xl bg-slate-900/30 text-shadow absolute text-white ${dir}-0 group-hover:translate-x-[110%] scale-0 group-hover:scale-100 -translate-x-full transition-all`}>{label}</span>
+            <span className={`font-tabi p-2 rounded-xl bg-slate-900/30 text-shadow absolute text-white ${dir}-0 scale-0 group-hover:scale-100 translate-x-[110%] transition-all`}>{label}</span>
         </button>
 
     )
@@ -251,6 +251,27 @@ export const Rule = ({className}) => {
     )
 }
 
+export const CurvedText = ({text}) => {
+
+
+    const splitText = useMemo(() => {
+
+        let array = []
+
+        for(let char of text){
+            array.push(
+                <span className={'curved-text font-tabi font-bold text-8xl'}>{char}</span>
+            )
+        }
+
+        return array
+
+    }, text)
+
+    return splitText
+
+}
+
 export const InfoBox = ({id, children, classes = '', sceneRef}) => {
 
     const ref = useRef()
@@ -289,7 +310,7 @@ export const InfoBox = ({id, children, classes = '', sceneRef}) => {
                 }}
                 animate={{
                     opacity: inView ? 1 : 0,
-                    translateX: inView ? '0px' : '-200px',
+                    translateX: inView ? '0px' : '-100px',
                     rotateZ: inView ? '0deg' : '12deg',
                     // transitionDelay: '0.1s'
                 }}
@@ -650,7 +671,7 @@ export const MenuWrapper = ({children, items = [], open = false}) => {
 
             {children}
 
-            <div  className={`${show ? 'scale-1' : 'scale-0'} origin-left left-[100%] bottom-[-50%] transition-all absolute rounded-xl p-2 bg-slate-900/20`}>
+            <div  className={`${show ? 'scale-1' : 'scale-0'} backdrop-blur-md origin-bottom left-0 -top-full transition-all absolute rounded-xl p-2 bg-slate-900/40 text-white`}>
                 <div className={'flex flex-col gap-2'}>
                     {items && items.map((x, i) => {
                         return(
@@ -666,6 +687,57 @@ export const MenuWrapper = ({children, items = [], open = false}) => {
                 </div>
 
             </div>
+        </div>
+    )
+}
+
+export const DepthText = ({children, n, primary = 'slate-900', secondary = 'slate-50'}) => {
+
+
+    const textArray = useMemo(() => {
+
+
+        let array = []
+        let xs = []
+
+        for(let x = 0; x < n; x++){
+
+            xs.push(1 - (x * (1/10)).toFixed(2))
+
+            if(x === 0){
+                array.push(
+                    <div style={{
+                        scale: `${(1 - (x * (1/10))).toFixed(2)}`,
+                        opacity: (1 - (x * (2/10))).toFixed(2),
+                        zIndex: n - x,
+                    }}
+                         className={`absolute inset-1/2 flex flex-col justify-center items-center gap-0 text-slate-900`}>
+                        {children}
+                    </div>
+                )
+            }else{
+                array.push(
+                    <div style={{
+                        scale: `${(1 - (x * (1/10))).toFixed(2)}`,
+                        opacity: (1 - (x * (2/10))).toFixed(2)
+                    }}
+                         className={`absolute inset-1/2 flex flex-col justify-center items-center gap-0 text-slate-50`}>
+                        {children}
+                    </div>
+                )
+            }
+
+
+        }
+
+        console.log('XS: ', xs)
+
+        return array
+    }, [n, children])
+
+    return(
+        <div className={'h-screen w-2/3 z-0 text-center relative flex flex-col justify-center items-center gap-0'}>
+            {textArray}
         </div>
     )
 }

@@ -6,6 +6,10 @@ export const smoothScrollRef = (ref) => {
     }
 }
 
+export const smoothScrollTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
 export const smoothScrollId = (id) => {
 
     let elem = document.getElementById(id)
@@ -124,6 +128,8 @@ export function getRandomArbitrary(min, max) {
 export function getRandom(min, max){
     return (Math.floor(Math.random() * max) + min)
 }
+
+// export function randomColorBased
 
 const icons = [
     'bolt',

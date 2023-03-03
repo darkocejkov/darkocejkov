@@ -8,15 +8,15 @@ import {
     useMotionValueEvent,
     useMotionValue,
     useSpring,
-    useTime, useVelocity
+    useTime, useVelocity, useMotionTemplate
 } from "framer-motion";
-import {downloadFile, getFileInfo, smoothScrollId} from "../GlobalFunctions";
-import Background from "../Components/Background";
+import {downloadFile, getFileInfo, smoothScrollId, smoothScrollTop} from "../GlobalFunctions";
+import Background, {SketchComposition, useSketch} from "../Components/Background";
 import {
     Accordion, BorderDiv,
-    BoxCarousel, CardBox,
+    BoxCarousel, CardBox, CurvedText,
     CustomButton,
-    CustomLink,
+    CustomLink, DepthText,
     FillLink, FunLink,
     InfoBox,
     Link, MenuWrapper, Rule,
@@ -41,24 +41,192 @@ const springSettings = {
     restDelta: 0.001
 }
 
-export const ScrollView = ({}) => {
+
+const Landing = ({svg = true}) => {
+
+    const landingRef = useRef()
+
+    const {scrollYProgress} = useScroll({target: landingRef})
+
+    const curveTitle = useSpring(useTransform(scrollYProgress, [0, 1], [40, 100]))
+    const curveTitle2 = useSpring(useTransform(scrollYProgress, [0, 1], [-100, 100]))
+    const curveTitle3 = useSpring(useTransform(scrollYProgress, [0, 1], [-5, 100]))
+
+    const opacityCurve = useTransform(scrollYProgress, [0, .1], [0, 1])
+
+    const curveTitlePercent = useMotionTemplate`${curveTitle}%`
+    const curveTitlePercent2 = useMotionTemplate`${curveTitle2}%`
+    const curveTitlePercent3 = useMotionTemplate`${curveTitle3}%`
+
+    const fontSizeA = useMotionTemplate`${useSpring(useTransform(scrollYProgress, [0, .5, 1], [0, 10, 2]))}rem`
+    const fontSizeB = useMotionTemplate`${useSpring(useTransform(scrollYProgress, [0, 1], [0, 5]))}rem`
+    const fontSizeC = useMotionTemplate`${useSpring(useTransform(scrollYProgress, [0, 1], [0, 15]))}rem`
+    const fontSizeD = useMotionTemplate`${useSpring(useTransform(scrollYProgress, [0, .5, 1], [4, 20, 4]))}rem`
+
+    useMotionValueEvent(scrollYProgress, "change", (l) => {
+        console.log(l)
+    })
+
+    return(
+        <>
+            <div className={'fixed top-0 left-0 lg:h-[500vh] h-[200vh] w-screen z-0'} ref={landingRef}>
+
+                {svg &&
+                    <svg width="100%" height="100%" viewBox="1000 1000 1000 1000">
+                        <path id="curve1" fill="transparent" d="M 0.17 0.23 c 0 0 60.43 510.17 228.93 486.77 s 243.8 -61.37 408.77 -54.05 c 172.09 7.64 340.13 139.95 364.73 -101.15 C 1011.5 178.9 908.8 -0.8 714.6 87.4 C 371.9 205.7 297.2 648.8 696.7 768.2 C 982.4 834.1 1418.8 626.5 1610.8 787.2"></path>
+
+                        <path id="curve2" fill="transparent" d="M 0.17 0.23 c 0 0 105.85 77.7 276.46 73.2 s 243.8 -61.37 408.77 -54.05 c 172.09 7.64 213.4 92.34 1019.2 914.02"></path>
+
+                        <path id="curve3" fill="transparent" d="M 20.4 471.3 C 407.7 906.6 1274.9 116.4 1736.9 482.5"></path>
+
+                        <path id="curve4" fill="transparent" d="M 1697.9 97.4 C 1149.1333 384.2333 1.4 67.3 0.3 971.3"></path>
+
+                        <path id="curve5" fill="transparent" d="M 798.3 2.6 C 641.6667 64.3333 455.7 2.6 328.4 187.8 C 39.3 600.8 967.1667 422.6 970.2 564"></path>
+
+                        <text width="100%">
+                            <motion.textPath
+                                animate={{
+                                    startOffset: ['100%','-20%'],
+                                }}
+                                transition={{
+                                    type: 'spring',
+                                    mass: 3
+                                }}
+                                style={{
+                                    fontSize: fontSizeA,
+                                    opacity: opacityCurve,
+                                }}
+                                alignmentBaseline="top"
+                                href="#curve1"
+                                startOffset={curveTitlePercent}
+                                className={'font-tabi font-bold fill-orange-400 stroke-slate-900 stroke-2'}
+                            >
+                                Darko Cejkov
+                            </motion.textPath>
+
+                            <motion.textPath
+                                animate={{
+                                    startOffset: ['-100%','10%'],
+                                }}
+                                transition={{
+                                    type: 'spring',
+                                    mass: 0.5
+                                }}
+                                style={{
+                                    fontSize: fontSizeB,
+                                    opacity: opacityCurve,
+                                }}
+                                alignmentBaseline="top"
+                                href="#curve2"
+                                startOffset={curveTitlePercent}
+                                className={'font-tabi fill-amber-400 stroke-orange-900 stroke-2'}
+                            >
+                                Darko Cejkov
+                            </motion.textPath>
+
+                            <motion.textPath
+                                animate={{
+                                    startOffset: ['-100%','10%'],
+                                }}
+                                transition={{
+                                    type: 'spring',
+                                    mass: 2
+                                }}
+                                style={{
+                                    fontSize: fontSizeC,
+                                    opacity: opacityCurve,
+                                }}
+                                alignmentBaseline="top"
+                                href="#curve3"
+                                startOffset={curveTitlePercent}
+                                className={'font-maruMega fill-slate-900 stroke-slate-50 stroke-1'}
+                            >
+                                Darko Cejkov
+                            </motion.textPath>
+
+                            <motion.textPath
+                                animate={{
+                                    startOffset: ['-100%','10%'],
+                                }}
+                                transition={{
+                                    type: 'spring',
+                                    mass: 5
+                                }}
+                                style={{
+                                    fontSize: fontSizeD,
+                                    opacity: opacityCurve,
+                                }}
+                                alignmentBaseline="top"
+                                href="#curve4"
+                                startOffset={curveTitlePercent2}
+                                className={'font-cositimes fill-slate-900 stroke-slate-50 stroke-1'}
+                            >
+                                Darko Cejkov
+                            </motion.textPath>
+
+                            <motion.textPath
+                                animate={{
+                                    startOffset: ['0%','10%'],
+                                }}
+                                transition={{
+                                    type: 'spring',
+                                    mass: .1
+                                }}
+                                style={{
+                                    fontSize: fontSizeB,
+                                    opacity: opacityCurve,
+                                }}
+                                alignmentBaseline="top"
+                                href="#curve5"
+                                startOffset={curveTitlePercent3}
+                                className={'font-sectraDisplay fill-slate-900 stroke-slate-50 stroke-1'}
+                            >
+                                Darko Cejkov
+                            </motion.textPath>
+
+                        </text>
+                    </svg>
+                }
+
+            </div>
+
+            <DepthText n={5} color={'slate'}>
+                <h1 className={'md:text-9xl text-5xl font-tabi font-bold'}>Darko Cejkov</h1>
+                <h2 className={'text-4xl font-tabi'}>Fullstack Developer</h2>
+            </DepthText>
+
+            <div className={'h-[1px] w-screen gradient-background z-0'}/>
+
+            {/*<div className={'h-screen w-2/3 z-0 text-center relative flex flex-col justify-center items-center gap-0'}>*/}
+            {/*    <div className={'absolute inset-1/2 flex flex-col justify-center items-center gap-0 text-slate-900'}>*/}
+            {/*        <h1 className={'md:text-9xl text-5xl font-tabi font-bold'}>Darko Cejkov</h1>*/}
+            {/*        <h2 className={'text-4xl font-tabi opacity-80'}>Fullstack Developer</h2>*/}
+            {/*    </div>*/}
+            {/*    <div className={'absolute inset-1/2 flex flex-col justify-center items-center gap-0 scale-[.9] text-slate-80 '}>*/}
+            {/*        <h1 className={'md:text-9xl text-5xl font-tabi font-bold'}>Darko Cejkov</h1>*/}
+            {/*        <h2 className={'text-4xl font-tabi opacity-80'}>Fullstack Developer</h2>*/}
+            {/*    </div>*/}
+            {/*</div>*/}
+
+        </>
+    )
+
+}
+
+export const ScrollView = ({sketchControls}) => {
 
     const {scrollYProgress, scrollY} = useScroll()
 
-    const [blind, setBlind] = useState(1)
-
     const titleView = useRef()
 
-    // const bottomProgress = useSpring(useTransform(scrollYProgress, [0, .3], [0, 1]), springSettings)
-    // const sideProgress = useSpring(useTransform(scrollYProgress, [.3, .6], [0, 1]), springSettings)
-    // const topProgress = useSpring(useTransform(scrollYProgress, [.6, 1], [0, 1]), springSettings)
 
     const bottomProgress = useTransform(scrollYProgress, [0, .3], [0, 1])
     const sideProgress = useTransform(scrollYProgress, [.3, .6], [0, 1])
     const topProgress = useTransform(scrollYProgress, [.6, 1], [0, 1])
 
-    const scrollVelocity = useVelocity(scrollY)
-    const scrollDirection = useRef(1)
+
+
+    const {renderControls, states} = useSketch()
 
     const links = [
         {label: 'GitHub', link: 'https://github.com/darkocejkov'},
@@ -73,59 +241,19 @@ export const ScrollView = ({}) => {
         ]}
     ]
 
-    const sections = [
-        {
-            id: "experience",
-            label: "Experience",
-
-        },
-    ]
-
-    const vvcDescription = [
-        {
-            title: 'Project Lead',
-            key: '0',
-            children: [
-                {title: 'a', key: '0-0'},
-                {title: 'a', key: '0-1'},
-                {title: 'a', key: '0-2'},
-                {title: 'a', key: '0-3'},
-            ]
-        },
-        {
-            title: 'Frontend Developer',
-            key: '1',
-            children: [
-                {title: 'b', key: '1-0'},
-                {title: 'b', key: '1-1'},
-                {title: 'b', key: '1-2'},
-                {title: 'b', key: '1-3'},
-            ]
-        },
-        {
-            title: 'Backend Engineer',
-            key: '2',
-            children: [
-                {title: 'c', key: '2-0'},
-                {title: 'c', key: '2-1'},
-                {title: 'c', key: '2-2'},
-                {title: 'c', key: '2-3'},
-            ]
-        },
-    ]
-
     const sceneRef = useRef()
 
-    const [play, setPlay] = useState(true)
-    const [front, setFront] = useState(false)
-    const [hide, setHide] = useState(false)
-    const [controls, setControls] = useState(false)
+    const checkpointRef = useRef()
+    const checkpointInView = useInView(checkpointRef)
 
     return(
         <>
-            <Background play={play} hide={hide} showFront={front} blind={blind} controls={controls} className={'h-screen'}/>
+            <SketchComposition {...states} className={'h-screen'}/>
 
-            <div className={'fixed right-[5%] top-[50%] -translate-y-1/2 z-50 flex flex-col gap-2 select-none'}>
+            <div className={'fixed right-[5%] top-[50%] -translate-y-1/2 z-50 md:text-3xl flex flex-col gap-2 select-none'}>
+                <div>
+                    <button onClick={() => smoothScrollTop()}>🐻</button>
+                </div>
                 <div>
                     <button onClick={() => smoothScrollId('experience')}>💼</button>
                 </div>
@@ -145,7 +273,7 @@ export const ScrollView = ({}) => {
                     className={'fixed bg-orange-500 bottom-0 left-0 z-20 right-0 h-[5px] origin-center'}
                     // className={'progress-bar'}
                     style={{ scaleX: bottomProgress }} />
-
+            {}
                 <motion.div
                     className={'fixed bg-orange-500 w-[5px] left-0 inset-y-0 z-20 h-full origin-bottom'}
                     // className={'progress-bar'}
@@ -172,7 +300,7 @@ export const ScrollView = ({}) => {
                 />
 
                 <motion.div
-                    className={`fixed bottom-0 z-50 p-5`}
+                    className={`fixed bottom-0 z-50 p-5 flex flex-row flex-wrap gap-3 justify-center md:justify-start`}
                     drag
                     dragElastic={0.1}
                     dragConstraints={{
@@ -187,142 +315,27 @@ export const ScrollView = ({}) => {
                     //     y: [-100, 0]
                     // }}
                 >
-                    <BorderDiv className={'font-tabi font-bold text-center text-3xl sm:text-6xl pointer-events-auto flex flex-col flex-nowrap items-center justify-center gap-3 p-4 backdrop-blur-md rounded-md shadow-lg relative'}>
-                        <h1>
-                            Darko Cejkov
-                        </h1>
-                        <div className={'flex self-center gap-0 text-sm hover:gap-6 font-normal transition-all'}>
 
-                            {hide
-                                ? (
-                                    <button onClick={() => setHide(false)} className={'bg-transparent hover:bg-slate-600/10 p-3 rounded-md group'}>
-                                        <i className="fa-solid fa-eye fa-xl"></i>
+                    {/*<motion.h1*/}
+                    {/*    className={'font-tabi lg:font-bold text-3xl sm:text-6xl p-2 md:p-3 backdrop-blur-md rounded-md shadow-lg'}*/}
+                    {/*>*/}
+                    {/*    Darko Cejkov*/}
+                    {/*</motion.h1>*/}
 
-
-                                        <span className={'text-white bg-slate-700/20 p-2 rounded-lg text-2xl group-hover:scale-100 scale-0 absolute -top-1/2 left-0 transition-all'}>
-                                            Show Sketch
-                                        </span>
-
-                                    </button>
-                                )
-                                : (
-                                    <button onClick={() => setHide(true)} className={'bg-transparent hover:bg-slate-600/10 p-3 rounded-md group'}>
-                                        <i className="fa-solid fa-eye-low-vision fa-xl"></i>
-
-
-                                        <span className={'text-white bg-slate-700/20 p-2 rounded-lg text-2xl group-hover:scale-100 scale-0 absolute -top-1/2 left-0 transition-all'}>
-                                            Hide Sketch
-                                        </span>
-
-                                    </button>
-                                )}
-
-                            {front
-                                ? (
-                                    <button onClick={() => setFront(false)} className={'bg-transparent hover:bg-slate-600/10 p-3 rounded-md group'}>
-                                        <i className="fa-solid fa-send-backward fa-xl"></i>
-
-
-                                        <span className={'text-white bg-slate-700/20 p-2 rounded-lg text-2xl group-hover:scale-100 scale-0 absolute -top-1/2 left-0 transition-all'}>
-                                            Send Sketch Backwards
-                                        </span>
-
-                                    </button>
-
-                                )
-                                : (
-                                    <button onClick={() => setFront(true)} className={'bg-transparent hover:bg-slate-600/10 p-3 rounded-md group'}>
-                                        <i className="fa-solid fa-bring-forward fa-xl"></i>
-
-
-                                        <span className={'text-white bg-slate-700/20 p-2 rounded-lg text-2xl group-hover:scale-100 scale-0 absolute -top-1/2 left-0 transition-all'}>
-                                            Bring Sketch Forwards
-                                        </span>
-
-                                    </button>
-
-                                )}
-
-                            {controls
-                                ? (
-                                    <button onClick={() => setControls(false)} className={'bg-transparent hover:bg-slate-600/10 p-3 rounded-md group text-center'}>
-
-                                        <i className="fa-solid fa-circle-half-stroke fa-xl transition-all"></i>
-
-                                        <span className={'text-white bg-slate-700/20 p-2 rounded-lg text-2xl group-hover:scale-100 scale-0 absolute -top-1/2 left-0 transition-all'}>
-                                            Close Controls
-                                        </span>
-
-                                    </button>
-                                )
-                                : (
-                                    <button onClick={() => setControls(true)} className={'bg-transparent hover:bg-slate-600/10 p-3 rounded-md group text-center'}>
-
-                                        <i className="self-center fa-duotone fa-circle-half-stroke fa-xl fa-rotate-180 transition-all"></i>
-
-
-                                        <span className={'text-white bg-slate-700/20 p-2 rounded-lg text-2xl group-hover:scale-100 scale-0 absolute -top-1/2 left-0 transition-all'}>
-                                            Open Controls
-                                        </span>
-
-                                    </button>
-                                )
-                            }
-
-
-
-                            <button className={'bg-transparent hover:bg-slate-600/10 p-3 rounded-md group'}>
-                                <i className="fa-solid fa-chevron-left fa-xl"></i>
-
-
-                                <span className={'text-white bg-slate-700/20 p-2 rounded-lg text-2xl group-hover:scale-100 scale-0 absolute -top-1/2 left-0 transition-all'}>
-                                    Previous Sketch
-                                </span>
-
-                            </button>
-
-                            {play
-                                ? (
-                                    <button onClick={() => setPlay(false)} className={'bg-transparent hover:bg-slate-600/10 p-3 rounded-md group'}>
-                                        <i className="fa-solid fa-pause fa-xl"></i>
-
-                                        <span className={'text-white bg-slate-700/20 p-2 rounded-lg text-2xl group-hover:scale-100 scale-0 absolute -top-1/2 left-0 transition-all'}>
-                                    Pause Sketch
-                                </span>
-                                    </button>
-                                )
-                                : (
-                                    <button onClick={() => setPlay(true)} className={'bg-transparent hover:bg-slate-600/10 p-3 rounded-md group'}>
-                                        <i className="fa-solid fa-play fa-xl"></i>
-
-                                        <span className={'text-white bg-slate-700/20 p-2 rounded-lg text-2xl group-hover:scale-100 scale-0 absolute -top-1/2 left-0 transition-all'}>
-                                    Play Sketch
-                                </span>
-                                    </button>
-                                )}
-
-
-
-                            {/*<button>*/}
-                            {/*    <i className="fa-solid fa-pause fa-2xl"></i>*/}
-                            {/*</button>*/}
-
-                            <button className={'bg-transparent hover:bg-slate-600/10 p-3 rounded-md group'}>
-                                <i className="fa-solid fa-chevron-right fa-xl"></i>
-
-                                <span className={'text-white bg-slate-700/20 p-2 rounded-lg text-2xl group-hover:scale-100 scale-0 absolute -top-1/2 left-0 transition-all'}>
-                                    Next Sketch
-                                </span>
-                            </button>
-
+                    <BorderDiv className={'font-tabi font-bold text-center text-3xl sm:text-6xl pointer-events-auto flex flex-col flex-nowrap items-center justify-center gap-3 p-1 md:p-2 backdrop-blur-md rounded-md shadow-lg relative'}>
+                        <div className={'flex flex-wrap self-center font-tabi gap-0 text-xs pointer-events-auto lg:hover:gap-2 font-normal transition-all'}>
+                            {renderControls()}
                         </div>
                     </BorderDiv>
-
                 </motion.div>
+
             </div>
 
 
-            <div ref={sceneRef} className='min-h-screen z-0 overflow-x-clip bg-gradient-to-b to-cyan-200 from-blue-500 flex flex-col flex-1 gap-5 pt-24 p-12 items-center justify-evenly select-none perspective-none'>
+            <div ref={sceneRef} className='min-h-screen z-0 overflow-x-clip bg-gradient-to-b to-cyan-200 from-blue-500 flex flex-col flex-1 gap-5 p-12 items-center justify-evenly select-none perspective-none'>
+
+                {/*<Landing svg={false}/>*/}
+                <Landing />
 
                 <InfoBox sceneRef={sceneRef} id={'experience'}>
 
@@ -332,7 +345,7 @@ export const ScrollView = ({}) => {
                                 // <FunLink url={'https://www.vvc.ca'} />
                                 <Link url={'https://www.vvc.ca'} />
                             }>
-                                <h2 className="md:text-4xl text-2xl font-tabi">
+                                <h2 className="md:text-4xl text-xl font-tabi">
                                     Van Valkenburg Communications (VVC)
                                 </h2>
                                 <SubtitleRule textPos={'right'} classes={'md:text-2xl text-xl font-maru font-bold uppercase'}>
@@ -379,9 +392,9 @@ export const ScrollView = ({}) => {
                             </div>
 
                             <div className={'flex flex-col gap-2 mt-5'}>
-                                <h3 className={'font-aeonik font-bold'}>Description, Responsibilities, Achievements</h3>
+                                <h3 className={'font-aeonik font-bold'} >Description, Responsibilities, Achievements</h3>
 
-                                <TextBox className={'font-fira md:p-6 font-thin flex flex-col gap-5'}>
+                                <TextBox className={'font-fira md:p-6 font-thin flex flex-col gap-5'} >
 
                                     <div className={'tree'}>
                                         <SubtitleRule classes={'text-xl text-center font-bold'} textPos={'center'}>
@@ -406,7 +419,7 @@ export const ScrollView = ({}) => {
                                         </div>
                                     </div>
 
-                                    <div className={'tree'}>
+                                    <div className={'tree'} >
                                         <SubtitleRule classes={'text-xl text-center'} textPos={'center'}>
                                             Frontend Development
                                         </SubtitleRule>
@@ -550,7 +563,7 @@ export const ScrollView = ({}) => {
                                 <TooltipWrapper fit tooltip={
                                     <Link url={'https://www.linkedin.com/company/traction-on-demand'} />
                                 }>
-                                    <h2 className="md:text-4xl text-2xl font-tabi">
+                                    <h2 className="md:text-4xl text-xl font-tabi">
                                         Traction on Demand
                                     </h2>
                                     <TitleRule classes={'md:text-2xl text-xl font-maru font-bold uppercase'}>
@@ -575,7 +588,7 @@ export const ScrollView = ({}) => {
                                 </div>
 
                                 <div className={'flex flex-col gap-2 mt-5'}>
-                                    <h3 className={'font-aeonik font-bold'}>Description, Responsibilities, Achievements</h3>
+                                    <h3 className={'font-aeonik font-bold'} ref={checkpointRef}>Description, Responsibilities, Achievements</h3>
 
                                     <TextBox className={'font-fira font-thin p-3 flex flex-col gap-5'}>
                                         <div className={'tree'}>
