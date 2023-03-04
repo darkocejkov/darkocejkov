@@ -39,21 +39,21 @@ function App() {
 			component: <ScrollView  />,
 			icon: <i className="fa-thin fa-scroll"></i>,
 		},
-		{
-			title: 'Image Grids',
-			component: <PhotoGrid />,
-			icon: <i className="fa-thin fa-grid"></i>,
-		},
-		{
-			title: 'Reference Sheet',
-			component: <CheatSheet />,
-			icon: <i className="fa-thin fa-cookie"></i>,
-		},
-		{
-			title: 'Flexbox Playground',
-			component: <FlexView />,
-			icon: <i className="fa-thin fa-boxes-stacked"></i>,
-		},
+		// {
+		// 	title: 'Image Grids',
+		// 	component: <PhotoGrid />,
+		// 	icon: <i className="fa-thin fa-grid"></i>,
+		// },
+		// {
+		// 	title: 'Reference Sheet',
+		// 	component: <CheatSheet />,
+		// 	icon: <i className="fa-thin fa-cookie"></i>,
+		// },
+		// {
+		// 	title: 'Flexbox Playground',
+		// 	component: <FlexView />,
+		// 	icon: <i className="fa-thin fa-boxes-stacked"></i>,
+		// },
 	]
 
 

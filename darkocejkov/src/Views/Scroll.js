@@ -69,7 +69,6 @@ const Landing = ({svg = true}) => {
         'font-fira',
     ]
 
-
     const colors = [
         'fill-slate-900',
         'fill-orange-500',
@@ -77,6 +76,16 @@ const Landing = ({svg = true}) => {
         'fill-sky-600',
         'fill-blue-600',
         'fill-rose-500',
+    ]
+
+    const words = [
+        "Darko",
+        "Cejkov",
+        "Developer",
+        "Fullstack",
+        "Fun",
+        "Design",
+        "Creative",
     ]
 
     // const paths = require('../assets/svg/SVGPaths').contourPaths
@@ -122,12 +131,13 @@ const Landing = ({svg = true}) => {
             let fontSizeList = []
             for(let x = 0; x < nSize; x++){
                 fontSizeList.push(
-                    `${getRandomFloat(0, 8)}rem`
+                    `${getRandom(0, 12)}rem`
                 )
             }
 
             let randomFont = randomFromList(fonts)
             let randomColor = randomFromList(colors)
+            let randomWord = randomFromList(words)
             // let randomStroke = randomFromList(colors)
 
             let transitionConfig = {
@@ -157,12 +167,13 @@ const Landing = ({svg = true}) => {
                     href={`#curve${i}`}
                     className={`${randomFont} ${randomColor}`}
                 >
-                    Darko Cejkov
+                    {randomWord}
                 </motion.textPath>
 
             )
         })
     }, [])
+
 
     return(
         <>
@@ -188,7 +199,7 @@ const Landing = ({svg = true}) => {
                     </motion.svg>
                 }
 
-                <div className={'absolute top-0 inset-1/2 perspective-none'}>
+                <div className={'absolute top-0 inset-1/2 rotate-d'}>
                     <DepthText spread={6} n={6} color={'slate'} />
                 </div>
 
@@ -255,7 +266,7 @@ export const ScrollView = ({sketchControls}) => {
             <div className={'fixed right-[5%] top-[50%] -translate-y-1/2 z-50 md:text-3xl flex flex-col gap-8 select-none'}>
                 <div>
                     <button className={'relative group'} onClick={() => smoothScrollTop()}>
-                        <p className={'animate-rotate-rock'}>🐻</p>
+                        <p className={'rotate-a flex justify-center items-center blob blob-9'}>🐻</p>
                         <div className={'absolute right-[110%] uppercase p-0 opacity-0 group-hover:opacity-100 group-hover:p-1 group-hover:px-12 transition-all rounded-full border-4 text-right top-0 whitespace-nowrap font-rubik text-lg border-blue-200'}>
                             About Me
                         </div>
@@ -263,15 +274,15 @@ export const ScrollView = ({sketchControls}) => {
                 </div>
                 <div>
                     <button className={'relative group'} onClick={() => smoothScrollId('experience')}>
-                        <p className={'animate-rotate-rock'}>💼</p>
+                        <p className={'rotate-b flex justify-center items-center blob blob-76'}>💼</p>
                         <div className={'absolute right-[110%] uppercase p-0 opacity-0 group-hover:opacity-100 group-hover:p-1 group-hover:px-12 transition-all rounded-full border-4 text-right top-0 whitespace-nowrap font-rubik text-lg border-blue-200'}>
                             Experience
                         </div>
                     </button>
                 </div>
                 <div>
-                    <button className={'relative group'} onClick={() => smoothScrollId('education')}>
-                        <p className={'animate-rotate-rock'}>🎓</p>
+                    <button className={'blob relative group'} onClick={() => smoothScrollId('education')}>
+                        <p className={'rotate-a flex justify-center items-center blob blob-30'}>🎓</p>
                         <div className={'absolute right-[110%] uppercase p-0 opacity-0 group-hover:opacity-100 group-hover:p-1 group-hover:px-12 transition-all rounded-full border-4 text-right top-0 whitespace-nowrap font-rubik text-lg border-blue-200'}>
                             Education
                         </div>
@@ -279,7 +290,7 @@ export const ScrollView = ({sketchControls}) => {
                 </div>
                 <div>
                     <button className={'relative group'} onClick={() => smoothScrollId('links')}>
-                        <p className={'animate-rotate-rock'}>🔗</p>
+                        <p className={'rotate-c flex justify-center items-center blob blob-13'}>🔗</p>
                         <div className={'absolute right-[110%] uppercase p-0 opacity-0 group-hover:opacity-100 group-hover:p-1 group-hover:px-12 transition-all rounded-full border-4 text-right top-0 whitespace-nowrap font-rubik text-lg border-blue-200'}>
                             Links
                         </div>
@@ -287,9 +298,17 @@ export const ScrollView = ({sketchControls}) => {
                 </div>
                 <div>
                     <button className={'relative group'} onClick={() => smoothScrollId('files')}>
-                        <p className={'animate-rotate-rock'}>📁</p>
+                        <p className={'rotate-b flex justify-center items-center blob blob-12'}>📁</p>
                         <div className={'absolute right-[110%] uppercase p-0 opacity-0 group-hover:opacity-100 group-hover:p-1 group-hover:px-12 transition-all rounded-full border-4 text-right top-0 whitespace-nowrap font-rubik text-lg border-blue-200'}>
                             Files
+                        </div>
+                    </button>
+                </div>
+                <div>
+                    <button className={'relative group'} onClick={() => smoothScrollId('projects')}>
+                        <p className={'rotate-b flex justify-center items-center blob blob-44'}>💽</p>
+                        <div className={'absolute right-[110%] uppercase p-0 opacity-0 group-hover:opacity-100 group-hover:p-1 group-hover:px-12 transition-all rounded-full border-4 text-right top-0 whitespace-nowrap font-rubik text-lg border-blue-200'}>
+                            Projects
                         </div>
                     </button>
                 </div>
@@ -350,7 +369,7 @@ export const ScrollView = ({sketchControls}) => {
                     {/*</motion.h1>*/}
 
                     <BorderDiv className={'font-tabi font-bold text-center text-3xl sm:text-6xl pointer-events-auto flex flex-col flex-nowrap items-center justify-center gap-3 p-1 md:p-2 backdrop-blur-md rounded-md shadow-lg relative'}>
-                        <div className={'flex flex-wrap self-center font-tabi gap-0 text-xs pointer-events-auto lg:hover:gap-2 font-normal transition-all'}>
+                        <div className={'flex flex-wrap self-center font-aeonik gap-0 text-xs pointer-events-auto lg:hover:gap-2 font-normal transition-all'}>
                             {renderControls()}
                         </div>
                     </BorderDiv>
@@ -827,6 +846,17 @@ export const ScrollView = ({sketchControls}) => {
 
 
                     </div>
+
+                </InfoBox>
+
+                <InfoBox id={'projects'}>
+                    <SubtitleRule textPos={'left'} classes={'md:text-4xl text-2xl font-tabi'}>
+                        Projects
+                    </SubtitleRule>
+
+                    {/*<div className={'md:text-2xl text-xl font-maru font-bold uppercase'}>*/}
+                    {/*    Self*/}
+                    {/*</div>*/}
 
                 </InfoBox>
 

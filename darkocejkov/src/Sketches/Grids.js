@@ -9,9 +9,9 @@ export const CubeGrid = ({a, b, c}) => {
         let coords = []
         let array = []
 
-        for(let x = -a; x < a; x ++){
-           for(let i = -b; i < b; i ++){
-               for(let j = -c; j < c; j++){
+        for(let x = -a; x <= a; x ++){
+           for(let i = -b; i <= b; i ++){
+               for(let j = -c; j <= c; j++){
                    coords.push(
                        [x, i, j]
                        // <Box position={[x, i, j]}/>

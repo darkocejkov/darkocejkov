@@ -23,7 +23,7 @@ const ControlButton = ({label, hidden = false, onClick, id, children, map, disab
     return(
         <button disabled={disabled} onClick={onClick} className={`${hidden ? 'hidden' : 'visible'} control bg-transparent hover:bg-slate-600/10 p-3 rounded-md group`}>
             {children}
-            <span className={'text-white bg-slate-700/50 origin-bottom p-2 rounded-lg text-md group-hover:scale-100 scale-0 absolute -top-1/2 right-0 transition-all'}>
+            <span className={'text-white bg-slate-700/50 whitespace-nowrap origin-bottom p-2 rounded-lg text-lg group-hover:scale-100 scale-0 absolute bottom-[110%] transition-all'}>
                 {label}
             </span>
         </button>
@@ -62,13 +62,13 @@ export const useSketch = () => {
     const sketches = [
         {
             title: 'Cube Grid',
-            component: <CubeGrid a={2} b={2} c={2} />,
+            component: <CubeGrid a={1} b={1} c={1} />,
             defaultStates: [{play: true}],
             disabledControls: ['play']
         },
         {
             title: 'Sphere Grid',
-            component: <SphereGrid a={2} b={2} c={2} />,
+            component: <SphereGrid a={1} b={1} c={1} />,
             defaultStates: [{play: true}],
             disabledControls: [],
         },
@@ -148,7 +148,7 @@ export const useSketch = () => {
                     )
                     : (
 
-                        <ControlButton hidden={hide} onClick={() => setFront(true)} label={"Send Sketch Backwards"}>
+                        <ControlButton hidden={hide} onClick={() => setFront(true)} label={"Send Sketch Forwards"}>
                             <i className="fa-solid fa-bring-forward fa-xl"></i>
                         </ControlButton>
                     )}

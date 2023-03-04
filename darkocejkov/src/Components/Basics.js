@@ -6,7 +6,7 @@ import {
     useDragControls,
     useMotionValueEvent,
     useTransform,
-    useMotionValue, useSpring
+    useMotionValue, useSpring, useAnimationFrame
 } from "framer-motion";
 import {byteSized, getFileInfo, humanFileSize, mimeType} from "../GlobalFunctions";
 import {useDragScroll} from "../Hooks/CustomHooks";
@@ -722,12 +722,15 @@ export const BlobUp = ({children, x = 50, y = 50}) => {
 
 const colorMap = [
     'text-slate-900',
-    'text-orange-500',
-    'text-lime-500',
-    'text-sky-600',
-    'text-blue-600',
-    'text-rose-500',
+    'text-orange-50',
+    // 'text-orange-500',
+    // 'text-lime-500',
+    // 'text-sky-600',
+    // 'text-blue-600',
+    // 'text-rose-500',
 ]
+
+const angle = Math.random()*Math.PI*2;
 
 const TitleText = ({total, i, x, y, active, setActive, spread}) => {
 
@@ -745,8 +748,25 @@ const TitleText = ({total, i, x, y, active, setActive, spread}) => {
     const dy = useSpring(y, springConfig)
     // const dy = useSpring(y)
 
+    const ref = useRef()
+
+    var angle = 0
+    const r = 250
+
+    // useAnimationFrame((time, delta) => {
+    //     if(active) return
+    //
+    //     console.log(`theta ${angle} x ${Math.cos(angle)*r} y ${Math.sin(angle)*r}`)
+    //
+    //     x.set(Math.cos(angle)*r)
+    //     y.set(Math.sin(angle)*r)
+    //
+    //     angle += 1/360
+    // })
+
     return(
         <motion.div
+            ref={ref}
             drag
             dragElastic={1}
             dragConstraints={{
@@ -755,8 +775,8 @@ const TitleText = ({total, i, x, y, active, setActive, spread}) => {
                 right: 0,
                 bottom: 0
             }}
-            dragTransition={{ bounceStiffness: 500, bounceDamping: 20, mass: 1}}
-            onDragStart={() => setActive(i)}
+            dragTransition={{ bounceStiffness: 500, ibounceDamping: 20, mass: 1}}
+            onDragStart={() => setActive(true)}
             style={{
                 scale: `${(1 - (i * (1/spread))).toFixed(2)}`,
                 opacity: (1 - (i * (1/spread))).toFixed(2),
@@ -765,7 +785,7 @@ const TitleText = ({total, i, x, y, active, setActive, spread}) => {
                 x: active === i ? x : dx,
                 y: active === i ? y : dy,
             }}
-            className={`absolute inset-1/2 flex flex-col justify-center items-center gap-0 ${colorMap[i]}`}>
+            className={`absolute inset-1/2 flex flex-col justify-center items-center gap-0 ${colorMap[i] || colorMap[colorMap.length - 1]}`}>
 
             <motion.h1
                 initial={{
@@ -807,17 +827,42 @@ const TitleText = ({total, i, x, y, active, setActive, spread}) => {
     )
 }
 
+const rad = 100
+
 export const DepthText = ({children, n, spread = n}) => {
 
     const springConfig = {
         // stiffness: Math.max(700 - d * 120, 0),
         // damping: (20 + (i * -2)),
-        mass: 1.5,
+        mass: 2,
         // mass: x,
     };
 
     const xx = useSpring(useMotionValue(0), springConfig)
     const yy = useSpring(useMotionValue(0), springConfig)
+
+
+
+    // useEffect(() => {
+    //     setTimeout(() => {
+    //         // xx.set(500)
+    //         yy.set(100)
+    //         xx.set(50)
+    //
+    //         setTimeout(() => {
+    //             // xx.set(500)
+    //             yy.set(-50)
+    //             xx.set(-30)
+    //
+    //             setTimeout(() => {
+    //                 // xx.set(500)
+    //                 yy.set(0)
+    //                 xx.set(0)
+    //
+    //             }, 2000)
+    //         }, 2000)
+    //     }, 1000)
+    // }, [])
 
     const [active, setActive] = useState(0)
 
