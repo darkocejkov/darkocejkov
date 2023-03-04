@@ -648,6 +648,39 @@
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#e43142",endColorstr="#a66a6a",GradientType=1);
 }
 
+.btn-gradient-2 {
+  background: linear-gradient(white, white) padding-box,
+  linear-gradient(90deg, rgba(228,49,66,1) 0%, rgba(217,206,66,1) 25%, rgba(75,147,206,1) 48%, rgba(186,130,179,1) 75%, rgba(166,106,106,1) 100%) border-box;
+  border-radius: 50em;
+  border: 2px solid transparent;
+}
+
+.blob{
+  background-image: url("./assets/svg/blob.svg");
+}
+
+.animate-rotate-rock{
+  animation: rotate-rock 4s ease-in-out infinite both;
+}
+
+@keyframes rotate-rock{
+  0% {
+    transform: rotate(0deg);
+  }
+  25%{
+    transform: rotate(-5deg);
+  }
+  50% {
+    transform: rotate(0deg);
+  }
+  75%{
+    transform: rotate(15deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
 button > .button-download{
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 512'%3E%3C!--! Font Awesome Pro 6.3.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --%3E%3Cpath d='M2 334.5c-3.8 8.8-2 19 4.6 26l136 144c4.5 4.8 10.8 7.5 17.4 7.5s12.9-2.7 17.4-7.5l136-144c6.6-7 8.4-17.2 4.6-26s-12.5-14.5-22-14.5l-72 0 0-288c0-17.7-14.3-32-32-32L128 0C110.3 0 96 14.3 96 32l0 288-72 0c-9.6 0-18.2 5.7-22 14.5z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;

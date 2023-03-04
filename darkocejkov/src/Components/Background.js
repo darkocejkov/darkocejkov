@@ -203,6 +203,9 @@ export const useSketch = () => {
             states: {
                 play, front, hide, controls, sketch
             },
+            setters: {
+                setHide, setPlay
+            },
 
             renderControls,
         }

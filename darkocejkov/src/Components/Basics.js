@@ -706,7 +706,17 @@ export const MenuWrapper = ({children, items = [], open = false}) => {
     )
 }
 
-export const PopUp = () => {
+export const BlobUp = ({children, x = 50, y = 50}) => {
+
+
+    return(
+        <div className={'animate-rotate-rock blob absolute h-[100px] w-[100px] -translate-x-1/2 -translate-y-1/2 flex justify-center items-center'} style={{
+            top: `${y}%`,
+            left: `${x}%`,
+        }}>
+            {children}
+        </div>
+    )
 
 }
 

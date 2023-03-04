@@ -26,7 +26,7 @@ import {
     CustomLink, DepthText,
     FillLink, FunLink,
     InfoBox,
-    Link, MenuWrapper, Rule,
+    Link, MenuWrapper, BlobUp, Rule,
     StatBox, SubtitleRule, TextBox,
     TitleLetters,
     TitleRule,
@@ -135,8 +135,8 @@ const Landing = ({svg = true}) => {
                 // mass: getRandomFloat(.1, 3),
                 // bounce: getRandomFloat(0, 1),
                 delay: getRandom(1, 6),
-                duration: getRandomFloat(3, 6),
-                // repeat: Infinity,
+                duration: getRandomFloat(3, 10),
+                repeat: Infinity,
             }
 
             console.log({transitionConfig, offsetList})
@@ -167,28 +167,42 @@ const Landing = ({svg = true}) => {
     return(
         <>
             {/*fixed top-0 left-0*/}
-            <div className={'h-screen w-screen z-0 relative bottom-fade'} ref={landingRef}>
+            <motion.div
+
+                className={'h-screen w-screen z-0 relative bottom-fade'}
+                ref={landingRef}>
 
                 {svg &&
-                    <svg height={'100%'} viewBox="0 0 1920 900">
+                    <motion.svg
+                        style={{
+                            opacity: svg ? 1 : 0
+                        }}
+                        height={'100%'}
+                        viewBox="0 0 1920 900">
 
                         {curves}
 
                         <text width="100%">
                             {textPaths}
                         </text>
-                    </svg>
+                    </motion.svg>
                 }
 
                 <div className={'absolute top-0 inset-1/2 perspective-none'}>
                     <DepthText spread={6} n={6} color={'slate'} />
                 </div>
-            </div>
+
+                {/*<BlobUp x={65} y={25}>*/}
+                {/*    <h1 className={'text-3xl font-aeonik'}>*/}
+                {/*        Drag Me!*/}
+                {/*    </h1>*/}
+                {/*</BlobUp>*/}
+
+            </motion.div>
 
             <div className={'h-[1px] mb-12 w-screen gradient-background z-0'}/>
         </>
     )
-
 }
 
 export const ScrollView = ({sketchControls}) => {
@@ -202,9 +216,7 @@ export const ScrollView = ({sketchControls}) => {
     const sideProgress = useTransform(scrollYProgress, [.3, .6], [0, 1])
     const topProgress = useTransform(scrollYProgress, [.6, 1], [0, 1])
 
-
-
-    const {renderControls, states} = useSketch()
+    const {renderControls, states, setters} = useSketch()
 
     const links = [
         {label: 'GitHub', link: 'https://github.com/darkocejkov'},
@@ -221,28 +233,65 @@ export const ScrollView = ({sketchControls}) => {
 
     const sceneRef = useRef()
 
-    const checkpointRef = useRef()
-    const checkpointInView = useInView(checkpointRef)
+    const [heroTimeout, setHeroTimeout] = useState(true)
+
+    useEffect(() => {
+
+        setTimeout(() => {
+            setHeroTimeout(false)
+
+            setters.setHide(false)
+            setters.setPlay(true)
+        }, 20000)
+
+    }, [])
+
+
 
     return(
         <>
             <SketchComposition {...states} className={'h-screen'}/>
 
-            <div className={'fixed right-[5%] top-[50%] -translate-y-1/2 z-50 md:text-3xl flex flex-col gap-2 select-none'}>
+            <div className={'fixed right-[5%] top-[50%] -translate-y-1/2 z-50 md:text-3xl flex flex-col gap-8 select-none'}>
                 <div>
-                    <button onClick={() => smoothScrollTop()}>🐻</button>
+                    <button className={'relative group'} onClick={() => smoothScrollTop()}>
+                        <p className={'animate-rotate-rock'}>🐻</p>
+                        <div className={'absolute right-[110%] uppercase p-0 opacity-0 group-hover:opacity-100 group-hover:p-1 group-hover:px-12 transition-all rounded-full border-4 text-right top-0 whitespace-nowrap font-rubik text-lg border-blue-200'}>
+                            About Me
+                        </div>
+                    </button>
                 </div>
                 <div>
-                    <button onClick={() => smoothScrollId('experience')}>💼</button>
+                    <button className={'relative group'} onClick={() => smoothScrollId('experience')}>
+                        <p className={'animate-rotate-rock'}>💼</p>
+                        <div className={'absolute right-[110%] uppercase p-0 opacity-0 group-hover:opacity-100 group-hover:p-1 group-hover:px-12 transition-all rounded-full border-4 text-right top-0 whitespace-nowrap font-rubik text-lg border-blue-200'}>
+                            Experience
+                        </div>
+                    </button>
                 </div>
                 <div>
-                    <button onClick={() => smoothScrollId('education')}>🎓</button>
+                    <button className={'relative group'} onClick={() => smoothScrollId('education')}>
+                        <p className={'animate-rotate-rock'}>🎓</p>
+                        <div className={'absolute right-[110%] uppercase p-0 opacity-0 group-hover:opacity-100 group-hover:p-1 group-hover:px-12 transition-all rounded-full border-4 text-right top-0 whitespace-nowrap font-rubik text-lg border-blue-200'}>
+                            Education
+                        </div>
+                    </button>
                 </div>
                 <div>
-                    <button onClick={() => smoothScrollId('links')}>🔗</button>
+                    <button className={'relative group'} onClick={() => smoothScrollId('links')}>
+                        <p className={'animate-rotate-rock'}>🔗</p>
+                        <div className={'absolute right-[110%] uppercase p-0 opacity-0 group-hover:opacity-100 group-hover:p-1 group-hover:px-12 transition-all rounded-full border-4 text-right top-0 whitespace-nowrap font-rubik text-lg border-blue-200'}>
+                            Links
+                        </div>
+                    </button>
                 </div>
                 <div>
-                    <button onClick={() => smoothScrollId('files')}>📁</button>
+                    <button className={'relative group'} onClick={() => smoothScrollId('files')}>
+                        <p className={'animate-rotate-rock'}>📁</p>
+                        <div className={'absolute right-[110%] uppercase p-0 opacity-0 group-hover:opacity-100 group-hover:p-1 group-hover:px-12 transition-all rounded-full border-4 text-right top-0 whitespace-nowrap font-rubik text-lg border-blue-200'}>
+                            Files
+                        </div>
+                    </button>
                 </div>
             </div>
 
@@ -313,7 +362,7 @@ export const ScrollView = ({sketchControls}) => {
             <div ref={sceneRef} className='min-h-screen z-0 overflow-x-clip bg-gradient-to-br from-blue-400 to-sky-200 via-rose-200 flex flex-col flex-1 gap-5 p-12 items-center justify-evenly select-none perspective-none'>
 
                 {/*<Landing svg={false}/>*/}
-                <Landing />
+                <Landing svg={heroTimeout}/>
 
                 <InfoBox sceneRef={sceneRef} id={'experience'}>
 
@@ -566,7 +615,7 @@ export const ScrollView = ({sketchControls}) => {
                                 </div>
 
                                 <div className={'flex flex-col gap-2 mt-5'}>
-                                    <h3 className={'font-aeonik font-bold'} ref={checkpointRef}>Description, Responsibilities, Achievements</h3>
+                                    <h3 className={'font-aeonik font-bold'}>Description, Responsibilities, Achievements</h3>
 
                                     <TextBox className={'font-fira font-thin p-3 flex flex-col gap-5'}>
                                         <div className={'tree'}>
