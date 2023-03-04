@@ -35,9 +35,9 @@ const ControlButton = ({label, hidden = false, onClick, id, children, map, disab
 
 export const useSketch = () => {
 
-    const [play, setPlay] = useState(true)
+    const [play, setPlay] = useState(false)
     const [front, setFront] = useState(false)
-    const [hide, setHide] = useState(false)
+    const [hide, setHide] = useState(true)
     const [controls, setControls] = useState(false)
 
     // const controlMap = [
@@ -62,13 +62,13 @@ export const useSketch = () => {
     const sketches = [
         {
             title: 'Cube Grid',
-            component: <CubeGrid a={4} b={4} c={2} />,
+            component: <CubeGrid a={2} b={2} c={2} />,
             defaultStates: [{play: true}],
             disabledControls: ['play']
         },
         {
             title: 'Sphere Grid',
-            component: <SphereGrid a={4} b={4} c={2} />,
+            component: <SphereGrid a={2} b={2} c={2} />,
             defaultStates: [{play: true}],
             disabledControls: [],
         },

@@ -6,6 +6,10 @@ export const smoothScrollRef = (ref) => {
     }
 }
 
+export const randomHex = () => {
+    return Math.floor(Math.random()*16777215).toString(16);
+}
+
 export const smoothScrollTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -87,6 +91,17 @@ export function humanFileSize(bytes, si=false, dp=1) {
     return bytes.toFixed(dp) + ' ' + units[u];
 }
 
+export const randomFromList = (array) => {
+    return array[Math.floor(Math.random() * array.length)]
+}
+
+export const evenSpread = (max, current, base, dir = 1) => {
+    return {
+        even: (base + (dir)*(current * (1/max))),
+        ten: (base + (dir)*(current * (1/10)))
+    }
+}
+
 function isInViewport(element) {
     const rect = element.getBoundingClientRect();
     return (
@@ -119,6 +134,11 @@ export const hasScrollLeft = (elem) => {
 
 export const maxScrollLeft = (elem) => {
    return elem.scrollWidth - elem.clientWidth
+}
+
+export function getRandomFloat(min, max){
+    return (Math.random() * max) + min
+
 }
 
 export function getRandomArbitrary(min, max) {

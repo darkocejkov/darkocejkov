@@ -1,5 +1,13 @@
 import React, {Suspense, useEffect, useMemo, useRef, useState} from 'react'
-import {useInView, motion, useScroll, useDragControls, useMotionValueEvent, useTransform} from "framer-motion";
+import {
+    useInView,
+    motion,
+    useScroll,
+    useDragControls,
+    useMotionValueEvent,
+    useTransform,
+    useMotionValue, useSpring
+} from "framer-motion";
 import {byteSized, getFileInfo, humanFileSize, mimeType} from "../GlobalFunctions";
 import {useDragScroll} from "../Hooks/CustomHooks";
 import {useControls} from "leva";
@@ -277,6 +285,13 @@ export const InfoBox = ({id, children, classes = '', sceneRef}) => {
     const ref = useRef()
     const inView = useInView(ref)
 
+    const [viewToggle, setViewToggle] = useState(false)
+
+    useEffect(() => {
+        console.log(`${id} = ${inView} (${viewToggle})`)
+        if(inView && viewToggle === false) setViewToggle(true)
+    }, [inView])
+
     // const {scrollYProgress} = useScroll({
     //     target: ref,
     //     offset: ["end end", "start start"]
@@ -309,20 +324,20 @@ export const InfoBox = ({id, children, classes = '', sceneRef}) => {
                     bottom: 0
                 }}
                 animate={{
-                    opacity: inView ? 1 : 0,
-                    translateX: inView ? '0px' : '-100px',
-                    rotateZ: inView ? '0deg' : '12deg',
+                    opacity: inView || viewToggle ? 1 : 0,
+                    translateX: inView || viewToggle ? '0px' : '-100px',
+                    rotateZ: inView || viewToggle ? '0deg' : '12deg',
                     // transitionDelay: '0.1s'
                 }}
                 style={{
-                    // transform: inView ? "none" : "translateX(-200px) rotate3d(1,1,1, 12deg)",
-                    filter: inView ? 'blur(0px)' : 'blur(5px)',
+                    // transform: inView || viewToggle ? "none" : "translateX(-200px) rotate3d(1,1,1, 12deg)",
+                    filter: inView || viewToggle ? 'blur(0px)' : 'blur(5px)',
                 }}
                 transition={{
                     type: 'spring',
                     mass: 2,
                 }}
-                className={`info-box p-5 relative md:max-w-[80%] origin-center max-w-full rounded-lg shadow ${classes}`}>
+                className={`info-box p-5 relative md:max-w-[80%] origin-center max-w-full rounded-lg shadow-lg ${classes}`}>
             {children}
 
 
@@ -691,46 +706,122 @@ export const MenuWrapper = ({children, items = [], open = false}) => {
     )
 }
 
-export const DepthText = ({children, n, primary = 'slate-900', secondary = 'slate-50'}) => {
+export const PopUp = () => {
 
+}
+
+const colorMap = [
+    'text-slate-900',
+    'text-orange-500',
+    'text-lime-500',
+    'text-sky-600',
+    'text-blue-600',
+    'text-rose-500',
+]
+
+const TitleText = ({total, i, x, y, active, setActive, spread}) => {
+
+    const d = total - (i * total)
+
+    const springConfig = {
+        // stiffness: Math.max(700 - d * 120, 0),
+        // damping: (20 + (i * -2)),
+        mass: (1 + (i * (1/total))).toFixed(2),
+        // mass: x,
+    };
+
+    const dx = useSpring(x, springConfig)
+    // const dx = useSpring(x)
+    const dy = useSpring(y, springConfig)
+    // const dy = useSpring(y)
+
+    return(
+        <motion.div
+            drag
+            dragElastic={1}
+            dragConstraints={{
+                left: 0,
+                top: 0,
+                right: 0,
+                bottom: 0
+            }}
+            dragTransition={{ bounceStiffness: 500, bounceDamping: 20, mass: 1}}
+            onDragStart={() => setActive(i)}
+            style={{
+                scale: `${(1 - (i * (1/spread))).toFixed(2)}`,
+                opacity: (1 - (i * (1/spread))).toFixed(2),
+                // filter: `blur(${((i * (1/10))).toFixed(2)}px)`,
+                zIndex: total - i,
+                x: active === i ? x : dx,
+                y: active === i ? y : dy,
+            }}
+            className={`absolute inset-1/2 flex flex-col justify-center items-center gap-0 ${colorMap[i]}`}>
+
+            <motion.h1
+                initial={{
+                    scale: 3,
+                    rotateZ: 34,
+                    rotateX: 10,
+                }}
+                animate={{
+                    scale: 1,
+                    rotateZ: 0,
+                    rotateX: 10,
+                }}
+                transition={{
+                    type: 'spring',
+                    // bounce: .25,
+                    // damping: 2,
+                }}
+                className={'md:text-9xl text-5xl font-tabi font-bold'}>Darko Cejkov</motion.h1>
+            <motion.h2
+                initial={{
+                    scale: 2.6,
+                    rotateZ: -35,
+                    rotateX: 10,
+                }}
+                animate={{
+                    scale: 1,
+                    rotateZ: 0,
+                    rotateX: 0,
+                }}
+                transition={{
+                    type: 'spring',
+                    // bounce: .25,
+                    // damping: 2,
+                }}
+                className={'text-4xl font-tabi'}>Fullstack Developer</motion.h2>
+
+            {/*{children}*/}
+        </motion.div>
+    )
+}
+
+export const DepthText = ({children, n, spread = n}) => {
+
+    const springConfig = {
+        // stiffness: Math.max(700 - d * 120, 0),
+        // damping: (20 + (i * -2)),
+        mass: 1.5,
+        // mass: x,
+    };
+
+    const xx = useSpring(useMotionValue(0), springConfig)
+    const yy = useSpring(useMotionValue(0), springConfig)
+
+    const [active, setActive] = useState(0)
 
     const textArray = useMemo(() => {
 
 
         let array = []
-        let xs = []
 
         for(let x = 0; x < n; x++){
 
-            xs.push(1 - (x * (1/10)).toFixed(2))
-
-            if(x === 0){
-                array.push(
-                    <div style={{
-                        scale: `${(1 - (x * (1/10))).toFixed(2)}`,
-                        opacity: (1 - (x * (2/10))).toFixed(2),
-                        zIndex: n - x,
-                    }}
-                         className={`absolute inset-1/2 flex flex-col justify-center items-center gap-0 text-slate-900`}>
-                        {children}
-                    </div>
-                )
-            }else{
-                array.push(
-                    <div style={{
-                        scale: `${(1 - (x * (1/10))).toFixed(2)}`,
-                        opacity: (1 - (x * (2/10))).toFixed(2)
-                    }}
-                         className={`absolute inset-1/2 flex flex-col justify-center items-center gap-0 text-slate-50`}>
-                        {children}
-                    </div>
-                )
-            }
-
-
+            array.push(
+                <TitleText x={xx} y={yy} total={n} i={x} setActive={setActive} spread={spread} active={active}/>
+            )
         }
-
-        console.log('XS: ', xs)
 
         return array
     }, [n, children])

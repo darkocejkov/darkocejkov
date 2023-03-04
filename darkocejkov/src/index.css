@@ -350,6 +350,14 @@
     -webkit-mask-image: -webkit-linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(2,0,0,1) 5%, rgba(0,0,0,1) 95%, rgba(20,0,0,0) 100%);
   }
 
+  .bottom-fade{
+    -webkit-mask-image: -webkit-linear-gradient(90deg, rgba(20,0,0,0) 0%, rgba(0,0,0,1) 35%, rgba(0,0,0,1) 100%)
+  }
+
+  .line-height-md{
+    line-height: 1.4 !important;
+  }
+
   /*.tree h3{*/
   /*  font-weight: bold;*/
   /*}*/

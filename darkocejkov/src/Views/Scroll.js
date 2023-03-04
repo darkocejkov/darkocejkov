@@ -10,7 +10,14 @@ import {
     useSpring,
     useTime, useVelocity, useMotionTemplate
 } from "framer-motion";
-import {downloadFile, getFileInfo, smoothScrollId, smoothScrollTop} from "../GlobalFunctions";
+import {
+    downloadFile,
+    getFileInfo, getRandom, getRandomFloat,
+    randomFromList,
+    randomHex,
+    smoothScrollId,
+    smoothScrollTop
+} from "../GlobalFunctions";
 import Background, {SketchComposition, useSketch} from "../Components/Background";
 import {
     Accordion, BorderDiv,
@@ -48,166 +55,137 @@ const Landing = ({svg = true}) => {
 
     const {scrollYProgress} = useScroll({target: landingRef})
 
-    const curveTitle = useSpring(useTransform(scrollYProgress, [0, 1], [40, 100]))
-    const curveTitle2 = useSpring(useTransform(scrollYProgress, [0, 1], [-100, 100]))
-    const curveTitle3 = useSpring(useTransform(scrollYProgress, [0, 1], [-5, 100]))
+    const fonts = [
+        'font-cositimes',
+        'font-maru',
+        'font-maruMega',
+        'font-sectraDisplay',
+        'font-sectra',
+        'font-tabi',
+        'font-tabi',
+        'font-wulkan',
+        'font-rubik',
+        'font-aeonik',
+        'font-fira',
+    ]
 
-    const opacityCurve = useTransform(scrollYProgress, [0, .1], [0, 1])
 
-    const curveTitlePercent = useMotionTemplate`${curveTitle}%`
-    const curveTitlePercent2 = useMotionTemplate`${curveTitle2}%`
-    const curveTitlePercent3 = useMotionTemplate`${curveTitle3}%`
+    const colors = [
+        'fill-slate-900',
+        'fill-orange-500',
+        'fill-lime-500',
+        'fill-sky-600',
+        'fill-blue-600',
+        'fill-rose-500',
+    ]
 
-    const fontSizeA = useMotionTemplate`${useSpring(useTransform(scrollYProgress, [0, .5, 1], [0, 10, 2]))}rem`
-    const fontSizeB = useMotionTemplate`${useSpring(useTransform(scrollYProgress, [0, 1], [0, 5]))}rem`
-    const fontSizeC = useMotionTemplate`${useSpring(useTransform(scrollYProgress, [0, 1], [0, 15]))}rem`
-    const fontSizeD = useMotionTemplate`${useSpring(useTransform(scrollYProgress, [0, .5, 1], [4, 20, 4]))}rem`
+    // const paths = require('../assets/svg/SVGPaths').contourPaths
+    const paths = [
+            'M 7 851.9 C 1012.6 961.3 1154.3 98.6 1918 266',
+            // 'M 3.6 998.1 C 1012.6 961.3 1154.3 98.6 30.4 19.3',
+            'M 3.6 998.1 C 1012.6 961.3 1154.3 98.6 1918 909',
+            'M 1918 -6 C 1012.6 961.3 1154.3 98.6 1916 1079',
+            'M 1916 328 C 1012.6 961.3 1154.3 98.6 -0.8 994.8',
+            // 'M 888 -6 C 1691.2 564 18.1 175.6 1781 1079',
+            'M -0.8 464.6 L 1918 467',
+            'M 1918 246 C 56 938 61 53 845 59 C 1722 58 1703 977 904 1079',
+            'M 172 1076 C 550.3333 759 557 55 1918 535 C 1343 1003 -1 -4 0 916',
 
-    useMotionValueEvent(scrollYProgress, "change", (l) => {
-        console.log(l)
-    })
+            'M 13 798 C 251 712.3333 394 489 750 563 C 1195 672 1388 380 1918 437',
+            'M 13 799 C 251 713.3333 556 917 727 542 C 857 232 1443 600 1918 342',
+        ]
+
+    const curves = useMemo(() => {
+
+        return paths.map((x, i) => {
+
+            let hex = randomHex()
+
+            //stroke={`#${hex}`}
+
+            return(
+                <path id={`curve${i}`} strokeOpacity={0.8} strokeDasharray={"4 2"} stroke={`#${hex}`} fill="transparent" d={x}></path>
+            )
+        })
+    }, [])
+
+    const textPaths = useMemo(() => {
+
+        return paths.map((x, i) => {
+
+            let nDivisions = getRandom(0, 5)
+
+            let offsetList = ['-100%', '100%']
+
+            let nSize = getRandom(1, 4)
+
+            let fontSizeList = []
+            for(let x = 0; x < nSize; x++){
+                fontSizeList.push(
+                    `${getRandomFloat(0, 8)}rem`
+                )
+            }
+
+            let randomFont = randomFromList(fonts)
+            let randomColor = randomFromList(colors)
+            // let randomStroke = randomFromList(colors)
+
+            let transitionConfig = {
+                type: 'spring',
+                // mass: getRandomFloat(.1, 3),
+                // bounce: getRandomFloat(0, 1),
+                delay: getRandom(1, 6),
+                duration: getRandomFloat(3, 6),
+                // repeat: Infinity,
+            }
+
+            console.log({transitionConfig, offsetList})
+
+            return(
+                <motion.textPath
+                    animate={{
+                        // startOffset: ['-100%', '100%'],
+                        startOffset: offsetList,
+                        fontSize: ['0rem', '5rem', '2rem']
+
+                    }}
+                    transition={transitionConfig}
+                    // style={{
+                    //     fontSize: ['0rem'],
+                    // }}
+                    alignmentBaseline="center"
+                    href={`#curve${i}`}
+                    className={`${randomFont} ${randomColor}`}
+                >
+                    Darko Cejkov
+                </motion.textPath>
+
+            )
+        })
+    }, [])
 
     return(
         <>
-            <div className={'fixed top-0 left-0 lg:h-[500vh] h-[200vh] w-screen z-0'} ref={landingRef}>
+            {/*fixed top-0 left-0*/}
+            <div className={'h-screen w-screen z-0 relative bottom-fade'} ref={landingRef}>
 
                 {svg &&
-                    <svg width="100%" height="100%" viewBox="1000 1000 1000 1000">
-                        <path id="curve1" fill="transparent" d="M 0.17 0.23 c 0 0 60.43 510.17 228.93 486.77 s 243.8 -61.37 408.77 -54.05 c 172.09 7.64 340.13 139.95 364.73 -101.15 C 1011.5 178.9 908.8 -0.8 714.6 87.4 C 371.9 205.7 297.2 648.8 696.7 768.2 C 982.4 834.1 1418.8 626.5 1610.8 787.2"></path>
+                    <svg height={'100%'} viewBox="0 0 1920 900">
 
-                        <path id="curve2" fill="transparent" d="M 0.17 0.23 c 0 0 105.85 77.7 276.46 73.2 s 243.8 -61.37 408.77 -54.05 c 172.09 7.64 213.4 92.34 1019.2 914.02"></path>
-
-                        <path id="curve3" fill="transparent" d="M 20.4 471.3 C 407.7 906.6 1274.9 116.4 1736.9 482.5"></path>
-
-                        <path id="curve4" fill="transparent" d="M 1697.9 97.4 C 1149.1333 384.2333 1.4 67.3 0.3 971.3"></path>
-
-                        <path id="curve5" fill="transparent" d="M 798.3 2.6 C 641.6667 64.3333 455.7 2.6 328.4 187.8 C 39.3 600.8 967.1667 422.6 970.2 564"></path>
+                        {curves}
 
                         <text width="100%">
-                            <motion.textPath
-                                animate={{
-                                    startOffset: ['100%','-20%'],
-                                }}
-                                transition={{
-                                    type: 'spring',
-                                    mass: 3
-                                }}
-                                style={{
-                                    fontSize: fontSizeA,
-                                    opacity: opacityCurve,
-                                }}
-                                alignmentBaseline="top"
-                                href="#curve1"
-                                startOffset={curveTitlePercent}
-                                className={'font-tabi font-bold fill-orange-400 stroke-slate-900 stroke-2'}
-                            >
-                                Darko Cejkov
-                            </motion.textPath>
-
-                            <motion.textPath
-                                animate={{
-                                    startOffset: ['-100%','10%'],
-                                }}
-                                transition={{
-                                    type: 'spring',
-                                    mass: 0.5
-                                }}
-                                style={{
-                                    fontSize: fontSizeB,
-                                    opacity: opacityCurve,
-                                }}
-                                alignmentBaseline="top"
-                                href="#curve2"
-                                startOffset={curveTitlePercent}
-                                className={'font-tabi fill-amber-400 stroke-orange-900 stroke-2'}
-                            >
-                                Darko Cejkov
-                            </motion.textPath>
-
-                            <motion.textPath
-                                animate={{
-                                    startOffset: ['-100%','10%'],
-                                }}
-                                transition={{
-                                    type: 'spring',
-                                    mass: 2
-                                }}
-                                style={{
-                                    fontSize: fontSizeC,
-                                    opacity: opacityCurve,
-                                }}
-                                alignmentBaseline="top"
-                                href="#curve3"
-                                startOffset={curveTitlePercent}
-                                className={'font-maruMega fill-slate-900 stroke-slate-50 stroke-1'}
-                            >
-                                Darko Cejkov
-                            </motion.textPath>
-
-                            <motion.textPath
-                                animate={{
-                                    startOffset: ['-100%','10%'],
-                                }}
-                                transition={{
-                                    type: 'spring',
-                                    mass: 5
-                                }}
-                                style={{
-                                    fontSize: fontSizeD,
-                                    opacity: opacityCurve,
-                                }}
-                                alignmentBaseline="top"
-                                href="#curve4"
-                                startOffset={curveTitlePercent2}
-                                className={'font-cositimes fill-slate-900 stroke-slate-50 stroke-1'}
-                            >
-                                Darko Cejkov
-                            </motion.textPath>
-
-                            <motion.textPath
-                                animate={{
-                                    startOffset: ['0%','10%'],
-                                }}
-                                transition={{
-                                    type: 'spring',
-                                    mass: .1
-                                }}
-                                style={{
-                                    fontSize: fontSizeB,
-                                    opacity: opacityCurve,
-                                }}
-                                alignmentBaseline="top"
-                                href="#curve5"
-                                startOffset={curveTitlePercent3}
-                                className={'font-sectraDisplay fill-slate-900 stroke-slate-50 stroke-1'}
-                            >
-                                Darko Cejkov
-                            </motion.textPath>
-
+                            {textPaths}
                         </text>
                     </svg>
                 }
 
+                <div className={'absolute top-0 inset-1/2 perspective-none'}>
+                    <DepthText spread={6} n={6} color={'slate'} />
+                </div>
             </div>
 
-            <DepthText n={5} color={'slate'}>
-                <h1 className={'md:text-9xl text-5xl font-tabi font-bold'}>Darko Cejkov</h1>
-                <h2 className={'text-4xl font-tabi'}>Fullstack Developer</h2>
-            </DepthText>
-
-            <div className={'h-[1px] w-screen gradient-background z-0'}/>
-
-            {/*<div className={'h-screen w-2/3 z-0 text-center relative flex flex-col justify-center items-center gap-0'}>*/}
-            {/*    <div className={'absolute inset-1/2 flex flex-col justify-center items-center gap-0 text-slate-900'}>*/}
-            {/*        <h1 className={'md:text-9xl text-5xl font-tabi font-bold'}>Darko Cejkov</h1>*/}
-            {/*        <h2 className={'text-4xl font-tabi opacity-80'}>Fullstack Developer</h2>*/}
-            {/*    </div>*/}
-            {/*    <div className={'absolute inset-1/2 flex flex-col justify-center items-center gap-0 scale-[.9] text-slate-80 '}>*/}
-            {/*        <h1 className={'md:text-9xl text-5xl font-tabi font-bold'}>Darko Cejkov</h1>*/}
-            {/*        <h2 className={'text-4xl font-tabi opacity-80'}>Fullstack Developer</h2>*/}
-            {/*    </div>*/}
-            {/*</div>*/}
-
+            <div className={'h-[1px] mb-12 w-screen gradient-background z-0'}/>
         </>
     )
 
@@ -332,7 +310,7 @@ export const ScrollView = ({sketchControls}) => {
             </div>
 
 
-            <div ref={sceneRef} className='min-h-screen z-0 overflow-x-clip bg-gradient-to-b to-cyan-200 from-blue-500 flex flex-col flex-1 gap-5 p-12 items-center justify-evenly select-none perspective-none'>
+            <div ref={sceneRef} className='min-h-screen z-0 overflow-x-clip bg-gradient-to-br from-blue-400 to-sky-200 via-rose-200 flex flex-col flex-1 gap-5 p-12 items-center justify-evenly select-none perspective-none'>
 
                 {/*<Landing svg={false}/>*/}
                 <Landing />
@@ -351,7 +329,7 @@ export const ScrollView = ({sketchControls}) => {
                                 <SubtitleRule textPos={'right'} classes={'md:text-2xl text-xl font-maru font-bold uppercase'}>
                                     Fullstack Developer
                                     <div className={`lg:flex-1 w-full h-[1px] bg-slate-900 self-center`} />
-                                    April 2021 - March 2023
+                                    April 2021 - February 2023
                                 </SubtitleRule>
                                 {/*<TitleRule classes={'md:text-2xl text-xl font-maru font-bold uppercase'}>*/}
                                 {/*    April 2021 - Present*/}
