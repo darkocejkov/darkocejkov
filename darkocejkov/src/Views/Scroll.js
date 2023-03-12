@@ -49,7 +49,7 @@ const springSettings = {
 }
 
 
-const Landing = ({svg = true}) => {
+const Landing = ({svg = true, showText = true}) => {
 
     const landingRef = useRef()
 
@@ -199,9 +199,13 @@ const Landing = ({svg = true}) => {
                     </motion.svg>
                 }
 
-                <div className={'absolute top-0 inset-1/2 rotate-d'}>
+                <motion.div
+                    animate={{
+                        opacity: showText ? 1 : 0
+                    }}
+                    className={'absolute top-0 inset-1/2 rotate-d'}>
                     <DepthText spread={6} n={6} color={'slate'} />
-                </div>
+                </motion.div>
 
                 {/*<BlobUp x={65} y={25}>*/}
                 {/*    <h1 className={'text-3xl font-aeonik'}>*/}
@@ -265,52 +269,73 @@ export const ScrollView = ({sketchControls}) => {
 
             <div className={'fixed right-[5%] top-[50%] -translate-y-1/2 z-50 md:text-3xl flex flex-col gap-8 select-none'}>
                 <div>
-                    <button className={'relative group'} onClick={() => smoothScrollTop()}>
-                        <p className={'rotate-a flex justify-center items-center blob blob-9'}>🐻</p>
-                        <div className={'absolute right-[110%] uppercase p-0 opacity-0 group-hover:opacity-100 group-hover:p-1 group-hover:px-12 transition-all rounded-full border-4 text-right top-0 whitespace-nowrap font-rubik text-lg border-blue-200'}>
-                            About Me
-                        </div>
-                    </button>
+
+                    <NavLinkWrapper icon={'🐻'} onClick={() => smoothScrollTop()}>
+                        About Me
+                    </NavLinkWrapper>
+
+                    {/*<button className={'relative group'} onClick={() => smoothScrollTop()}>*/}
+                    {/*    <p className={'rotate-a flex justify-center items-center blob blob-9'}>🐻</p>*/}
+                    {/*    <div className={'absolute right-[110%] uppercase p-0 opacity-0 group-hover:opacity-100 group-hover:p-1 group-hover:px-12 transition-all rounded-full border-4 text-right top-0 whitespace-nowrap font-rubik text-lg border-blue-200'}>*/}
+                    {/*        About Me*/}
+                    {/*    </div>*/}
+                    {/*</button>*/}
                 </div>
                 <div>
-                    <button className={'relative group'} onClick={() => smoothScrollId('experience')}>
-                        <p className={'rotate-b flex justify-center items-center blob blob-76'}>💼</p>
-                        <div className={'absolute right-[110%] uppercase p-0 opacity-0 group-hover:opacity-100 group-hover:p-1 group-hover:px-12 transition-all rounded-full border-4 text-right top-0 whitespace-nowrap font-rubik text-lg border-blue-200'}>
-                            Experience
-                        </div>
-                    </button>
+                    <NavLinkWrapper icon={'💼'} onClick={() => smoothScrollId('experience')}>
+                        Experience
+                    </NavLinkWrapper>
+
+                    {/*<button className={'relative group'} onClick={() => smoothScrollId('experience')}>*/}
+                    {/*    <p className={'rotate-b flex justify-center items-center blob blob-76'}>💼</p>*/}
+                    {/*    <div className={'absolute right-[110%] uppercase p-0 opacity-0 group-hover:opacity-100 group-hover:p-1 group-hover:px-12 transition-all rounded-full border-4 text-right top-0 whitespace-nowrap font-rubik text-lg border-blue-200'}>*/}
+                    {/*        Experience*/}
+                    {/*    </div>*/}
+                    {/*</button>*/}
                 </div>
                 <div>
-                    <button className={'blob relative group'} onClick={() => smoothScrollId('education')}>
-                        <p className={'rotate-a flex justify-center items-center blob blob-30'}>🎓</p>
-                        <div className={'absolute right-[110%] uppercase p-0 opacity-0 group-hover:opacity-100 group-hover:p-1 group-hover:px-12 transition-all rounded-full border-4 text-right top-0 whitespace-nowrap font-rubik text-lg border-blue-200'}>
-                            Education
-                        </div>
-                    </button>
+                    <NavLinkWrapper icon={'🎓'} onClick={() => smoothScrollId('education')}>
+                        Education
+                    </NavLinkWrapper>
+                    {/*<button className={'blob relative group'} onClick={() => smoothScrollId('education')}>*/}
+                    {/*    <p className={'rotate-a flex justify-center items-center blob blob-30'}>🎓</p>*/}
+                    {/*    <div className={'absolute right-[110%] uppercase p-0 opacity-0 group-hover:opacity-100 group-hover:p-1 group-hover:px-12 transition-all rounded-full border-4 text-right top-0 whitespace-nowrap font-rubik text-lg border-blue-200'}>*/}
+                    {/*        Education*/}
+                    {/*    </div>*/}
+                    {/*</button>*/}
                 </div>
                 <div>
-                    <button className={'relative group'} onClick={() => smoothScrollId('links')}>
-                        <p className={'rotate-c flex justify-center items-center blob blob-13'}>🔗</p>
-                        <div className={'absolute right-[110%] uppercase p-0 opacity-0 group-hover:opacity-100 group-hover:p-1 group-hover:px-12 transition-all rounded-full border-4 text-right top-0 whitespace-nowrap font-rubik text-lg border-blue-200'}>
-                            Links
-                        </div>
-                    </button>
+                    <NavLinkWrapper icon={'🔗'} onClick={() => smoothScrollId('links')}>
+                        Links
+                    </NavLinkWrapper>
+                    {/*<button className={'relative group'} onClick={() => smoothScrollId('links')}>*/}
+                    {/*    <p className={'rotate-c flex justify-center items-center blob blob-13'}>🔗</p>*/}
+                    {/*    <div className={'absolute right-[110%] uppercase p-0 opacity-0 group-hover:opacity-100 group-hover:p-1 group-hover:px-12 transition-all rounded-full border-4 text-right top-0 whitespace-nowrap font-rubik text-lg border-blue-200'}>*/}
+                    {/*        Links*/}
+                    {/*    </div>*/}
+                    {/*</button>*/}
                 </div>
                 <div>
-                    <button className={'relative group'} onClick={() => smoothScrollId('files')}>
-                        <p className={'rotate-b flex justify-center items-center blob blob-12'}>📁</p>
-                        <div className={'absolute right-[110%] uppercase p-0 opacity-0 group-hover:opacity-100 group-hover:p-1 group-hover:px-12 transition-all rounded-full border-4 text-right top-0 whitespace-nowrap font-rubik text-lg border-blue-200'}>
-                            Files
-                        </div>
-                    </button>
+                    <NavLinkWrapper icon={'📁'} onClick={() => smoothScrollId('files')}>
+                        Files
+                    </NavLinkWrapper>
+                    {/*<button className={'relative group'} onClick={() => smoothScrollId('files')}>*/}
+                    {/*    <p className={'rotate-b flex justify-center items-center blob blob-12'}>📁</p>*/}
+                    {/*    <div className={'absolute right-[110%] uppercase p-0 opacity-0 group-hover:opacity-100 group-hover:p-1 group-hover:px-12 transition-all rounded-full border-4 text-right top-0 whitespace-nowrap font-rubik text-lg border-blue-200'}>*/}
+                    {/*        Files*/}
+                    {/*    </div>*/}
+                    {/*</button>*/}
                 </div>
                 <div>
-                    <button className={'relative group'} onClick={() => smoothScrollId('projects')}>
-                        <p className={'rotate-b flex justify-center items-center blob blob-44'}>💽</p>
-                        <div className={'absolute right-[110%] uppercase p-0 opacity-0 group-hover:opacity-100 group-hover:p-1 group-hover:px-12 transition-all rounded-full border-4 text-right top-0 whitespace-nowrap font-rubik text-lg border-blue-200'}>
-                            Projects
-                        </div>
-                    </button>
+                    <NavLinkWrapper icon={'💽'} onClick={() => smoothScrollId('projects')}>
+                        Projects
+                    </NavLinkWrapper>
+                    {/*<button className={'relative group'} onClick={() => smoothScrollId('projects')}>*/}
+                    {/*    <p className={'rotate-b flex justify-center items-center blob blob-44'}>💽</p>*/}
+                    {/*    <div className={'absolute right-[110%] uppercase p-0 opacity-0 group-hover:opacity-100 group-hover:p-1 group-hover:px-12 transition-all rounded-full border-4 text-right top-0 whitespace-nowrap font-rubik text-lg border-blue-200'}>*/}
+                    {/*        Projects*/}
+                    {/*    </div>*/}
+                    {/*</button>*/}
                 </div>
             </div>
 
@@ -381,7 +406,7 @@ export const ScrollView = ({sketchControls}) => {
             <div ref={sceneRef} className='min-h-screen z-0 overflow-x-clip bg-gradient-to-br from-blue-400 to-sky-200 via-rose-200 flex flex-col flex-1 gap-5 p-12 items-center justify-evenly select-none perspective-none'>
 
                 {/*<Landing svg={false}/>*/}
-                <Landing svg={heroTimeout}/>
+                <Landing svg={heroTimeout} showText={states.text}/>
 
                 <InfoBox sceneRef={sceneRef} id={'experience'}>
 
@@ -865,6 +890,17 @@ export const ScrollView = ({sketchControls}) => {
 
 
         </>
+    )
+}
+
+const NavLinkWrapper = ({children, onClick, icon}) => {
+    return(
+        <button className={'relative group'} onClick={() => onClick()}>
+            <p className={'rotate-a flex justify-center items-center blob blob-9'}>{icon}</p>
+            <div className={'absolute right-[110%] uppercase p-0 opacity-0 group-hover:opacity-100 group-hover:p-1 group-hover:px-12 transition-all rounded-full border-4 text-right top-0 whitespace-nowrap font-rubik text-lg border-blue-200'}>
+                {children}
+            </div>
+        </button>
     )
 }
 

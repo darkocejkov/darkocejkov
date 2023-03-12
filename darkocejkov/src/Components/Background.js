@@ -8,7 +8,9 @@ import {useMotionValueEvent, useScroll} from "framer-motion";
 
 import {MyApp, SketchControls} from "./Basics";
 import {CubeGrid, SphereGrid} from "../Sketches/Grids";
-import {PerspectiveCamera} from "@react-three/drei";
+import {PerspectiveCamera, OrbitControls} from "@react-three/drei";
+import TestScene from "./Spline/Test1";
+import Spline from "@splinetool/react-spline";
 
 
 
@@ -23,8 +25,8 @@ const ControlButton = ({label, hidden = false, onClick, id, children, map, disab
     return(
         <button disabled={disabled} onClick={onClick} className={`${hidden ? 'hidden' : 'visible'} control bg-transparent hover:bg-slate-600/10 p-3 rounded-md group`}>
             {children}
-            <span className={'text-white bg-slate-700/50 whitespace-nowrap origin-bottom p-2 rounded-lg text-lg group-hover:scale-100 scale-0 absolute bottom-[110%] transition-all'}>
-                {label}
+            <span className={'text-white bg-slate-700/50 whitespace-nowrap origin-bottom-left p-2 rounded-lg text-lg group-hover:scale-100 group-hover:opacity-100 opacity-0 scale-0 absolute left-0 bottom-[110%] transition-all'}>
+                {label} {disabled && " (Disabled)"}
             </span>
         </button>
     )
@@ -35,40 +37,34 @@ const ControlButton = ({label, hidden = false, onClick, id, children, map, disab
 
 export const useSketch = () => {
 
+    const [text, setText] = useState(true)
     const [play, setPlay] = useState(false)
     const [front, setFront] = useState(false)
     const [hide, setHide] = useState(true)
     const [controls, setControls] = useState(false)
 
-    // const controlMap = [
-    //     {time: [
-    //         {
-    //             variable: play,
-    //             show: false,
-    //             fn: setPlay(true),
-    //             icon: '',
-    //             label: 'Play Sketch'
-    //         },
-    //         {
-    //             variable: play,
-    //             show: true,
-    //             fn: setPlay(false),
-    //             icon: '',
-    //             label: 'Pause Sketch'
-    //         },
-    //     ]},
-    // ]
-
     const sketches = [
         {
             title: 'Cube Grid',
-            component: <CubeGrid a={1} b={1} c={1} />,
+            component:
+                <Canvas>
+                    <CubeGrid a={1} b={1} c={1} />
+                </Canvas>,
             defaultStates: [{play: true}],
             disabledControls: ['play']
         },
         {
             title: 'Sphere Grid',
-            component: <SphereGrid a={1} b={1} c={1} />,
+            component:
+                <Canvas>
+                    <SphereGrid a={1} b={1} c={1} />
+                </Canvas>,
+            defaultStates: [{play: true}],
+            disabledControls: [],
+        },
+        {
+            title: 'Glass',
+            component: <Spline scene="https://prod.spline.design/CkM2tOih3X5XlOIv/scene.splinecode" />,
             defaultStates: [{play: true}],
             disabledControls: [],
         },
@@ -76,10 +72,6 @@ export const useSketch = () => {
 
     const [sketch, setSketch] = useState(null)
     const [sketchIndex, setSketchIndex] = useState(null)
-
-    // useEffect(() => {
-    //
-    // }, [sketch])
 
     useEffect(() => {
         setSketch(sketches[0])
@@ -126,6 +118,18 @@ export const useSketch = () => {
     const renderControls = () => {
         return(
             <>
+                {text
+                    ? (
+                        <ControlButton onClick={() => setText(false)} label={"Hide Hero Text"}>
+                            <i className="fa-solid fa-text-slash fa-xl"></i>
+                        </ControlButton>
+                    )
+                    : (
+                        <ControlButton onClick={() => setText(true)} label={"Show Hero Text"}>
+                            <i className="fa-solid fa-text fa-xl"></i>
+                        </ControlButton>
+                    )}
+
                 {hide
                     ? (
 
@@ -201,7 +205,7 @@ export const useSketch = () => {
     return(
         {
             states: {
-                play, front, hide, controls, sketch
+                play, front, hide, controls, sketch, text
             },
             setters: {
                 setHide, setPlay
@@ -228,11 +232,6 @@ const Scene = ({children, blind}) => {
 
 export const SketchComposition = ({play, front, hide, controls, sketch = null, className = ''}) => {
 
-
-    useEffect(() => {
-        console.log(sketch)
-    }, [])
-
     return(
         <>
             <motion.div
@@ -247,11 +246,7 @@ export const SketchComposition = ({play, front, hide, controls, sketch = null, c
                 transition={{type: 'spring'}}
                 className={`${className} w-screen fixed top-0 pointer-events-auto backdrop-blur-sm`}
             >
-                <Canvas>
-                    {/*<Scene blind={blind}>*/}
-                        {sketch && sketch.component}
-                    {/*</Scene>*/}
-                </Canvas>
+                {sketch && sketch.component}
             </motion.div>
 
             {controls &&
@@ -275,7 +270,10 @@ export default function Background({showFront, play, hide, blind, className = ''
         },
         {
             title: 'Sphere Grid',
-            component: <SphereGrid a={4} b={4} c={2} />,
+            component:
+                <Canvas>
+                    <SphereGrid a={4} b={4} c={2} />
+                </Canvas>,
         },
     ]
 

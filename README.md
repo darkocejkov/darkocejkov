@@ -1,14 +1,12 @@
-### Howdy 🤠
+# Howdy 🤠
 
-Darko Cejkov (DARK-o chey-kov): I am a developer with many interests, but am currently based in Web Design + Development. 
+### Darko Cejkov (DARK-o chey-kov): I am a developer with many interests, but am currently based in Fullstack Web Design + Development. I primarily work with the React framework, and am pretty darn good at using JavaScript.
+ 
+I am currently my time looking for work, and practicing my base knowledge in the meantime. I have been hard at work on this project, and you can see the work at [my personal website](www.darkocejkov.ca). This repository serves as an introduction, and a portfolio into my foray in web design and development. This work is meant to be a mix of different visual methods of web design, including different generative art. I also emphasize this project & repo. as being a playground and environment to play around.
 
-Currently, I'm working with Van Valkenburg Communications (VVC), a multi-media A/V production company, to create a fresh, responsive, and accessible way to attend live meetings and events.
+My most recent experience involves working with [Van Valkenburg Communications (VVC)](https://www.vvc.ca), a multi-media A/V production company, to create a fresh, responsive, and accessible way to attend live meetings and events.
 
-I've previously interned at Traction on Demand under the Marketing Automation discipline, learning how to build emails that are personalized and follow marketing journeys that tailor to customers.
-
-This repository serves as an introduction, and a portfolio into my foray in web design and development. Currently in its early stages, the portfolio is meant to be a mix of different visual methods of web design, including different generative art.
-
-The main framework is React. 
+I've previously interned at [Traction on Demand](https://www.linkedin.com/company/traction-on-demand) under the Marketing Automation discipline, learning how to build emails that are personalized and follow marketing journeys that tailor to customers.
 
 <!--
 **darkocejkov/darkocejkov** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
