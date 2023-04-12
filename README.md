@@ -35,7 +35,7 @@ I specialize in building beautiful and eye-catching visuals for front-end client
 - ❓ Ask me about anything related to MERN stack and related technologies!
 
 
-- ⚡ I have a major in both Computer Science & Psychology.
+- ⚡ I graduated with TWO majors, Computer Science & Psychology.
 
 
 <br/>  
