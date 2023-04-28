@@ -20,17 +20,14 @@ import {
 } from "../GlobalFunctions";
 import Background, {SketchComposition, useSketch} from "../Components/Background";
 import {
-    Accordion, BorderDiv,
-    BoxCarousel, CardBox, CurvedText,
+    BorderDiv,
+    BoxCarousel, CardBox,
     CustomButton,
     CustomLink, DepthText,
-    FillLink, FunLink,
     InfoBox,
-    Link, MenuWrapper, BlobUp, Rule,
+    Link, MenuWrapper,
     StatBox, SubtitleRule, TextBox,
-    TitleLetters,
     TitleRule,
-    Tooltip,
     TooltipWrapper
 } from "../Components/Basics";
 
@@ -241,9 +238,19 @@ export const ScrollView = ({sketchControls}) => {
 
     const files = [
         {label: 'Resume', files: [
-                {label: 'Minified', file: minResume, onEffect: () => getFileInfo(minResume), onClick: () => downloadFile(minResume, 'Darko Cejkov Resume 2023')},
-                {label: 'Full', file: resume, onEffect: () => getFileInfo(resume), onClick: () => downloadFile(resume, 'Darko Cejkov Resume 2023')},
-        ]}
+                {
+                    label: 'Minified',
+                    file: minResume,
+                    onEffect: () => getFileInfo(minResume),
+                    onClick: () => downloadFile(minResume, 'Darko Cejkov Resume 2023')
+                },
+                {
+                    label: 'Full',
+                    file: resume,
+                    onEffect: () => getFileInfo(resume),
+                    onClick: () => downloadFile(resume, 'Darko Cejkov Resume 2023')
+                },
+            ]}
     ]
 
     const sceneRef = useRef()

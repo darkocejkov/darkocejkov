@@ -8,9 +8,7 @@ import {useMotionValueEvent, useScroll} from "framer-motion";
 
 import {MyApp, SketchControls} from "./Basics";
 import {CubeGrid, SphereGrid} from "../Sketches/Grids";
-import {PerspectiveCamera, OrbitControls} from "@react-three/drei";
-import TestScene from "./Spline/Test1";
-import Spline from "@splinetool/react-spline";
+
 
 
 
@@ -59,12 +57,6 @@ export const useSketch = () => {
                 <Canvas>
                     <SphereGrid a={1} b={1} c={1} />
                 </Canvas>,
-            defaultStates: [{play: true}],
-            disabledControls: [],
-        },
-        {
-            title: 'Glass',
-            component: <Spline scene="https://prod.spline.design/CkM2tOih3X5XlOIv/scene.splinecode" />,
             defaultStates: [{play: true}],
             disabledControls: [],
         },
