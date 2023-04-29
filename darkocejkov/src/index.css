@@ -876,6 +876,10 @@
   border: 2px solid transparent;
 }
 
+.fa-arena {
+  background-image: url('./assets/svg/arena-mark.svg')
+}
+
 .blob{
   height: 50px;
   width: 50px;

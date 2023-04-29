@@ -73,6 +73,8 @@ export function ControlBar({}) {
 }
 
 export const ToolController = () => {
+
+    // Meant as a DEV utility to open/trigger things like modals
     return (
         <div
             className={'fixed left-0 inset-y-1/2 opacity-60 hover:opacity-100 inset-x-1/2 p-3 h-fit w-fit link-background bg-gradient-to-b from-amber-400 to-amber-400 z-50 rounded-t-xl shadow-lg backdrop-blur-sm '}>
@@ -89,6 +91,10 @@ export const ToolController = () => {
 }
 
 function MusicControls({}) {
+
+    // use-sound package with useSound hook
+    // visualizator through Web Audio API
+
     return (
         <ButtonLayout>
             <></>
