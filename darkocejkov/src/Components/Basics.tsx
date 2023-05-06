@@ -21,8 +21,10 @@ import {byteSized, getFileInfo, humanFileSize, mimeType} from "../GlobalFunction
 import {useDragScroll} from "../Hooks/CustomHooks";
 import {useControls} from "leva";
 import {ReactChild, FileInformation, Placements} from "../types.ts";
-import {random} from "../helpers.ts";
+import {random, writeClipboard} from "../helpers.ts";
 import {colors} from "../theme.ts";
+import {Tooltip as TT} from "antd";
+import {useToast} from "../Hooks/Toast.tsx";
 
 
 const ControlsStats = () => {
@@ -73,6 +75,51 @@ export const TextBox = ({children, className = ''}: {
     )
 }
 
+export const DragPane = ({children, className, id, subtle = false}: {
+    children: ReactChild,
+    id: string,
+    className?: string,
+    subtle?: boolean
+}) => {
+
+    let translateY = random(subtle ? 10 : 50, true)
+    let rotateZ = random(subtle ? 3 : 15, true)
+
+    const constraintRef = useRef(null)
+
+    return (
+
+        <>
+            <div ref={constraintRef} className={'fixed top-0 left-0 h-screen w-screen'}/>
+            <motion.div id={id}
+                        drag
+                        dragElastic={0.15}
+                        whileDrag={{
+                            backgroundColor: 'rgba(7, 89, 133, 0.09)',
+                            scale: 1.05
+                        }}
+                        dragConstraints={constraintRef}
+                        initial={{
+                            opacity: 0,
+                            translateY: translateY,
+                            rotateZ: rotateZ
+                        }}
+                        animate={{
+                            opacity: 1,
+                            translateY: 0,
+                            rotateZ: 0,
+                            // transitionDelay: '0.1s'
+                        }}
+                        transition={{
+                            type: 'spring',
+                            mass: 2,
+                        }}
+                        className={`select-none info-box p-5 relative md:max-w-[80%] z-10 origin-center max-w-full rounded-lg shadow-lg ${className}`}>
+                {children}
+            </motion.div>
+        </>
+    )
+}
 
 export const Pane = ({children, className, id, subtle = false}: {
     children: ReactChild,
@@ -449,22 +496,93 @@ export const Link = ({url, children, className}: {
     )
 }
 
-export const CustomLink = ({url, children, className}: {
-    url?: string,
-    children: ReactChild,
-    className?: string
-}) => {
+type ClipboardProps = {
+    onClick: () => void,
+    text: string,
+}
 
-    // link-background
+export const BasicLink = ({children, url}: {
+    children: ReactChild,
+    url: string,
+}) => {
     return (
-        <a target={"_blank"} tabIndex={0}
-           className={`p-2 hover:scale-125 hover:rotate-2  rounded-sm link-background bg-gradient-to-b from-amber-400 to-amber-400 z-20  ${className ? className : 'text-xl font-rubik normal-case'}`}
-           href={url}>
+        <motion.a
+            rel="noreferrer noopener"
+            target={"_blank"}
+            tabIndex={0}
+            className={`link`}
+            href={url}
+        >
             {children}
             {url && isExternalLink(url) &&
-                <i className="fa-solid fa-square-arrow-up-right ml-2 fa-xs"></i>
+                <i className="fa-regular fa-square-arrow-up-right fa-xs ml-2"></i>
             }
-        </a>
+
+        </motion.a>
+    )
+}
+
+export const CustomLink = ({label, clipboard, url, children, className = 'text-xl font-rubik normal-case'}: {
+    url?: string,
+    clipboard?: ClipboardProps,
+    onClick?: () => void,
+    children: ReactChild,
+    className?: string,
+    label: string,
+}) => {
+
+    const [hover, setHover] = useState(false)
+
+    const {addToast} = useToast()
+
+    const copyToClip = (text: string) => {
+        writeClipboard(text, () => addToast(`Copied: "${text}"`))
+    }
+
+    // link-background
+    // hover:scale-125 hover:rotate-2
+    return (
+        <motion.a
+            rel="noreferrer noopener"
+            target={"_blank"}
+            tabIndex={0}
+            className={`cursor-pointer relative p-4 rounded-sm link-background bg-gradient-to-b from-amber-400 to-amber-400 z-20 flex flex-col gap-1 ${className}`}
+            href={url}
+
+            onClick={() => clipboard ? copyToClip(clipboard.text) : null}
+
+            onMouseEnter={() => setHover(true)}
+            onMouseLeave={() => setHover(false)}
+            initial={{
+                scale: 1,
+                rotateX: '0deg'
+            }}
+            style={{
+                scale: hover ? 1.25 : 1,
+                rotateX: hover ? `${random(10, true, 0, false)}deg` : '0deg'
+            }}
+
+        >
+            {children}
+            {url && isExternalLink(url) &&
+                <i className="absolute fa-solid top-3 right-1 fa-square-arrow-up-right ml-2 fa-xs"></i>
+            }
+            {clipboard &&
+                <>
+                    <i className="absolute fa-solid top-3 right-1 fa-copy ml-2 fa-xs"></i>
+                </>
+            }
+
+            <motion.p
+                className={'text-sm text-center'}>{label}</motion.p>
+
+            {/*<motion.p*/}
+            {/*    animate={{*/}
+            {/*        opacity: hover ? 1 : 0*/}
+            {/*    }}*/}
+            {/*    className={'text-sm text-center'}>{label}</motion.p>*/}
+        </motion.a>
+
     )
 }
 

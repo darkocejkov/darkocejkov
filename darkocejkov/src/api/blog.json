@@ -1,0 +1,82 @@
+[
+  {
+    "name": "README.md",
+    "path": "README.md",
+    "sha": "9f6c8ce1b59690da33b53dc7f8c0b76680a1e980",
+    "size": 183,
+    "url": "https://api.github.com/repos/darkocejkov/knowledge/contents/README.md?ref=main",
+    "html_url": "https://github.com/darkocejkov/knowledge/blob/main/README.md",
+    "git_url": "https://api.github.com/repos/darkocejkov/knowledge/git/blobs/9f6c8ce1b59690da33b53dc7f8c0b76680a1e980",
+    "download_url": "https://raw.githubusercontent.com/darkocejkov/knowledge/main/README.md",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/darkocejkov/knowledge/contents/README.md?ref=main",
+      "git": "https://api.github.com/repos/darkocejkov/knowledge/git/blobs/9f6c8ce1b59690da33b53dc7f8c0b76680a1e980",
+      "html": "https://github.com/darkocejkov/knowledge/blob/main/README.md"
+    }
+  },
+  {
+    "name": "careersResources",
+    "path": "careersResources",
+    "sha": "cc560abbacbe90b217f7ad752fbf5332e6411d47",
+    "size": 0,
+    "url": "https://api.github.com/repos/darkocejkov/knowledge/contents/careersResources?ref=main",
+    "html_url": "https://github.com/darkocejkov/knowledge/tree/main/careersResources",
+    "git_url": "https://api.github.com/repos/darkocejkov/knowledge/git/trees/cc560abbacbe90b217f7ad752fbf5332e6411d47",
+    "download_url": null,
+    "type": "dir",
+    "_links": {
+      "self": "https://api.github.com/repos/darkocejkov/knowledge/contents/careersResources?ref=main",
+      "git": "https://api.github.com/repos/darkocejkov/knowledge/git/trees/cc560abbacbe90b217f7ad752fbf5332e6411d47",
+      "html": "https://github.com/darkocejkov/knowledge/tree/main/careersResources"
+    }
+  },
+  {
+    "name": "personalLearning",
+    "path": "personalLearning",
+    "sha": "0114d0499f50eeb6e2e860e1d61b79b4de63961a",
+    "size": 0,
+    "url": "https://api.github.com/repos/darkocejkov/knowledge/contents/personalLearning?ref=main",
+    "html_url": "https://github.com/darkocejkov/knowledge/tree/main/personalLearning",
+    "git_url": "https://api.github.com/repos/darkocejkov/knowledge/git/trees/0114d0499f50eeb6e2e860e1d61b79b4de63961a",
+    "download_url": null,
+    "type": "dir",
+    "_links": {
+      "self": "https://api.github.com/repos/darkocejkov/knowledge/contents/personalLearning?ref=main",
+      "git": "https://api.github.com/repos/darkocejkov/knowledge/git/trees/0114d0499f50eeb6e2e860e1d61b79b4de63961a",
+      "html": "https://github.com/darkocejkov/knowledge/tree/main/personalLearning"
+    }
+  },
+  {
+    "name": "projects",
+    "path": "projects",
+    "sha": "f677c7195d86123b3fad8854a3ce2a2e5151e18b",
+    "size": 0,
+    "url": "https://api.github.com/repos/darkocejkov/knowledge/contents/projects?ref=main",
+    "html_url": "https://github.com/darkocejkov/knowledge/tree/main/projects",
+    "git_url": "https://api.github.com/repos/darkocejkov/knowledge/git/trees/f677c7195d86123b3fad8854a3ce2a2e5151e18b",
+    "download_url": null,
+    "type": "dir",
+    "_links": {
+      "self": "https://api.github.com/repos/darkocejkov/knowledge/contents/projects?ref=main",
+      "git": "https://api.github.com/repos/darkocejkov/knowledge/git/trees/f677c7195d86123b3fad8854a3ce2a2e5151e18b",
+      "html": "https://github.com/darkocejkov/knowledge/tree/main/projects"
+    }
+  },
+  {
+    "name": "wlu",
+    "path": "wlu",
+    "sha": "c9a9223661d3d615fb757b1eb9978976eba22101",
+    "size": 0,
+    "url": "https://api.github.com/repos/darkocejkov/knowledge/contents/wlu?ref=main",
+    "html_url": "https://github.com/darkocejkov/knowledge/tree/main/wlu",
+    "git_url": "https://api.github.com/repos/darkocejkov/knowledge/git/trees/c9a9223661d3d615fb757b1eb9978976eba22101",
+    "download_url": null,
+    "type": "dir",
+    "_links": {
+      "self": "https://api.github.com/repos/darkocejkov/knowledge/contents/wlu?ref=main",
+      "git": "https://api.github.com/repos/darkocejkov/knowledge/git/trees/c9a9223661d3d615fb757b1eb9978976eba22101",
+      "html": "https://github.com/darkocejkov/knowledge/tree/main/wlu"
+    }
+  }
+]

@@ -1,51 +1,59 @@
-import React, {useState} from 'react'
+import React, {useReducer, useState} from 'react'
 import {Canvas} from "@react-three/fiber";
 import {ControlButton} from '../Components/Basics.tsx'
 import {ReactChild} from "../types.ts";
+import {useToast} from "../Hooks/Toast.tsx";
+import useSound from "use-sound";
 
 type ControlMode = {
     label: string,
     id: number,
     component: ReactChild,
     icon?: ReactChild
+
 }
 
 const ButtonLayout = ({children}: {
     children: ReactChild
 }) => (
     <div
-        className={'flex flex-row self-center font-aeonik gap-0 text-xs pointer-events-auto hover:gap-4 font-normal transition-all'}>
+        className={'flex flex-row self-center font-aeonik gap-0 text-xs pointer-events-auto hover:gap-1 font-normal transition-all'}>
         {children}
     </div>
 )
 
 export function ControlBar({}) {
 
+
     const modes = [
         {
             label: 'Sketch',
             icon: <i className="fa-solid fa-scribble"></i>,
+            component: <SketchControls key={'sketch'}/>,
             id: 0
         },
-        {
-            label: 'Media',
-            icon: <i className="fa-solid fa-music"></i>,
-            id: 1
-        },
+        // {
+        //     label: 'Media',
+        //     icon: <i className="fa-solid fa-music"></i>,
+        //     component: <MusicControls key={'music'} dispatch={dispatch} state={state}/>,
+        //     id: 1
+        // },
         {
             label: 'Tools',
             icon: <i className="fa-solid fa-music"></i>,
-            id: 1
+            component: <ToolController key={'tools'}/>,
+
+            id: 2
         }
     ]
 
-    const [mode, setMode] = useState<ControlMode>()
 
-    console.log({mode})
+    const [mode, setMode] = useState<ControlMode>()
 
     return (
         <div
             className={'fixed min-h-[5%] min-w-[10%] bottom-0 opacity-60 hover:opacity-100 inset-x-1/2 p-3 translate-y-1/2 hover:translate-y-0 -translate-x-1/2 w-fit link-background-to-r bg-gradient-to-r from-amber-400 to-amber-400 z-50 rounded-t-xl shadow-lg backdrop-blur-sm'}>
+
 
             {!mode &&
                 <ButtonLayout>
@@ -62,43 +70,87 @@ export function ControlBar({}) {
             }
 
             {mode &&
-                <ControlButton label={'Menu'} onClick={() => setMode(undefined)}>
-                    <i className="fa-solid fa-arrow-left"></i>
-                </ControlButton>
+                <ButtonLayout>
+                    <ControlButton label={'Menu'} onClick={() => setMode(undefined)}>
+                        <i className="fa-solid fa-arrow-left"></i>
+                    </ControlButton>
+
+                    <>
+                        {mode.component}
+                    </>
+
+                </ButtonLayout>
             }
 
-            {/*<SketchControls/>*/}
         </div>
     )
 }
 
 export const ToolController = () => {
 
-    // Meant as a DEV utility to open/trigger things like modals
+    const {addToast} = useToast()
+
     return (
-        <div
-            className={'fixed left-0 inset-y-1/2 opacity-60 hover:opacity-100 inset-x-1/2 p-3 h-fit w-fit link-background bg-gradient-to-b from-amber-400 to-amber-400 z-50 rounded-t-xl shadow-lg backdrop-blur-sm '}>
-            <div className={'flex flex-col gap-2'}>
+        <>
+            <ControlButton label={"Trigger Modal"}>
+                <i className="fa-solid fa-window fa-xl"></i>
+            </ControlButton>
 
-                <button>
-                    modal
-                </button>
-
-            </div>
-
-        </div>
+            <ControlButton onClick={() => addToast('Toasty!', {duration: 0})} label={"Random Toast"}>
+                <i className="fa-solid fa-bread-slice-butter fa-xl"></i>
+            </ControlButton>
+        </>
     )
 }
 
-function MusicControls({}) {
+const playlist = [
+    {
+        title: 'Faith In Strangers',
+        author: 'Andy Stott',
+        path: '../assets/songs/Andy Stott - Faith In Strangers.mp3'
+    },
+]
 
-    // use-sound package with useSound hook
-    // visualizator through Web Audio API
+export function MusicBar({}) {
+
+    // const [play, exposedData] = useSound(fernace, {
+    //     volume: 0.2,
+    // })
+    const [state, dispatch] = useReducer((state, action) => {
+
+        if (action.type === 'STOP' && state === 'PLAYING') {
+            // exposedData.stop()
+            return 'STOPPED'
+        } else if (action.type === 'PLAY') {
+            // play()
+            return 'PLAYING'
+        } else if (action.type === 'PAUSE') {
+            // exposedData.pause()
+            return 'PAUSED'
+        }
+
+    }, 'STOPPED')
+
+    // https://web.dev/webaudio-intro/
+    // https://www.twilio.com/blog/audio-visualisation-web-audio-api--react
+    // https://www.telerik.com/blogs/adding-audio-visualization-react-app-using-web-audio-api
+    // https://github.com/goldfire/howler.js#quick-start
 
     return (
-        <ButtonLayout>
-            <></>
-        </ButtonLayout>
+        <div
+            className={'fixed min-h-[5%] min-w-[10%] bottom-0 opacity-60 hover:opacity-100 inset-x-3/4 p-3 translate-y-1/2 hover:translate-y-0 -translate-x-1/2 w-fit link-background-to-r bg-gradient-to-r from-orange-400 to-orange-400 z-50 rounded-t-xl shadow-lg backdrop-blur-sm'}>
+            <ButtonLayout>
+                <ControlButton onClick={() => dispatch({type: 'PLAY'})} label={"Play"}>
+                    <i className="fa-solid fa-play fa-xl"></i>
+                </ControlButton>
+                <ControlButton onClick={() => dispatch({type: 'STOP'})} label={"Stop"}>
+                    <i className="fa-solid fa-stop fa-xl"></i>
+                </ControlButton>
+                <ControlButton onClick={() => dispatch({type: 'PAUSE'})} label={"Pause"}>
+                    <i className="fa-solid fa-pause fa-xl"></i>
+                </ControlButton>
+            </ButtonLayout>
+        </div>
     )
 }
 
@@ -115,7 +167,7 @@ function SketchControls({}) {
     const [sketchIndex, setSketchIndex] = useState(null)
 
     return (
-        <ButtonLayout>
+        <>
             <ControlButton onClick={() => setHide(false)} label={"Show Sketch"}>
                 <i className="fa-solid fa-eye fa-xl"></i>
 
@@ -145,6 +197,6 @@ function SketchControls({}) {
             <ControlButton onClick={() => null} label={"Next Sketch"}>
                 <i className="fa-solid fa-chevron-right fa-xl"></i>
             </ControlButton>
-        </ButtonLayout>
+        </>
     )
 }

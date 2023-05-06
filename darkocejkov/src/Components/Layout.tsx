@@ -11,17 +11,16 @@ export function Layout(props: LayoutProps) {
 
     return (
         <div
-            className={'perspective-lg min-h-screen min-w-screen p-24 flex flex-col items-center justify-center gap-5 bg-gradient-to-b from-blue-100 to-orange-400'}>
+            className={'perspective-lg min-h-screen min-w-screen p-24 pt-32 flex flex-col items-center gap-5 bg-gradient-to-b from-blue-100 to-blue-400 overflow-hidden'}>
             {children}
         </div>
     )
 }
 
-export function Container(props: LayoutProps) {
-    const {children} = props
+export function Container({children, className = ''}: LayoutProps) {
 
     return (
-        <div className={'container mx-auto flex justify-center items-center'}>
+        <div className={`container mx-auto flex justify-center items-center ${className}`}>
             {children}
         </div>
     )

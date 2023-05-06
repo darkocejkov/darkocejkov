@@ -1021,7 +1021,9 @@ button:disabled{
   opacity: 0.5;
 }
 
-
+.link {
+  text-decoration: underline wavy red;
+}
 
 .gradient-background{
   background: var(--alien-gradient);
@@ -1047,12 +1049,22 @@ button:disabled{
   }
 }
 
+/*  https://css-tricks.com/adding-stroke-to-web-text/ */
+.text-outline {
+  -webkit-text-stroke-width: 2px;
+  -webkit-text-stroke-color: black;
+}
 
-.scrollbar-none::-webkit-scrollbar{
+.text-shadow-sm {
+  text-shadow: 2px 2px 2px black;
+}
+
+
+.scrollbar-none::-webkit-scrollbar {
   display: none;
 }
 
-.link-background-to-r{
+.link-background-to-r {
   background-position: 0 0;
   background-repeat: repeat-y;
   background-size: 4px 100%;
@@ -1085,6 +1097,7 @@ button:disabled{
 .perspective-none{
   perspective: none;
 }
+
 
 ::-webkit-scrollbar {
   /*width: 5px;*/

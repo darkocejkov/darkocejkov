@@ -1,10 +1,10 @@
-import React, {useState} from 'react'
+import React, {useEffect, useRef, useState} from 'react'
 
-import {Routes, Route, Navigate} from 'react-router-dom'
+import {Routes, Route, Navigate, useLocation} from 'react-router-dom'
 
 import {Layout} from "../Components/Layout.tsx";
 import Navigation from "../Components/Navigation.tsx";
-import {ControlBar, SketchControls, ToolController} from "../Components/Controller.tsx";
+import {ControlBar, MusicBar} from "../Components/Controller.tsx";
 
 import Hero from '../Pages/Hero.tsx'
 import Experience from '../Pages/Experience.tsx'
@@ -20,6 +20,7 @@ import NotFound from "../Pages/404.tsx";
 
 import {NavRoute} from '../types.ts'
 import {LoadBar} from "../Components/Basics.tsx";
+import {Toast, ToastProvider, useToast} from "../Hooks/Toast.tsx";
 
 export default function Apex({}) {
 
@@ -88,9 +89,21 @@ export default function Apex({}) {
         }
     ]
 
+    const layoutClassName = ''
+
+    const [selectedRoute, setSelectedRoute] = useState<NavRoute>()
+
+    const location = useLocation()
+
+    useEffect(() => {
+        let route = routes.find(x => x.path === location.pathname)
+        setSelectedRoute(route)
+
+    }, [location])
+
 
     return (
-        <>
+        <ToastProvider>
             <LoadBar progress={0}/>
 
             {/*<ToolController/>*/}
@@ -106,7 +119,9 @@ export default function Apex({}) {
             </Layout>
 
             <ControlBar/>
-        </>
+
+            <MusicBar/>
+        </ToastProvider>
     )
 
 }
