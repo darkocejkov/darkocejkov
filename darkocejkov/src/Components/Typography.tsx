@@ -1,70 +1,7 @@
-import React, {RefObject, useId, useRef, useState} from "react";
-
-import {motion, useInView, useMotionValueEvent, useScroll, useTransform} from "framer-motion";
-
-import {IconContext} from "react-icons";
-import {toBeginning, toEnd, quadToCenter} from "../animations.ts";
-
-
-import {ReactChild, AnimationFunction} from "../types.ts";
-
-
-export default function Hero({}) {
-
-
-    return (
-        <motion.div className={'container flex flex-col justify-center items-center transition-all select-none '}>
-
-            <IconContext.Provider value={{size: '8rem'}}>
-
-                <div className={'flex flex-col md:gap-5 justify-center items-center'}>
-                    <div className={'flex flex-wrap gap-5 justify-center items-center'}>
-                        {/*<Text text={"darko cejkov."} className={"text-[4rem] md:text-[8rem] font-tabi"}/>*/}
-                        <div className={'flex'}>
-                            <Text text={"darko"}
-                                  className={"text-[4rem] md:text-[6rem] lg:text-[8rem] font-tabi"}
-                                  animFunction={toBeginning}/>
-
-                        </div>
-                        <div className={'flex'}>
-                            <Text text={"cejkov."}
-                                  className={"text-[4rem] md:text-[6rem] lg:text-[8rem] -mt-12 sm:mt-0 font-tabi"}
-                                  animFunction={toEnd}/>
-                        </div>
-                    </div>
-
-                    <div className={'flex'}>
-                        <Text text={"fullstack."} className={"text-[3rem] md:text-[4rem] lg:text-[5rem]  font-rubik"}
-                              animFunction={toBeginning}
-                              element={1.5}/>
-                    </div>
-
-                    <div className={'flex'}>
-                        <Text text={"developer."} className={"text-[3rem] md:text-[4rem] lg:text-[5rem]   font-rubik"}
-                              animFunction={toEnd}
-                              element={2.5}/>
-                    </div>
-
-                    <div className={'flex'}>
-                        <Text text={"engineer."} className={"text-[3rem] md:text-[4rem] lg:text-[5rem]   font-rubik"}
-                              animFunction={toBeginning}
-                              element={3.5}/>
-                    </div>
-
-                    <div className={'flex'}>
-                        <Text text={"designer."} className={"text-[3rem] md:text-[4rem] lg:text-[5rem]   font-rubik"}
-                              animFunction={toEnd}
-                              element={4.5}/>
-                    </div>
-
-                </div>
-
-
-            </IconContext.Provider>
-        </motion.div>
-    )
-}
-
+import {quadToCenter} from "../animations.ts";
+import {AnimationFunction, ReactChild} from "../types.ts";
+import React, {useState} from "react";
+import {motion} from "framer-motion";
 
 const Text = ({text, className = '', animFunction = quadToCenter, element = 0}: {
     text: string,
@@ -193,5 +130,3 @@ const Char = ({children, index, total, className = '', animFunction, element = 0
         </motion.span>
     )
 }
-
-

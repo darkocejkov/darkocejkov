@@ -3,6 +3,10 @@ import React from "react";
 
 import Apex from "./Views/Apex.tsx";
 
+
+// import "./fonts/tabi/Tabi-Regular.ttf"
+// import "./fonts/tabi/Tabi-Super.ttf"
+
 import {
 	QueryClient,
 	QueryClientProvider,

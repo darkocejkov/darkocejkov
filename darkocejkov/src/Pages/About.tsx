@@ -1,35 +1,35 @@
 import React, {
     Dispatch,
-    ForwardedRef,
-    forwardRef,
     RefObject,
-    useLayoutEffect,
     useEffect,
     useMemo,
     useRef,
-    useState, useDeferredValue
+    useState,
 } from "react";
-import {DragPane, InfoBox} from "../Components/Basics.tsx";
 import {
     animate,
     motion,
     MotionValue,
     useDragControls,
     useMotionValue,
-    useMotionValueEvent,
     useSpring
 } from "framer-motion";
 import {createPortal} from "react-dom";
 import {ReactChild} from "../types.ts";
-import {start} from "repl";
-import {boundingBoxRange, LipSum5, random, vh2px, vw2px} from "../helpers.ts";
+
+import {boundingBoxRange, random, vh2px, vw2px} from "../helpers.ts";
 import {SpriteMap} from "use-sound/dist/types";
 
 import useSound from "use-sound";
 
+//      Import SFX files - TS does NOT like the fact that it's not a module
+// @ts-ignore
 import popSFX from '../assets/sfx/pops.mp3'
+// @ts-ignore
 import hover from '../assets/sfx/primarySystemSounds/navigation_hover-tap.wav'
+// @ts-ignore
 import transitionRight from '../assets/sfx/primarySystemSounds/navigation_transition-right.wav'
+// @ts-ignore
 import confirm from '../assets/sfx/primarySystemSounds/state-change_confirm-up.wav'
 
 import {open, closing, closed} from '../assets/ascii/eyes.js'
@@ -168,7 +168,10 @@ const NodeContainer = ({contentList}: {
 
             <div className={'flex flex-col gap-2'}>
                 <div ref={constraintRef}
-                     className={'max-h-[80vh] bg-slate-900/10 rounded-xl grid grid-cols-4 grid-rows-3 gap-4 p-6'}>
+
+                     className={'max-h-[80vh] bg-slate-900/10 rounded-xl grid-fill p-6 overflow-x-hidden'}>
+
+                    {/**/}
                     {elementArray}
                 </div>
 
@@ -272,13 +275,22 @@ const NodePane = ({total, i, x, y, active, setActive, children, constraint, rese
 
     const oldFlag = useRef(resetFlag)
 
-    if (oldFlag.current !== resetFlag) {
+    // const [resetting, setResetting] = useState(false)
 
-        // console.log(`${i} old ${oldFlag.current} new ${resetFlag} ${xx} ${yy}`)
+    const handleReset = () => {
+        // setResetting(() => true)
+        // setTimeout(() => {
+        //     setResetting(() => false)
+        // }, 250)
+
         oldFlag.current = resetFlag
 
         if (xx.get() !== 0 || yy.get() !== 0) {
+
+
             setTimeout(() => {
+
+
                 //
                 xx.stop()
                 yy.stop()
@@ -294,6 +306,36 @@ const NodePane = ({total, i, x, y, active, setActive, children, constraint, rese
                 })
             }, i * resetIndexDelay)
         }
+    }
+
+    if (oldFlag.current !== resetFlag) {
+
+        handleReset()
+
+        // console.log(`${i} old ${oldFlag.current} new ${resetFlag} ${xx} ${yy}`)
+        // oldFlag.current = resetFlag
+        //
+        // if (xx.get() !== 0 || yy.get() !== 0) {
+        //
+        //
+        //     setTimeout(() => {
+        //
+        //
+        //         //
+        //         xx.stop()
+        //         yy.stop()
+        //
+        //         animate(xx.get(), 0, {
+        //             onUpdate: latest => xx.set(latest),
+        //             // onComplete: () => play({id: 'a'})
+        //         })
+        //
+        //         animate(yy.get(), 0, {
+        //             onUpdate: latest => yy.set(latest),
+        //             onComplete: () => play({id: 'b'})
+        //         })
+        //     }, i * resetIndexDelay)
+        // }
 
         // xx.stop()
         // yy.stop()
@@ -345,10 +387,29 @@ const NodePane = ({total, i, x, y, active, setActive, children, constraint, rese
                     x: xx,
                     y: yy,
                 }}
-                className={'backdrop-blur-md p-5 bg-slate-900/0 relative origin-center rounded-lg shadow-lg overflow-hidden select-none z-10'}
+                className={'backdrop-blur-md p-5 bg-slate-900/0 relative origin-center rounded-lg shadow-lg overflow-hidden select-none z-10 flex-1 h-fit'}
             >
-                <div className={'absolute right-0 -top-2 p-1'} onPointerDown={startDrag}>
-                    <i className="fa-solid fa-grip-dots"></i>
+                {/*<div className={'absolute right-0 -top-2 p-1'} onPointerDown={startDrag}>*/}
+                {/*    <i className="fa-solid fa-grip-dots"></i>*/}
+                {/*</div>*/}
+
+                <div className={'absolute right-0 -top-2 p-1 flex gap-1 items-center justify-center'}>
+
+                    {/*<motion.div*/}
+                    {/*    animate={{*/}
+                    {/*        rotateZ: resetting ? '360deg' : '0deg',*/}
+                    {/*        opacity: resetting ? '1' : '0'*/}
+                    {/*    }}*/}
+                    {/*>*/}
+                    {/*    <GrPowerReset size={'1rem'}/>*/}
+                    {/*</motion.div>*/}
+
+
+                    <div onPointerDown={startDrag}>
+                        <i className="fa-solid fa-grip-dots"></i>
+                    </div>
+
+
                 </div>
 
                 {children}
@@ -397,7 +458,8 @@ const Content = ({children}: {
     children: ReactChild
 }) => (
     // bg-white/10
-    <div className={'flex justify-center h-full w-full items-center rounded-xl overflow-y-auto'}>
+    <div
+        className={'flex justify-center h-full w-full items-center rounded-xl overflow-y-auto overflow-x-hidden break-words'}>
         {children}
     </div>
 )
@@ -420,10 +482,15 @@ const textArray = [
 ]
 
 const dancing = [
+    'ᕕʕ •ₒ• ʔ୨',
     '＼ʕ •ᴥ•ʔ＼',
     '／ʕ•ᴥ• ʔ／',
     '＼ʕ •ᴥ• ʔ／',
     'ʅ_ʕ •ᴥ• ʔ_ʃ',
+    'ʕ •ₒ• ʔ',
+    'ʕ ꈍᴥꈍʔ',
+    'ʕ´•㉨•`ʔ',
+
 ]
 
 const AnimateText = () => {
@@ -488,103 +555,105 @@ const contentChildren: ReactChild[] = [
             <IconContext.Provider value={{size: '1.5rem'}}>
 
                 <Tooltip title={'TypeScript'}>
-                    <SiTypescript/>
+                    <SiTypescript className={'text-yellow-300'}/>
                 </Tooltip>
 
 
                 <Tooltip title={'JavaScript/ES6'}>
 
-                    <SiJavascript/>
+                    <SiJavascript className={'text-green-600'}/>
                 </Tooltip>
 
                 <Tooltip title={'Python 3'}>
 
-                    <FaPython/>
+                    <FaPython className={'text-red-500'}/>
                 </Tooltip>
 
                 <Tooltip title={'CLANG (C/C++)'}>
 
-                    <TbBrandCpp/>
+                    <TbBrandCpp className={'text-red-500'}/>
                 </Tooltip>
 
                 <Tooltip title={'Java OOP'}>
 
-                    <FaJava/>
+                    <FaJava className={'text-red-500'}/>
                 </Tooltip>
 
-                <Tooltip title={'Blender'}>
 
-                    <SiBlender/>
-                </Tooltip>
 
                 <Tooltip title={'ReactJS'}>
 
-                    <FaReact/>
+                    <FaReact className={'text-green-600'}/>
                 </Tooltip>
 
                 <Tooltip title={'ThreeJS'}>
 
-                    <TbBrandThreejs/>
+                    <TbBrandThreejs className={'text-yellow-300'}/>
                 </Tooltip>
 
                 <Tooltip title={'NodeJS Runtime'}>
 
-                    <FaNodeJs/>
+                    <FaNodeJs className={'text-green-600'}/>
                 </Tooltip>
 
                 <Tooltip title={'Git VCS'}>
 
-                    <FaGit/>
+                    <FaGit className={'text-green-600'}/>
                 </Tooltip>
 
                 <Tooltip title={'PassportJS Auth'}>
 
-                    <SiPassport/>
+                    <SiPassport className={'text-green-600'}/>
                 </Tooltip>
 
                 <Tooltip title={'ExpressJS Middleware'}>
 
-                    <SiExpress/>
+                    <SiExpress className={'text-green-600'}/>
                 </Tooltip>
 
                 <Tooltip title={'MySQL relational database'}>
 
-                    <SiMysql/>
+                    <SiMysql className={'text-green-600'}/>
                 </Tooltip>
 
                 <Tooltip title={'Redis key/value database'}>
 
-                    <SiRedis/>
+                    <SiRedis className={'text-yellow-600'}/>
                 </Tooltip>
 
                 <Tooltip title={'Linux administration'}>
 
-                    <FaLinux/>
+                    <FaLinux className={'text-green-600'}/>
+                </Tooltip>
+
+                <Tooltip title={'Blender'}>
+
+                    <SiBlender className={'text-red-500'}/>
                 </Tooltip>
 
                 <Tooltip title={'Illustrator'}>
 
-                    <SiAdobeillustrator/>
+                    <SiAdobeillustrator className={'text-yellow-300'}/>
                 </Tooltip>
 
                 <Tooltip title={'Photoshop'}>
 
-                    <SiAdobephotoshop/>
+                    <SiAdobephotoshop className={'text-green-600'}/>
                 </Tooltip>
 
                 <Tooltip title={'Premiere Pro'}>
 
-                    <SiAdobepremierepro/>
+                    <SiAdobepremierepro className={'text-green-600'}/>
                 </Tooltip>
 
                 <Tooltip title={'Figma design prototypes'}>
 
-                    <FaFigma/>
+                    <FaFigma className={'text-red-600'}/>
                 </Tooltip>
 
                 <Tooltip title={'AWS (S3, SES, EC2, ECS, Lightsail, Amplify)'}>
 
-                    <FaAws/>
+                    <FaAws className={'text-yellow-300'}/>
                 </Tooltip>
             </IconContext.Provider>
         </div>
@@ -630,7 +699,7 @@ const contentChildren: ReactChild[] = [
             open,
         ]}/>
     </pre>,
-    <TextReplace textArray={dancing} time={500}/>,
+    <TextReplace textArray={dancing} time={500} className={'text-3xl'}/>,
 ]
 
 

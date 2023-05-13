@@ -1,5 +1,5 @@
 import React from "react";
-import {InfoBox, Link, StatBox, TitleRule, TooltipWrapper, Pane} from "../Components/Basics.tsx";
+import {InfoBox, Link, StatBox, TitleRule, TooltipWrapper, Pane, TextBox} from "../Components/Basics.tsx";
 import {Tooltip} from "antd";
 
 export default function Education() {
@@ -12,16 +12,18 @@ export default function Education() {
             <TitleRule classes={'md:text-2xl text-xl font-maru font-bold uppercase'}>
                 <>
                     Wilfrid Laurier University (2016 - 2022)
-                    <div className={`lg:flex-1 w-full h-[1px] bg-slate-900 self-center`}/>
-                    <p>GPA of <b>8.9</b> of 12 overall</p>
-                    <Tooltip className={'inline'} title={"9.8 Computer Science, 8.6 Psychology"}>
-                        <i className="fa-solid fa-circle-info fa-sm self-center"></i>
-                    </Tooltip>
+                    <div className={`hr-fill`}/>
+                    <p>GPA of <b>8.9</b> of 12 overall
+                        <Tooltip className={'inline ml-1'} title={"9.8 Computer Science, 8.6 Psychology"}>
+                            <i className="fa-solid fa-circle-info fa-sm self-center"></i>
+                        </Tooltip>
+                    </p>
+
                 </>
             </TitleRule>
 
-            <h2 className={'md:text-2xl text-xl font-maru  uppercase'}>
-                Double Major, 20 credits total
+            <h2 className={'text-xl md:text-2xl font-maru uppercase'}>
+                Double Major - 20 credits.
             </h2>
 
             <h3 className={'mt-2 font-aeonik font-bold'}>Courses of Interest</h3>
@@ -108,6 +110,40 @@ export default function Education() {
 
             </div>
 
+            <div className={'flex flex-col gap-2 mt-2'}>
+
+                <h3 className={'font-aeonik font-bold'}>My Experience</h3>
+                <TextBox className={'font-rubik md:p-6 font-thin text-xl flex flex-col gap-5'}>
+                    <p>University was both an obstacle and a lesson. My personal crux was less about the content, and
+                        more about myself and the purpose of learning. Going into university, I was under-prepared, and
+                        tried using lazy approaches to passing courses - I failed many times.
+                        When I got the dreaded letter of official notice for academic probation, I couldn't let myself
+                        fail out of school, and I started to really put in effort to not only stay afloat, but succeed
+                        many of my peers.
+                    </p>
+                    <p>
+                        When I focused, I got very deep into learning about many different programming languages. Most
+                        surprisingly, I started loving math - especially theoretical discrete maths.
+                    </p>
+                </TextBox>
+
+            </div>
+
+            <div className={'flex flex-col gap-2 mt-2'}>
+
+                <h3 className={'font-aeonik font-bold'}>Why Psychology <em>and</em> Computer Science?</h3>
+                <TextBox className={'font-rubik md:p-6 font-thin text-xl flex flex-col gap-5'}>
+                    <p>
+                        Scientific psychology has quite a lot of overlap in computer science. My specialization was
+                        neuroscience - which if you are being reductionist, is similar to electronic circuitry.
+                        Psychology as a displine itself is also very interesting and can be very deep, because it's
+                        rooted in philosophy, and especially something that can be quite meta, the human condition and
+                        experience.
+
+                    </p>
+                </TextBox>
+
+            </div>
 
         </Pane>
     )

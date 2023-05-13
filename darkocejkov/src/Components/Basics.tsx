@@ -69,7 +69,7 @@ export const TextBox = ({children, className = ''}: {
     className?: string
 }) => {
     return (
-        <p className={`bg-slate-900/10 max-h-[50vh] overflow-y-auto p-4 rounded-tl-xl rounded-bl-xl ${className}`}>
+        <p className={`bg-slate-900/10 max-h-[30vh] overflow-y-auto p-4 rounded-tl-xl rounded-bl-xl ${className}`}>
             {children}
         </p>
     )
@@ -148,7 +148,7 @@ export const Pane = ({children, className, id, subtle = false}: {
                         type: 'spring',
                         mass: 2,
                     }}
-                    className={`info-box p-5 relative md:max-w-[80%] z-10 origin-center max-w-full rounded-lg shadow-lg ${className}`}>
+                    className={`info-box p-5 relative  z-10 origin-center max-w-full md:max-w-[80%] rounded-lg shadow-lg min-w-[250px] ${className}`}>
             {children}
         </motion.div>
     )
@@ -477,7 +477,7 @@ const isExternalLink = (url: string) => {
     return tmp.host !== window.location.host;
 };
 
-export const Link = ({url, children, className}: {
+export const Link = ({url, children, className = 'text-xl font-rubik normal-case'}: {
     url?: string,
     children?: ReactChild,
     className?: string
@@ -485,7 +485,7 @@ export const Link = ({url, children, className}: {
 
     return (
         <a target={"_blank"}
-           className={`hover:underline z-20  ${className ? className : 'text-xl font-rubik normal-case'}`} href={url}>
+           className={`hover:underline z-20  ${className}`} href={url}>
             {children
                 ? (children)
                 : (url?.split('/')[2])}
@@ -497,7 +497,7 @@ export const Link = ({url, children, className}: {
 }
 
 type ClipboardProps = {
-    onClick: () => void,
+    onClick?: () => void,
     text: string,
 }
 
@@ -546,7 +546,7 @@ export const CustomLink = ({label, clipboard, url, children, className = 'text-x
             rel="noreferrer noopener"
             target={"_blank"}
             tabIndex={0}
-            className={`cursor-pointer relative p-4 rounded-sm link-background bg-gradient-to-b from-amber-400 to-amber-400 z-20 flex flex-col gap-1 ${className}`}
+            className={`cursor-pointer relative p-4 rounded-sm origin-center link-background bg-gradient-to-b from-amber-400 to-amber-400 z-20 flex flex-col gap-1 ${className}`}
             href={url}
 
             onClick={() => clipboard ? copyToClip(clipboard.text) : null}

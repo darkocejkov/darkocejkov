@@ -5,6 +5,8 @@ import {ReactChild} from "../types.ts";
 import {useToast} from "../Hooks/Toast.tsx";
 import useSound from "use-sound";
 
+import {CgLinear} from 'react-icons/cg'
+
 type ControlMode = {
     label: string,
     id: number,

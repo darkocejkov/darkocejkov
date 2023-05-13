@@ -605,14 +605,30 @@
   }
 
 
+  .row {
 
-  .row{
+  }
+
+  .col {
 
   }
 
-  .col{
-
+  .title {
+    @apply md:text-4xl text-2xl font-tabi break-words
   }
+
+  .subtitle {
+    @apply md:text-xl text-lg font-maru font-bold uppercase break-words
+  }
+
+  .hr-fill {
+    @apply lg:flex-1 w-full h-[1px] bg-slate-900 self-center
+  }
+
+  .grid-fill {
+    @apply grid gap-4 xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-1 overflow-y-auto
+  }
+
 
 }
 
@@ -1064,6 +1080,15 @@ button:disabled{
   display: none;
 }
 
+.link-background-to-b {
+  background-position: 0 0;
+  background-repeat: repeat-x;
+  background-size: 4px 100%;
+  color: #000;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
 .link-background-to-r {
   background-position: 0 0;
   background-repeat: repeat-y;
@@ -1077,24 +1102,34 @@ button:disabled{
   background-size: 100% 100%;
 }
 
-.link-background{
+.link-background {
   background-position: 0 100%;
   background-repeat: repeat-x;
   background-size: 4px 4px;
   color: #000;
   text-decoration: none;
-  transition: all 0.2s;
+  transition: all 0.24s ease-in-out;
 }
 
-.link-background:hover{
+.link-background:hover {
   background-size: 4px 100%;
 }
 
-.perspective-lg{
+/*.link-container::after {*/
+/*  width: 100vw;*/
+/*  height: 110%;*/
+/*  @apply bg-orange-400;*/
+/*  display: block;*/
+/*  position: absolute;*/
+/*  content: '';*/
+/*}*/
+
+
+.perspective-lg {
   perspective: 800px;
 }
 
-.perspective-none{
+.perspective-none {
   perspective: none;
 }
 
@@ -1128,10 +1163,10 @@ button:disabled{
   background-color: black;
 }
 
-@font-face {
-  font-family: "CosiTimes";
-  src: url("../public/fonts/CosiTimes-Bold.ttf");
-}
+/*@font-face {*/
+/*  font-family: "CosiTimes";*/
+/*  src: url("../public/fonts/CosiTimes-Bold.ttf");*/
+/*}*/
 
 @font-face {
   font-family: 'GT Maru';
@@ -1213,93 +1248,93 @@ button:disabled{
   font-display: auto;
 }
 
-@font-face {
-  font-family: 'GT Maru Mega';
-  src: url('../public/fonts/maru/GTMaruMega-Mini.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-}
+/*@font-face {*/
+/*  font-family: 'GT Maru Mega';*/
+/*  src: url('../public/fonts/maru/GTMaruMega-Mini.ttf') format('truetype');*/
+/*  font-weight: normal;*/
+/*  font-style: normal;*/
+/*}*/
 
-@font-face {
-  font-family: 'GT Maru Mega';
-  src: url('../public/fonts/maru/GTMaruMega-Midi.ttf') format('truetype');
-  font-weight: bold;
-  font-style: normal;
-}
+/*@font-face {*/
+/*  font-family: 'GT Maru Mega';*/
+/*  src: url('../public/fonts/maru/GTMaruMega-Midi.ttf') format('truetype');*/
+/*  font-weight: bold;*/
+/*  font-style: normal;*/
+/*}*/
 
-@font-face {
-  font-family: 'GT Maru Mega';
-  src: url('../public/fonts/maru/GTMaruMega-Maxi.ttf') format('truetype');
-  font-weight: bold;
-  font-style: normal;
-}
+/*@font-face {*/
+/*  font-family: 'GT Maru Mega';*/
+/*  src: url('../public/fonts/maru/GTMaruMega-Maxi.ttf') format('truetype');*/
+/*  font-weight: bold;*/
+/*  font-style: normal;*/
+/*}*/
 
-@font-face {
-  font-family: 'GT Sectra Display';
-  src: url('../public/fonts/sectra/GT-Sectra-LCGV-Display-Super.ttf') format('truetype');
-  font-weight: 900;
-  font-style: normal;
-  font-display: auto;
-}
+/*@font-face {*/
+/*  font-family: 'GT Sectra Display';*/
+/*  src: url('../public/fonts/sectra/GT-Sectra-LCGV-Display-Super.ttf') format('truetype');*/
+/*  font-weight: 900;*/
+/*  font-style: normal;*/
+/*  font-display: auto;*/
+/*}*/
 
-@font-face {
-  font-family: 'GT Sectra Display';
-  src: url('../public/fonts/sectra/GT-Sectra-LCGV-Display-Medium.ttf') format('truetype');
-  font-weight: 500;
-  font-style: normal;
-  font-display: auto;
-}
+/*@font-face {*/
+/*  font-family: 'GT Sectra Display';*/
+/*  src: url('../public/fonts/sectra/GT-Sectra-LCGV-Display-Medium.ttf') format('truetype');*/
+/*  font-weight: 500;*/
+/*  font-style: normal;*/
+/*  font-display: auto;*/
+/*}*/
 
-@font-face {
-  font-family: 'GT Sectra Display';
-  src: url('../public/fonts/sectra/GT-Sectra-LCGV-Display-Medium-Italic.ttf') format('truetype');
-  font-weight: 500;
-  font-style: italic;
-  font-display: auto;
-}
+/*@font-face {*/
+/*  font-family: 'GT Sectra Display';*/
+/*  src: url('../public/fonts/sectra/GT-Sectra-LCGV-Display-Medium-Italic.ttf') format('truetype');*/
+/*  font-weight: 500;*/
+/*  font-style: italic;*/
+/*  font-display: auto;*/
+/*}*/
 
-@font-face {
-  font-family: 'GT Sectra Display';
-  src: url('../public/fonts/sectra/GT-Sectra-LCGV-Display-Super-Italic.ttf') format('truetype');
-  font-weight: 900;
-  font-style: italic;
-  font-display: auto;
-}
+/*@font-face {*/
+/*  font-family: 'GT Sectra Display';*/
+/*  src: url('../public/fonts/sectra/GT-Sectra-LCGV-Display-Super-Italic.ttf') format('truetype');*/
+/*  font-weight: 900;*/
+/*  font-style: italic;*/
+/*  font-display: auto;*/
+/*}*/
 
-@font-face {
-  font-family: 'GT Sectra Display';
-  src: url('../public/fonts/sectra/GT-Sectra-LCGV-Display-Regular.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-  font-display: auto;
-}
+/*@font-face {*/
+/*  font-family: 'GT Sectra Display';*/
+/*  src: url('../public/fonts/sectra/GT-Sectra-LCGV-Display-Regular.ttf') format('truetype');*/
+/*  font-weight: normal;*/
+/*  font-style: normal;*/
+/*  font-display: auto;*/
+/*}*/
 
-@font-face {
-  font-family: 'GT Sectra Display';
-  src: url('../public/fonts/sectra/GT-Sectra-LCGV-Display-Regular-Italic.ttf') format('truetype');
-  font-weight: normal;
-  font-style: italic;
-  font-display: auto;
-}
+/*@font-face {*/
+/*  font-family: 'GT Sectra Display';*/
+/*  src: url('../public/fonts/sectra/GT-Sectra-LCGV-Display-Regular-Italic.ttf') format('truetype');*/
+/*  font-weight: normal;*/
+/*  font-style: italic;*/
+/*  font-display: auto;*/
+/*}*/
 
-@font-face {
-  font-family: 'GT Sectra Fine';
-  src: url('../public/fonts/sectra/GT-Sectra-LCGV-Fine-Black.ttf') format('truetype');
-  font-weight: 900;
-}
+/*@font-face {*/
+/*  font-family: 'GT Sectra Fine';*/
+/*  src: url('../public/fonts/sectra/GT-Sectra-LCGV-Fine-Black.ttf') format('truetype');*/
+/*  font-weight: 900;*/
+/*}*/
 
-@font-face {
-  font-family: 'GT Sectra Fine';
-  src: url('../public/fonts/sectra/GT-Sectra-LCGV-Fine-Black-Italic.ttf') format('truetype');
-  font-weight: 900;
-  font-style: italic;
-}
+/*@font-face {*/
+/*  font-family: 'GT Sectra Fine';*/
+/*  src: url('../public/fonts/sectra/GT-Sectra-LCGV-Fine-Black-Italic.ttf') format('truetype');*/
+/*  font-weight: 900;*/
+/*  font-style: italic;*/
+/*}*/
 
-@font-face {
-  font-family: 'GT Sectra Fine';
-  src: url('../public/fonts/sectra/GT-Sectra-LCGV-Fine-Bold.ttf') format('truetype');
-  font-weight: 600;
-}
+/*@font-face {*/
+/*  font-family: 'GT Sectra Fine';*/
+/*  src: url('../public/fonts/sectra/GT-Sectra-LCGV-Fine-Bold.ttf') format('truetype');*/
+/*  font-weight: 600;*/
+/*}*/
 
 @font-face {
   font-family: 'Tabi';

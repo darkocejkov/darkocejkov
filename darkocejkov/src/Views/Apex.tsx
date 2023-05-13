@@ -3,7 +3,7 @@ import React, {useEffect, useRef, useState} from 'react'
 import {Routes, Route, Navigate, useLocation} from 'react-router-dom'
 
 import {Layout} from "../Components/Layout.tsx";
-import Navigation from "../Components/Navigation.tsx";
+import Navigation, {TopNav} from "../Components/Navigation.tsx";
 import {ControlBar, MusicBar} from "../Components/Controller.tsx";
 
 import Hero from '../Pages/Hero.tsx'
@@ -18,62 +18,189 @@ import Contact from "../Pages/Contact.tsx";
 import Files from '../Pages/Files.tsx'
 import NotFound from "../Pages/404.tsx";
 
-import {NavRoute} from '../types.ts'
+import {NavRoute, ReactChild} from '../types.ts'
 import {LoadBar} from "../Components/Basics.tsx";
 import {Toast, ToastProvider, useToast} from "../Hooks/Toast.tsx";
 
+import {BsArrowUpLeftCircle} from "react-icons/bs";
+import {SiAboutdotme} from 'react-icons/si'
+import {
+    TbSchool,
+    TbHeartHandshake,
+    TbBrain,
+    TbFolder,
+    TbTerminal2,
+    TbMail,
+    TbAsterisk,
+    TbMathPi,
+    TbRegex
+} from 'react-icons/tb'
+
+import {RiHomeLine} from 'react-icons/ri'
+
+import {MdAlternateEmail} from "react-icons/md";
+import {FiTool} from "react-icons/fi";
+
+const LocationIcon = ({primary, secondary, path}: {
+    primary: ReactChild,
+    secondary: ReactChild,
+    path: string,
+}) => {
+
+    const location = useLocation()
+
+    if (location.pathname === path) {
+        return (
+            <>
+                {primary}
+            </>
+        )
+    }
+
+    return (
+        <>
+            {secondary}
+        </>
+    )
+}
+
+const Icon = ({children, className = ''}: {
+    children: ReactChild,
+    className?: string,
+}) => {
+    return (
+        <div className={`p-1 ${className}`}>
+            {children}
+        </div>
+    )
+}
+
 export default function Apex({}) {
+
 
     const routes: NavRoute[] = [
         {
             path: '/',
+            description: 'Home',
             element: <Hero/>,
-            icon: '🏠',
+            icon: (
+
+                <LocationIcon primary={(
+                    <Icon>
+                        <RiHomeLine/>
+                    </Icon>
+                )} secondary={(
+                    <Icon>
+                        <BsArrowUpLeftCircle/>
+                    </Icon>
+                )} path={'/'}/>
+
+
+            ),
             label: 'Home'
         },
         {
-            path: 'about',
+            path: '/about',
+            description: 'About',
             element: <About/>,
-            label: 'Home',
+            label: 'About Me',
+            icon: (
+                <div className={'p-1'}>
+                    <TbRegex/>
+                    {/*<SiAboutdotme/>*/}
+                </div>
+            ),
         },
         {
-            path: 'education',
+            path: '/education',
             element: <Education/>,
             label: 'Education',
+            description: 'Education',
+            icon: (
+                <div className={'p-1'}>
+                    <TbMathPi/>
+                    {/*<TbSchool/>*/}
+                </div>
+            ),
         },
         {
-            path: 'experience',
+            path: '/experience',
             element: <Experience/>,
+            description: 'Experience',
             label: 'Professional Experience',
+            icon: (
+                <div className={'p-1'}>
+                    <TbAsterisk/>
+                    {/*<TbHeartHandshake/>*/}
+                </div>
+            ),
         },
         {
-            path: 'projects',
+            path: '/projects',
             element: <Projects/>,
+            description: 'Projects',
             label: 'Project Portfolio',
+            icon: (
+                <div className={'p-1'}>
+                    <TbTerminal2/>
+
+
+                </div>
+            ),
         },
         {
-            path: 'links',
+            path: '/links',
+            description: 'Socials',
             element: <Links/>,
+            icon: (
+                <div className={'p-1'}>
+                    <MdAlternateEmail/>
+                </div>
+            ),
             label: 'Socials & Links',
         },
         {
-            path: 'files',
+            description: 'Files',
+            path: '/files',
             element: <Files/>,
+            icon: (
+                <div className={'p-1'}>
+                    <TbFolder/>
+                </div>
+            ),
             label: 'Files & Downloads',
         },
         {
-            path: 'contact',
+            description: 'Contact',
+            path: '/contact',
             element: <Contact/>,
+            icon: (
+                <div className={'p-1'}>
+                    <TbMail/>
+                </div>
+            ),
             label: 'Contact Me',
         },
         {
-            path: 'tools',
+            description: 'Tools',
+            path: '/tools',
             element: <Tools/>,
+            icon: (
+                <div className={'p-1'}>
+                    <FiTool/>
+                </div>
+            ),
             label: 'Tools & Utilities',
         },
         {
-            path: 'blog',
+            description: 'Blog',
+            path: '/blog',
             element: <Blog/>,
+            icon: (
+                <div className={'p-1'}>
+                    <TbBrain/>
+                </div>
+            ),
             label: 'Knowledge Base & Blog',
         },
         {
@@ -108,7 +235,8 @@ export default function Apex({}) {
 
             {/*<ToolController/>*/}
 
-            <Navigation routes={routes}/>
+            {/*<Navigation routes={routes}/>*/}
+            <TopNav routes={routes}/>
 
             <Layout>
                 <Routes>
@@ -118,9 +246,9 @@ export default function Apex({}) {
                 </Routes>
             </Layout>
 
-            <ControlBar/>
+            {/*<ControlBar/>*/}
+            {/*<MusicBar/>*/}
 
-            <MusicBar/>
         </ToastProvider>
     )
 

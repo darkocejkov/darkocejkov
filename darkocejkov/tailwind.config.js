@@ -6,13 +6,15 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        cositimes: ["CosiTimes", "serif"],
-        maru: ["GT Maru", "san-serif"],
-        maruMega: ["GT Maru Mega", "sans-serif"],
-        sectraDisplay: ['GT Sectra Display', 'serif'],
-        sectra: ['GT Sectra Fine', 'serif'],
+        // cositimes: ["CosiTimes", "serif"],
+        // maruMega: ["GT Maru Mega", "sans-serif"],
+        // wulkan: ['Wulkan Display', 'serif'],
+        // sectraDisplay: ['GT Sectra Display', 'serif'],
+        // sectra: ['GT Sectra Fine', 'serif'],
+
         tabi: ['Tabi', 'serif'],
-        wulkan: ['Wulkan Display', 'serif'],
+
+        maru: ["GT Maru", "san-serif"],
         rubik: ['Rubik', 'sans-serif'],
         aeonik: ['Aeonik TRIAL', 'sans-serif'],
         fira: ['Fira Code', 'sans-serif']
