@@ -17,7 +17,7 @@
 
 
 ### Thank you for checking out my page!
-I am a junior full-stack developer with 2+ years of professional experience working in a fast-paced environment. I have unparalleled passion for developing in both front and back-end applications. I enjoy full-stack development because it's a great way to balance creativity and technicality.
+I am a web developer with a focus on frontend, but a future vision for full-stack developing. 2+ years of professional experience working in a fast-paced environment. I have unparalleled passion for developing in both front and back-end applications. I enjoy full-stack development because it's a great way to balance creativity and technicality.
 
 I specialize in building beautiful and eye-catching visuals for front-end client-facing work, while managing high-performance scalable back-end architecture. There's nothing more challenging and interesting than to design a beautiful user experience, while supporting it with efficient infrastructure. I have started learning to love system designing and the process of planning.
 
@@ -29,13 +29,13 @@ I specialize in building beautiful and eye-catching visuals for front-end client
 - 🔭 I’m currently working on [my portfolio](https://github.com/darkocejkov/darkocejkov) and a [fullstack filebrowsing application](https://github.com/darkocejkov/fileBrowser)
 
 
-- 🌱 I’m currently learning Docker, TypeScript, Project Planning and Workflow (CI/CD), ThreeJS + GLSL.
+- 🌱 I'm learning at-scale methods of working in SWE roles. There are so 
 
 
 - ❓ Ask me about anything related to MERN stack and related technologies!
 
 
-- ⚡ I graduated with TWO majors, Computer Science & Psychology.
+- ⚡ I love my 2 majors: Computer Science & Psychology.
 
 
 <br/>  
