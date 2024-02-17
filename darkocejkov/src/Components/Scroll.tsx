@@ -9,30 +9,31 @@
 import React, {RefObject, useId, useRef} from "react";
 import {ReactChild} from "../types.ts";
 import {motion, useMotionValueEvent, useScroll, useTransform} from "framer-motion";
+import {Text} from '../Components/Typography.tsx'
 
 const ScrollCylinder = () => {
 
 
-    const elements = [
+    const elements: ReactChild[] = [
 
-        <div className={'flex'}>
-            <Text text={"fullstack."} className={"text-[5rem] font-rubik"} animFunction={toBeginning}/>
-        </div>,
-        <div className={'flex'}>
-            <Text text={"developer."} className={"text-[5rem] font-rubik"} animFunction={toEnd}/>
-        </div>,
-        <div className={'flex'}>
-            <Text text={"engineer."} className={"text-[5rem] font-rubik"} animFunction={toEnd}/>
-        </div>,
-        <div className={'flex'}>
-            <Text text={"design."} className={"text-[5rem] font-rubik"} animFunction={toEnd}/>
-        </div>,
-        <div className={'flex'}>
-            <Text text={"curator."} className={"text-[5rem] font-rubik"} animFunction={toEnd}/>
-        </div>,
-        <div className={'flex'}>
-            <Text text={"creator."} className={"text-[5rem] font-rubik"} animFunction={toEnd}/>
-        </div>,
+        // <div className={'flex'}>
+        //     <Text text={"fullstack."} className={"text-[5rem] font-rubik"} animFunction={toBeginning}/>
+        // </div>,
+        // <div className={'flex'}>
+        //     <Text text={"developer."} className={"text-[5rem] font-rubik"} animFunction={toEnd}/>
+        // </div>,
+        // <div className={'flex'}>
+        //     <Text text={"engineer."} className={"text-[5rem] font-rubik"} animFunction={toEnd}/>
+        // </div>,
+        // <div className={'flex'}>
+        //     <Text text={"design."} className={"text-[5rem] font-rubik"} animFunction={toEnd}/>
+        // </div>,
+        // <div className={'flex'}>
+        //     <Text text={"curator."} className={"text-[5rem] font-rubik"} animFunction={toEnd}/>
+        // </div>,
+        // <div className={'flex'}>
+        //     <Text text={"creator."} className={"text-[5rem] font-rubik"} animFunction={toEnd}/>
+        // </div>,
     ]
 
     const rootRef = useRef<HTMLDivElement>(null)

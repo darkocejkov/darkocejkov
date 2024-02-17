@@ -1,9 +1,40 @@
 import {quadToCenter} from "../animations.ts";
 import {AnimationFunction, ReactChild} from "../types.ts";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {motion} from "framer-motion";
 
-const Text = ({text, className = '', animFunction = quadToCenter, element = 0}: {
+export const TextReplace = ({textArray, time = 1000, className = '', restartDelay = 0}: {
+    textArray: string[],
+    time?: number //ms
+    className?: string,
+    restartDelay?: number
+}) => {
+
+    const [text, setText] = useState({text: textArray[0], i: 0})
+
+    useEffect(() => {
+        const id = setInterval(() => {
+
+            setText(text => {
+                let n = text.i + 1
+                if (n > (textArray.length - 1)) n = 0
+
+
+                return {text: textArray[n], i: n}
+            })
+        }, time)
+
+        return () => {
+            clearInterval(id)
+        }
+    }, [])
+
+    return (
+        <p className={className}>{text.text}</p>
+    )
+}
+
+export const Text = ({text, className = '', animFunction = quadToCenter, element = 0}: {
     text: string,
     className?: string,
     animFunction?: AnimationFunction,
@@ -41,7 +72,7 @@ const Text = ({text, className = '', animFunction = quadToCenter, element = 0}: 
 }
 
 
-const Char = ({children, index, total, className = '', animFunction, element = 0}: {
+export const Char = ({children, index, total, className = '', animFunction, element = 0}: {
     children: ReactChild
     index: number,
     total: number,

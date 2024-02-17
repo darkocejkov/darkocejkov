@@ -1,9 +1,11 @@
-import React, {useEffect, useRef, useState} from 'react'
+import React, {useEffect, useRef, useState, useLayoutEffect, createContext} from 'react'
 
 import {Routes, Route, Navigate, useLocation} from 'react-router-dom'
 
+import {LocationContext} from "../Contexts/Location";
+
 import {Layout} from "../Components/Layout.tsx";
-import Navigation, {TopNav} from "../Components/Navigation.tsx";
+import {TopNav} from "../Components/Navigation.tsx";
 import {ControlBar, MusicBar} from "../Components/Controller.tsx";
 
 import Hero from '../Pages/Hero.tsx'
@@ -19,7 +21,6 @@ import Files from '../Pages/Files.tsx'
 import NotFound from "../Pages/404.tsx";
 
 import {NavRoute, ReactChild} from '../types.ts'
-import {LoadBar} from "../Components/Basics.tsx";
 import {Toast, ToastProvider, useToast} from "../Hooks/Toast.tsx";
 
 import {BsArrowUpLeftCircle} from "react-icons/bs";
@@ -40,6 +41,9 @@ import {RiHomeLine} from 'react-icons/ri'
 
 import {MdAlternateEmail} from "react-icons/md";
 import {FiTool} from "react-icons/fi";
+import {LoadBar} from "../Components/Progress.tsx";
+import {MenuContext} from "../Contexts/Menu";
+
 
 const LocationIcon = ({primary, secondary, path}: {
     primary: ReactChild,
@@ -75,6 +79,21 @@ const Icon = ({children, className = ''}: {
     )
 }
 
+const ScrollWrapper = ({children}: {
+    children: ReactChild
+}) => {
+    const location = useLocation();
+    useLayoutEffect(() => {
+        document.documentElement.scrollTo(0, 0);
+    }, [location.pathname]);
+
+    return (
+        <>
+            {children}
+        </>
+    )
+}
+
 export default function Apex({}) {
 
 
@@ -82,7 +101,7 @@ export default function Apex({}) {
         {
             path: '/',
             description: 'Home',
-            element: <Hero/>,
+            // element: <Hero/>,
             icon: (
 
                 <LocationIcon primary={(
@@ -97,20 +116,22 @@ export default function Apex({}) {
 
 
             ),
-            label: 'Home'
-        },
-        {
-            path: '/about',
-            description: 'About',
+            label: 'Home',
+
             element: <About/>,
-            label: 'About Me',
-            icon: (
-                <div className={'p-1'}>
-                    <TbRegex/>
-                    {/*<SiAboutdotme/>*/}
-                </div>
-            ),
         },
+        // {
+        //     path: '/about',
+        //     description: 'About',
+        //     element: <About/>,
+        //     label: 'About Me',
+        //     icon: (
+        //         <div className={'p-1'}>
+        //             <TbRegex/>
+        //             {/*<SiAboutdotme/>*/}
+        //         </div>
+        //     ),
+        // },
         {
             path: '/education',
             element: <Education/>,
@@ -181,17 +202,17 @@ export default function Apex({}) {
             ),
             label: 'Contact Me',
         },
-        {
-            description: 'Tools',
-            path: '/tools',
-            element: <Tools/>,
-            icon: (
-                <div className={'p-1'}>
-                    <FiTool/>
-                </div>
-            ),
-            label: 'Tools & Utilities',
-        },
+        // {
+        //     description: 'Tools',
+        //     path: '/tools',
+        //     element: <Tools/>,
+        //     icon: (
+        //         <div className={'p-1'}>
+        //             <FiTool/>
+        //         </div>
+        //     ),
+        //     label: 'Tools & Utilities',
+        // },
         {
             description: 'Blog',
             path: '/blog',
@@ -220,36 +241,46 @@ export default function Apex({}) {
 
     const [selectedRoute, setSelectedRoute] = useState<NavRoute>()
 
+    const [menuOpen, setMenuOpen] = useState(false)
+
+
     const location = useLocation()
 
     useEffect(() => {
         let route = routes.find(x => x.path === location.pathname)
         setSelectedRoute(route)
-
     }, [location])
 
 
     return (
-        <ToastProvider>
-            <LoadBar progress={0}/>
+        <ScrollWrapper>
+            <ToastProvider>
+                <MenuContext.Provider value={{
+                    state: menuOpen,
+                    setState: setMenuOpen
+                }}>
+                    <LocationContext.Provider value={selectedRoute}>
+                        <LoadBar progress={0}/>
 
-            {/*<ToolController/>*/}
+                        {/*<ToolController/>*/}
+                        {/*<Navigation routes={routes}/>*/}
+                        <TopNav routes={routes}/>
 
-            {/*<Navigation routes={routes}/>*/}
-            <TopNav routes={routes}/>
+                        <Layout>
+                            <Routes>
+                                {routes.map(route => {
+                                    return <Route {...route} key={route.path}/>
+                                })}
+                            </Routes>
+                        </Layout>
 
-            <Layout>
-                <Routes>
-                    {routes.map(route => {
-                        return <Route {...route} key={route.path}/>
-                    })}
-                </Routes>
-            </Layout>
+                        {/*<ControlBar/>*/}
+                        {/*<MusicBar/>*/}
+                    </LocationContext.Provider>
+                </MenuContext.Provider>
+            </ToastProvider>
+        </ScrollWrapper>
 
-            {/*<ControlBar/>*/}
-            {/*<MusicBar/>*/}
-
-        </ToastProvider>
     )
 
 }

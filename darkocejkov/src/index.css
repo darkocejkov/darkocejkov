@@ -90,6 +90,14 @@
   @apply bg-gradient-to-r from-orange-400 to-orange-500
 }
 
+.hard-shadow {
+  box-shadow: 10px 10px 0px 0px white;
+}
+
+.hard-text-shadow {
+
+}
+
 .button-shadow {
   box-shadow: 0px 5px 0px 0px rgba(0, 0, 0, 0.17);
 }
@@ -380,17 +388,22 @@
     letter-spacing: 1px;
   }
 
-@layer components{
+@layer components {
 
-  :root{
-    --alien-gradient: linear-gradient(90deg, rgba(228,49,66,1) 0%, rgba(217,206,66,1) 25%, rgba(75,147,206,1) 48%, rgba(186,130,179,1) 75%, rgba(166,106,106,1) 100%);
+  :root {
+    --alien-gradient: linear-gradient(90deg, rgba(228, 49, 66, 1) 0%, rgba(217, 206, 66, 1) 25%, rgba(75, 147, 206, 1) 48%, rgba(186, 130, 179, 1) 75%, rgba(166, 106, 106, 1) 100%);
+
   }
 
-  .text-shadow{
+  .salt {
+    font-feature-settings: "salt" on;
+  }
+
+  .text-shadow {
     text-shadow: 2px 2px 2px #000000;
   }
 
-  .image-grid{
+  .image-grid {
     display: flex;
     flex-wrap: wrap;
     gap: 20px;
@@ -629,6 +642,97 @@
     @apply grid gap-4 xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-1 overflow-y-auto
   }
 
+  .stripe-container {
+    position: relative;
+
+  }
+
+  .stripe {
+    height: 20vh;
+    width: 100vw;
+
+    animation-delay: attr(anim-delay time);
+
+    @apply pointer-events-none block absolute top-0 left-0
+  }
+
+  .letter-breath {
+    animation: letter-breath 4s infinite ease-in-out;
+  }
+
+  @keyframes letter-breath {
+    0%, 100% {
+      letter-spacing: 0rem;
+    }
+    50% {
+      letter-spacing: .2rem
+    }
+  }
+
+  .skew-dance {
+    animation: skew-dance 18s ease-in-out infinite;
+    /*animation-delay: 0s;*/
+  }
+
+  @keyframes skew-dance {
+    0%, 100% {
+      transform: translateY(0%) translateX(-50%) skewY(0deg);
+    }
+    25% {
+      transform: translateY(-150%) translateX(-50%) skewY(10deg);
+    }
+    50% {
+      transform: translateY(-50%) translateX(-50%) skewY(35deg);
+    }
+    75% {
+      transform: translateY(-300%) translateX(-50%) skewY(-25deg);
+    }
+  }
+
+  .skew-dance-subtle {
+    animation: skew-dance 18s ease-in-out infinite;
+    /*animation-delay: 0s;*/
+  }
+
+  @keyframes skew-dance-subtle {
+    0%, 100% {
+      transform: translateY(0%) translateX(-50%) skewY(0deg);
+    }
+    25% {
+      transform: translateY(-60%) translateX(-50%) skewY(10deg);
+    }
+    50% {
+      transform: translateY(-20%) translateX(-50%) skewY(35deg);
+    }
+    75% {
+      transform: translateY(20%) translateX(-50%) skewY(-25deg);
+    }
+  }
+
+  .square {
+    width: 50%;
+  }
+
+  .square:after {
+    content: "";
+    display: block;
+    padding-bottom: 100%;
+  }
+
+  .blur-pane-outline {
+    @apply backdrop-blur-lg outline outline-offset-2 outline-slate-900 rounded-full outline-1
+  }
+
+  .tabbed:after {
+    content: "";
+
+  }
+
+  .quote:before, .quote:after {
+    content: '"';
+    font-size: 3rem;
+
+  }
 
 }
 
@@ -1075,6 +1179,23 @@ button:disabled{
   text-shadow: 2px 2px 2px black;
 }
 
+.text-shadow-hard {
+  text-shadow: 5px 5px 0 red;
+}
+
+.drop-shadow-hard {
+  filter: drop-shadow(3px 3px 0 rgba(255, 255, 255, 0.4));
+}
+
+.drop-shadow-soft {
+  filter: drop-shadow(3px 3px 0 rgba(0, 0, 0, 0.1));
+}
+
+.wave-mask {
+  mask: url("./assets/svg/wave.svg");
+  mask-repeat: no-repeat;
+  mask-position: bottom;
+}
 
 .scrollbar-none::-webkit-scrollbar {
   display: none;
@@ -1114,15 +1235,6 @@ button:disabled{
 .link-background:hover {
   background-size: 4px 100%;
 }
-
-/*.link-container::after {*/
-/*  width: 100vw;*/
-/*  height: 110%;*/
-/*  @apply bg-orange-400;*/
-/*  display: block;*/
-/*  position: absolute;*/
-/*  content: '';*/
-/*}*/
 
 
 .perspective-lg {
@@ -1247,6 +1359,57 @@ button:disabled{
   font-style: italic;
   font-display: auto;
 }
+
+@font-face {
+  font-family: 'Unique';
+  src: url('./assets/fonts/unique/Web-PS/Unique-Bold.otf') format('opentype');
+  font-weight: bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Unique';
+  src: url('./assets/fonts/unique/Web-PS/Unique-SemiBold.otf') format('opentype');
+  font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Unique';
+  src: url('./assets/fonts/unique/Web-PS/Unique-Regular.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Unique';
+  src: url('./assets/fonts/unique/Web-PS/Unique-Medium.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+}
+
+
+@font-face {
+  font-family: 'Unique';
+  src: url('./assets/fonts/unique/Web-PS/Unique-ExtraLight.otf') format('opentype');
+  font-weight: 200;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Unique';
+  src: url('./assets/fonts/unique/Web-PS/Unique-Thin.otf') format('opentype');
+  font-weight: 100;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Unique';
+  src: url('./assets/fonts/unique/Web-PS/Unique-Light.otf') format('opentype');
+  font-weight: 300;
+  font-style: normal;
+}
+
 
 /*@font-face {*/
 /*  font-family: 'GT Maru Mega';*/
@@ -1527,5 +1690,54 @@ button:disabled{
   font-family: 'Fira Code';
   src: url('../public/fonts/firaCode/FiraCode-SemiBold.ttf') format('truetype');
   font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Kica';
+  src: url('./assets/fonts/kica/IFKica-Bold.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Kica';
+  src: url('./assets/fonts/kica/IFKica-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Kica';
+  src: url('./assets/fonts/kica/IFKica-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Kiosk';
+  src: url('./assets/fonts/Kiosk-TRIAL.otf') format('opentype');
+  font-weight: bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Mazaeni';
+  src: url('./assets/fonts/Mazaeni-Regular.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Monopol';
+  src: url('./assets/fonts/Monopol-TRIAL.otf') format('opentype');
+  font-weight: bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Nineties Display';
+  src: url('./assets/fonts/NinetiesDisplay.otf') format('opentype');
+  font-weight: bold;
   font-style: normal;
 }

@@ -22,37 +22,41 @@ export default function Hero({}) {
                         {/*<Text text={"darko cejkov."} className={"text-[4rem] md:text-[8rem] font-tabi"}/>*/}
                         <div className={'flex'}>
                             <Text text={"darko"}
-                                  className={"text-[4rem] md:text-[6rem] lg:text-[8rem] font-tabi"}
+                                  className={"text-[4rem] md:text-[6rem] lg:text-[8rem] font-tabi leading-none"}
                                   animFunction={toBeginning}/>
 
                         </div>
                         <div className={'flex'}>
                             <Text text={"cejkov."}
-                                  className={"text-[4rem] md:text-[6rem] lg:text-[8rem] -mt-12 sm:mt-0 font-tabi"}
+                                  className={"text-[4rem] md:text-[6rem] lg:text-[8rem] -mt-12 sm:mt-0 font-tabi leading-none"}
                                   animFunction={toEnd}/>
                         </div>
                     </div>
 
                     <div className={'flex'}>
-                        <Text text={"fullstack."} className={"text-[3rem] md:text-[4rem] lg:text-[5rem]  font-rubik"}
+                        <Text text={"fullstack."}
+                              className={"text-[3rem] md:text-[4rem] lg:text-[5rem]  font-rubik leading-none"}
                               animFunction={toBeginning}
                               element={1.5}/>
                     </div>
 
                     <div className={'flex'}>
-                        <Text text={"developer."} className={"text-[3rem] md:text-[4rem] lg:text-[5rem]   font-rubik"}
+                        <Text text={"developer."}
+                              className={"text-[3rem] md:text-[4rem] lg:text-[5rem]   font-rubik leading-none"}
                               animFunction={toEnd}
                               element={2.5}/>
                     </div>
 
                     <div className={'flex'}>
-                        <Text text={"engineer."} className={"text-[3rem] md:text-[4rem] lg:text-[5rem]   font-rubik"}
+                        <Text text={"engineer."}
+                              className={"text-[3rem] md:text-[4rem] lg:text-[5rem]   font-rubik leading-none"}
                               animFunction={toBeginning}
                               element={3.5}/>
                     </div>
 
                     <div className={'flex'}>
-                        <Text text={"designer."} className={"text-[3rem] md:text-[4rem] lg:text-[5rem]   font-rubik"}
+                        <Text text={"designer."}
+                              className={"text-[3rem] md:text-[4rem] lg:text-[5rem]   font-rubik leading-none"}
                               animFunction={toEnd}
                               element={4.5}/>
                     </div>

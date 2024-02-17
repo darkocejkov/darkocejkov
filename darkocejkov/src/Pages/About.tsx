@@ -7,30 +7,14 @@ import React, {
     useState,
 } from "react";
 import {
-    animate,
+    animate, AnimatePresence,
     motion,
     MotionValue,
-    useDragControls,
-    useMotionValue,
-    useSpring
+    useDragControls, useInView,
+    useMotionValue, useMotionValueEvent, useScroll,
+    useSpring, useTransform
 } from "framer-motion";
-import {createPortal} from "react-dom";
-import {ReactChild} from "../types.ts";
 
-import {boundingBoxRange, random, vh2px, vw2px} from "../helpers.ts";
-import {SpriteMap} from "use-sound/dist/types";
-
-import useSound from "use-sound";
-
-//      Import SFX files - TS does NOT like the fact that it's not a module
-// @ts-ignore
-import popSFX from '../assets/sfx/pops.mp3'
-// @ts-ignore
-import hover from '../assets/sfx/primarySystemSounds/navigation_hover-tap.wav'
-// @ts-ignore
-import transitionRight from '../assets/sfx/primarySystemSounds/navigation_transition-right.wav'
-// @ts-ignore
-import confirm from '../assets/sfx/primarySystemSounds/state-change_confirm-up.wav'
 
 import {open, closing, closed} from '../assets/ascii/eyes.js'
 
@@ -39,6 +23,7 @@ import {
     SiTypescript,
     SiBlender,
     SiJavascript,
+    SiWebpack,
     SiMysql,
     SiRedis,
     SiAdobeillustrator,
@@ -47,690 +32,601 @@ import {
     SiPassport,
     SiExpress,
 } from "react-icons/si";
-import {TbBrandThreejs, TbBrandCpp, TbArrowsRandom} from 'react-icons/tb'
+import {
+    TbBrandThreejs,
+    TbBrandCpp,
+    TbArrowsRandom,
+    TbCircleArrowDownFilled,
+    TbCircleArrowDown,
+    TbArrowNarrowDown
+} from 'react-icons/tb'
+import {BsFillSquareFill} from 'react-icons/bs'
 import {FaNodeJs, FaFigma, FaGit, FaReact, FaAws, FaJava, FaLinux, FaPython} from "react-icons/fa";
 import {Link} from "react-router-dom";
-import {Tooltip} from "antd";
-
-const popSpriteMap: SpriteMap = {
-    a: [250, 420],
-    b: [650, 820],
-    c: [1830, 1920],
-    d: [2780, 2880],
-    e: [3750, 3840]
-}
-
-const facts = [
-    '＼ʕ •ᴥ•ʔ／',
-    'fun',
-    'creative',
-    'illustrative',
-    'design',
-    'developer',
-    'innovator'
-]
-
-type Position = {
-    x: number,
-    y: number
-}
-
-type Node = {
-    // startPos: Position,
-    children: ReactChild
-    id: number
-}
-
-const NodeContainer = ({contentList}: {
-    contentList: Node[]
-}) => {
-
-    const constraintRef = useRef(null)
-
-    const springConfig = {
-        // stiffness: Math.max(700 - d * 120, 0),
-        // damping: (20 + (i * -2)),
-        mass: 2,
-        // mass: x,
-    };
-
-    const x = useSpring(useMotionValue(0), springConfig)
-    const y = useSpring(useMotionValue(0), springConfig)
-
-    const [active, setActive] = useState<number | null>(null)
-
-    const total = contentList.length
-
-    const [flag, setFlag] = useState(0)
-    const [resetting, setResetting] = useState(false)
-
-    const elementArray = useMemo(() => {
-        return contentList.map((content, i) => {
-
-            return (
-                <NodePane
-                    key={content.id}
-                    total={total}
-                    i={content.id}
-                    x={x}
-                    y={y}
-                    active={active}
-                    setActive={setActive}
-                    constraint={constraintRef}
-                    resetFlag={flag}
-                >
-                    {content.children}
-                </NodePane>
-            )
-        })
-    }, [flag])
-
-    const [reset] = useSound(transitionRight, {
-        interrupt: true,
-        playbackRate: 1,
-        volume: 0.5
-    })
-
-    const [shuffle] = useSound(confirm, {
-        interrupt: true,
-        volume: 0.5,
-    })
-
-    const handleReset = () => {
-        reset()
-        setFlag(flag => flag + 1)
-        setResetting(true)
-    }
-
-    const handleShuffle = () => {
-        shuffle()
-    }
-
-
-    if (resetting) {
-        setTimeout(() => setResetting(false), 1000)
-    }
-
-
-    const actionVariants = {
-        spin: {
-            rotate: '-1turn',
-            transition: {
-                duration: .5
-            }
-        },
-        still: {}
-    }
-
-
-    return createPortal(
-        <div className={'fixed top-[5%] left-[5%] h-[90%] w-[90%]'}>
-
-            <div className={'flex flex-col gap-2'}>
-                <div ref={constraintRef}
-
-                     className={'max-h-[80vh] bg-slate-900/10 rounded-xl grid-fill p-6 overflow-x-hidden'}>
-
-                    {/**/}
-                    {elementArray}
-                </div>
-
-                <div className={'flex justify-center gap-4 bg-slate-900/10 rounded-xl p-2 pb-3'}>
-                    <button
-                        onClick={handleReset}
-                        className={'p-2 px-5 bg-slate-900/10 font-rubik rounded-xl button-shadow backdrop-blur-md transition-all'}>
-                        <motion.i
-                            variants={actionVariants}
-                            animate={resetting ? 'spin' : 'still'}
-                            className="fa-solid fa-arrow-rotate-left"
-                        ></motion.i>
-                    </button>
-
-                    <button
-                        onClick={handleShuffle}
-                        className={'p-2 px-5 bg-slate-900/10 font-rubik rounded-xl button-shadow backdrop-blur-md transition-all'}>
-                        <TbArrowsRandom/>
-                    </button>
-
-                </div>
-
-            </div>
-
-
-            {/*<div className={'fixed top-[80vh] left-1/2 -translate-x-1/2 -translate-y-1/2 z-30'}>*/}
-            {/*    <button*/}
-            {/*        onClick={handleReset}*/}
-            {/*        className={'p-2 px-5 bg-slate-900/10 font-rubik rounded-xl button-shadow backdrop-blur-md transition-all'}>*/}
-            {/*        <motion.i*/}
-            {/*            variants={actionVariants}*/}
-            {/*            animate={resetting ? 'spin' : 'still'}*/}
-            {/*            className="fa-solid fa-arrow-rotate-left"*/}
-            {/*        ></motion.i>*/}
-            {/*    </button>*/}
-            {/*</div>*/}
-
-            {/*<Measure/>*/}
-
-            {/*{elementArray}*/}
-        </div>,
-        document.body
-    )
-}
-
-const resetIndexDelay = 200
-
-const NodePane = ({total, i, x, y, active, setActive, children, constraint, resetFlag}: {
-    children: ReactChild
-    total: number,
-    i: number,
-    x: MotionValue,
-    y: MotionValue,
-    active: number | null,
-    setActive: Dispatch<number | null>,
-    constraint: RefObject<HTMLDivElement>,
-    resetFlag: number
-}) => {
-    // const d = total - (i * total)
-
-    const springConfig = {
-        // stiffness: Math.max(700 - d * 120, 0),
-        // damping: (20 + (i * -2)),
-        mass: 1,
-        // mass: x,
-    };
-
-
-    const dx = useSpring(x)
-    // const dx = useSpring(x)
-    const dy = useSpring(y)
-    // const dy = useSpring(y)
-
-    // const ref = useRef<HTMLDivElement>(null)
-
-    // <i className="fa-solid fa-grip-dots"></i>
-    const dragControls = useDragControls()
-
-    function startDrag(event: React.PointerEvent<HTMLDivElement>) {
-        dragControls.start(event, {snapToCursor: false})
-    }
-
-    const [up] = useSound(hover, {
-        volume: 0.5
-    })
-    const [down] = useSound(hover, {
-        playbackRate: 0.75,
-        volume: 0.5
-    })
-
-    const [play] = useSound(popSFX, {
-        sprite: popSpriteMap,
-        volume: 0.1,
-        interrupt: true,
-    })
-
-    const xx = useMotionValue(0)
-    const yy = useMotionValue(0)
-
-    const paneRef = useRef(null)
-
-    const oldFlag = useRef(resetFlag)
-
-    // const [resetting, setResetting] = useState(false)
-
-    const handleReset = () => {
-        // setResetting(() => true)
-        // setTimeout(() => {
-        //     setResetting(() => false)
-        // }, 250)
-
-        oldFlag.current = resetFlag
-
-        if (xx.get() !== 0 || yy.get() !== 0) {
-
-
-            setTimeout(() => {
-
-
-                //
-                xx.stop()
-                yy.stop()
-
-                animate(xx.get(), 0, {
-                    onUpdate: latest => xx.set(latest),
-                    // onComplete: () => play({id: 'a'})
-                })
-
-                animate(yy.get(), 0, {
-                    onUpdate: latest => yy.set(latest),
-                    onComplete: () => play({id: 'b'})
-                })
-            }, i * resetIndexDelay)
-        }
-    }
-
-    if (oldFlag.current !== resetFlag) {
-
-        handleReset()
-
-        // console.log(`${i} old ${oldFlag.current} new ${resetFlag} ${xx} ${yy}`)
-        // oldFlag.current = resetFlag
-        //
-        // if (xx.get() !== 0 || yy.get() !== 0) {
-        //
-        //
-        //     setTimeout(() => {
-        //
-        //
-        //         //
-        //         xx.stop()
-        //         yy.stop()
-        //
-        //         animate(xx.get(), 0, {
-        //             onUpdate: latest => xx.set(latest),
-        //             // onComplete: () => play({id: 'a'})
-        //         })
-        //
-        //         animate(yy.get(), 0, {
-        //             onUpdate: latest => yy.set(latest),
-        //             onComplete: () => play({id: 'b'})
-        //         })
-        //     }, i * resetIndexDelay)
-        // }
-
-        // xx.stop()
-        // yy.stop()
-        //
-        // animate(xx.get(), 0, {
-        //     onUpdate: latest => xx.set(latest),
-        //     onComplete: () => play({id: 'a'})
-        // })
-        //
-        // animate(yy.get(), 0, {
-        //     onUpdate: latest => yy.set(latest),
-        //     onComplete: () => play({id: 'b'})
-        // })
-    }
-
-
-    return (
-        <>
-            <motion.div
-                ref={paneRef}
-                drag
-                dragConstraints={constraint}
-                // dragTransition={{bounceStiffness: 500, bounceDamping: 20}}
-                onDragStart={() => {
-                    setActive(i)
-                    // play({id: 'a'})
-                    up()
-                    return
-                }}
-                onDragEnd={() => {
-                    setActive(null)
-                    // play({id: 'b'})
-                    down()
-                    return
-                }}
-                dragControls={dragControls}
-                dragListener={false}
-                whileDrag={{
-                    scale: 1.05,
-                    rotateZ: `${random(25, true)}deg`
-                }}
-                initial={{
-                    opacity: 0,
-                }}
-                animate={{
-                    opacity: 1,
-                }}
-                style={{
-                    x: xx,
-                    y: yy,
-                }}
-                className={'backdrop-blur-md p-5 bg-slate-900/0 relative origin-center rounded-lg shadow-lg overflow-hidden select-none z-10 flex-1 h-fit'}
-            >
-                {/*<div className={'absolute right-0 -top-2 p-1'} onPointerDown={startDrag}>*/}
-                {/*    <i className="fa-solid fa-grip-dots"></i>*/}
-                {/*</div>*/}
-
-                <div className={'absolute right-0 -top-2 p-1 flex gap-1 items-center justify-center'}>
-
-                    {/*<motion.div*/}
-                    {/*    animate={{*/}
-                    {/*        rotateZ: resetting ? '360deg' : '0deg',*/}
-                    {/*        opacity: resetting ? '1' : '0'*/}
-                    {/*    }}*/}
-                    {/*>*/}
-                    {/*    <GrPowerReset size={'1rem'}/>*/}
-                    {/*</motion.div>*/}
-
-
-                    <div onPointerDown={startDrag}>
-                        <i className="fa-solid fa-grip-dots"></i>
-                    </div>
-
-
-                </div>
-
-                {children}
-            </motion.div>
-        </>
-    )
-}
-
-const distances = [
-    10, 20, 30, 50, 100, 125, 150, 200, 300, 400
-]
-
-let contents: Node[] = []
-
-for (let d of distances) {
-    contents.push(
-        {
-            id: d, children:
-                <div className={'flex'}>
-
-                </div>
-        }
-    )
-}
-
-const boundingW = 90
-const boundingH = 90
-
-const differenceX = (100 - boundingW) / 2
-const differenceY = (100 - boundingH) / 2
-
-const bounding = boundingBoxRange(boundingW, boundingH)
-
-const Measure = () => {
-    return (
-        <div className={'bg-slate-900 fixed'} style={{
-            height: '1px',
-            width: `${vw2px(differenceX)}px`,
-            top: '50vh',
-            left: 0
-        }}/>
-    )
-}
-
-const Content = ({children}: {
-    children: ReactChild
-}) => (
-    // bg-white/10
-    <div
-        className={'flex justify-center h-full w-full items-center rounded-xl overflow-y-auto overflow-x-hidden break-words'}>
-        {children}
-    </div>
-)
-
-const textArray = [
-    '┏ʕ •ᴥ•ʔ┛',
-    '＼ʕ •ᴥ•ʔ＼',
-    'ʕ •ₒ• ʔ',
-    'ʕ ꈍᴥꈍʔ',
-    'ʕ ´•̥̥̥ ᴥ•̥̥̥',
-    '＼ʕ •ᴥ•ʔ／',
-    '＼ʕ •ᴥ•ʔ＼',
-    'ʕʘ̅͜ʘ̅ʔ',
-    ' ʕ – o – ʔ',
-    '(✪㉨✪)',
-    'ʕ ﹷ ᴥ ﹷʔ',
-    'ᕕʕ •ₒ• ʔ୨',
-    'ʅʕ•ᴥ•ʔʃ',
-    'ʕ´•㉨•`ʔ',
-]
-
-const dancing = [
-    'ᕕʕ •ₒ• ʔ୨',
-    '＼ʕ •ᴥ•ʔ＼',
-    '／ʕ•ᴥ• ʔ／',
-    '＼ʕ •ᴥ• ʔ／',
-    'ʅ_ʕ •ᴥ• ʔ_ʃ',
-    'ʕ •ₒ• ʔ',
-    'ʕ ꈍᴥꈍʔ',
-    'ʕ´•㉨•`ʔ',
-
-]
-
-const AnimateText = () => {
-    return (
-        <motion.p
-            className={'h-full w-full'}
-        >
-
-        </motion.p>
-    )
-}
-
-const TextReplace = ({textArray, time = 1000, className = '', restartDelay = 0}: {
-    textArray: string[],
-    time?: number //ms
-    className?: string,
-    restartDelay?: number
-}) => {
-
-    const [text, setText] = useState({text: textArray[0], i: 0})
-
-    useEffect(() => {
-        const id = setInterval(() => {
-
-            setText(text => {
-                let n = text.i + 1
-                if (n > (textArray.length - 1)) n = 0
-
-
-                return {text: textArray[n], i: n}
-            })
-        }, time)
-
-        return () => {
-            clearInterval(id)
-        }
-    }, [])
-
-    return (
-        <p className={className}>{text.text}</p>
-    )
-
-}
-
-const contentData = [
-    {}
-]
-
-
-const contentChildren: ReactChild[] = [
-    <p className={'font-rubik '}>
-        <span className={'font-tabi text-3xl'}>Hellooo!</span>
-        <hr/>
-        <span>I'm Darko ʕ ꈍᴥꈍʔ</span>
-    </p>,
-    <p className={'font-rubik text-center'}>
-        I'm a developer/engineer. Experience in Web. Pursuing dreams that coalesce technical and creative skills.
-    </p>,
-    <p className={'font-rubik flex flex-col text-center gap-1'}>
-        Here's a quick look at tech I've used:
-        <div className={'flex gap-2 justify-evenly flex-wrap'}>
-            <IconContext.Provider value={{size: '1.5rem'}}>
-
-                <Tooltip title={'TypeScript'}>
-                    <SiTypescript className={'text-yellow-300'}/>
-                </Tooltip>
-
-
-                <Tooltip title={'JavaScript/ES6'}>
-
-                    <SiJavascript className={'text-green-600'}/>
-                </Tooltip>
-
-                <Tooltip title={'Python 3'}>
-
-                    <FaPython className={'text-red-500'}/>
-                </Tooltip>
-
-                <Tooltip title={'CLANG (C/C++)'}>
-
-                    <TbBrandCpp className={'text-red-500'}/>
-                </Tooltip>
-
-                <Tooltip title={'Java OOP'}>
-
-                    <FaJava className={'text-red-500'}/>
-                </Tooltip>
-
-
-
-                <Tooltip title={'ReactJS'}>
-
-                    <FaReact className={'text-green-600'}/>
-                </Tooltip>
-
-                <Tooltip title={'ThreeJS'}>
-
-                    <TbBrandThreejs className={'text-yellow-300'}/>
-                </Tooltip>
-
-                <Tooltip title={'NodeJS Runtime'}>
-
-                    <FaNodeJs className={'text-green-600'}/>
-                </Tooltip>
-
-                <Tooltip title={'Git VCS'}>
-
-                    <FaGit className={'text-green-600'}/>
-                </Tooltip>
-
-                <Tooltip title={'PassportJS Auth'}>
-
-                    <SiPassport className={'text-green-600'}/>
-                </Tooltip>
-
-                <Tooltip title={'ExpressJS Middleware'}>
-
-                    <SiExpress className={'text-green-600'}/>
-                </Tooltip>
-
-                <Tooltip title={'MySQL relational database'}>
-
-                    <SiMysql className={'text-green-600'}/>
-                </Tooltip>
-
-                <Tooltip title={'Redis key/value database'}>
-
-                    <SiRedis className={'text-yellow-600'}/>
-                </Tooltip>
-
-                <Tooltip title={'Linux administration'}>
-
-                    <FaLinux className={'text-green-600'}/>
-                </Tooltip>
-
-                <Tooltip title={'Blender'}>
-
-                    <SiBlender className={'text-red-500'}/>
-                </Tooltip>
-
-                <Tooltip title={'Illustrator'}>
-
-                    <SiAdobeillustrator className={'text-yellow-300'}/>
-                </Tooltip>
-
-                <Tooltip title={'Photoshop'}>
-
-                    <SiAdobephotoshop className={'text-green-600'}/>
-                </Tooltip>
-
-                <Tooltip title={'Premiere Pro'}>
-
-                    <SiAdobepremierepro className={'text-green-600'}/>
-                </Tooltip>
-
-                <Tooltip title={'Figma design prototypes'}>
-
-                    <FaFigma className={'text-red-600'}/>
-                </Tooltip>
-
-                <Tooltip title={'AWS (S3, SES, EC2, ECS, Lightsail, Amplify)'}>
-
-                    <FaAws className={'text-yellow-300'}/>
-                </Tooltip>
-            </IconContext.Provider>
-        </div>
-        <span>for specifics, check out my <Link className={'link'} to={'/experience'}>experience</Link> </span>
-    </p>,
-    <p className={'font-rubik flex flex-col gap-2 items-center justify-center'}>
-        <p className={'text-xl'}>Here's what I <em className={'link'}>really</em> do:</p>
-        <TextReplace className={'font-fira'} textArray={[
-            'Develop code',
-            'Design ideas',
-            'Create action',
-            'Curate taste',
-            'Break things',
-            '... then fix them.',
-            'Overcomplicate',
-            'Simplify',
-            'Refactor'
-        ]}/>
-    </p>,
-    <p className={'font-rubik text-center'}>
-        <span className={'text-xl'}>My Mantra</span>
-        <br/>
-        <span>I learn. I make. I do. I have fun.</span>
-    </p>,
-    <p className={'font-rubik text-center'}>At the heart of my soul, I am creative and never like to sit still. My
-        passion is in finding new things and learning about the
-        fundamentals.</p>,
-    <p className={'font-rubik text-center'}>Gaming, Computers, Software, Audio/Video Production & Editing, DJing,
-        Animals, Sketching & Painting, Tinkering.</p>,
-    <p className={'font-rubik text-center'}>I'm inspired by new, sleek, modern designs - while at the same time,
-        love the nostalgia of the 90s/Y2K era.</p>,
-    <p className={'font-rubik text-center'}>I love thrifting and vintage. I love animals - rats, cats, dogs, bears,
-        snakes.</p>,
-    <p className={'font-rubik text-center'}>Obsessed with cyberpunk/dystopia/sci-fi. Akira, Lain, Ghost In The
-        Shell, Tokyo Ghost, Sandman,
-        Blade Runner, Blade, Matrix.</p>,
-    <pre className={'font-fira text-[.25rem]'}>
-        <TextReplace time={250} textArray={[
-            open,
-            closing,
-            closed,
-            closing,
-            open,
-        ]}/>
-    </pre>,
-    <TextReplace textArray={dancing} time={500} className={'text-3xl'}/>,
-]
-
+import {Pane, PaneOutlineWrapper, TransparentPane} from "../Components/Window.tsx";
+import {Rule} from "../Components/Layout.tsx";
+import {BlurButton} from "../Components/Buttons.tsx";
+import {createPortal} from "react-dom";
+import Marquee from "react-fast-marquee";
+import {FanWave} from "../Sketches/Waves.tsx";
+import {ReactChild} from "../types.ts";
+import {bgColorMap} from "../theme.ts";
+import {TextReplace} from "../Components/Typography";
+
+// const contentChildren: ReactChild[] = [
+//     <p className={'font-rubik '}>
+//         <span className={'font-tabi text-3xl'}>Hellooo!</span>
+//         <hr/>
+//         <span>I'm Darko ʕ ꈍᴥꈍʔ</span>
+//     </p>,
+//     <p className={'font-rubik text-center'}>
+//         I'm a developer/engineer. Experience in Web. Pursuing dreams that coalesce technical and creative skills.
+//     </p>,
+//     <p className={'font-rubik flex flex-col text-center gap-1'}>
+//         Here's a quick look at tech I've used:
+//         <div className={'flex gap-2 justify-evenly flex-wrap'}>
+//             <IconContext.Provider value={{size: '1.5rem'}}>
+//
+//                 <IconPane title={'TypeScript'}>
+//                     <SiTypescript className={'text-yellow-300'}/>
+//                 </IconPane>
+//
+//
+//                 <IconPane title={'JavaScript/ES6'}>
+//
+//                     <SiJavascript className={'text-green-600'}/>
+//                 </IconPane>
+//
+//                 <IconPane title={'Python 3'}>
+//
+//                     <FaPython className={'text-red-500'}/>
+//                 </IconPane>
+//
+//                 <IconPane title={'CLANG (C/C++)'}>
+//
+//                     <TbBrandCpp className={'text-red-500'}/>
+//                 </IconPane>
+//
+//                 <IconPane title={'Java OOP'}>
+//
+//                     <FaJava className={'text-red-500'}/>
+//                 </IconPane>
+//
+//
+//
+//                 <IconPane title={'ReactJS'}>
+//
+//                     <FaReact className={'text-green-600'}/>
+//                 </IconPane>
+//
+//                 <IconPane title={'ThreeJS'}>
+//
+//                     <TbBrandThreejs className={'text-yellow-300'}/>
+//                 </IconPane>
+//
+//                 <IconPane title={'NodeJS Runtime'}>
+//
+//                     <FaNodeJs className={'text-green-600'}/>
+//                 </IconPane>
+//
+//                 <IconPane title={'Git VCS'}>
+//
+//                     <FaGit className={'text-green-600'}/>
+//                 </IconPane>
+//
+//                 <IconPane title={'PassportJS Auth'}>
+//
+//                     <SiPassport className={'text-green-600'}/>
+//                 </IconPane>
+//
+//                 <IconPane title={'ExpressJS Middleware'}>
+//
+//                     <SiExpress className={'text-green-600'}/>
+//                 </IconPane>
+//
+//                 <IconPane title={'MySQL relational database'}>
+//
+//                     <SiMysql className={'text-green-600'}/>
+//                 </IconPane>
+//
+//                 <IconPane title={'Redis key/value database'}>
+//
+//                     <SiRedis className={'text-yellow-600'}/>
+//                 </IconPane>
+//
+//                 <IconPane title={'Linux administration'}>
+//
+//                     <FaLinux className={'text-green-600'}/>
+//                 </IconPane>
+//
+//                 <IconPane title={'Blender'}>
+//
+//                     <SiBlender className={'text-red-500'}/>
+//                 </IconPane>
+//
+//                 <IconPane title={'Illustrator'}>
+//
+//                     <SiAdobeillustrator className={'text-yellow-300'}/>
+//                 </IconPane>
+//
+//                 <IconPane title={'Photoshop'}>
+//
+//                     <SiAdobephotoshop className={'text-green-600'}/>
+//                 </IconPane>
+//
+//                 <IconPane title={'Premiere Pro'}>
+//
+//                     <SiAdobepremierepro className={'text-green-600'}/>
+//                 </IconPane>
+//
+//                 <IconPane title={'Figma design prototypes'}>
+//
+//                     <FaFigma className={'text-red-600'}/>
+//                 </IconPane>
+//
+//                 <IconPane title={'AWS (S3, SES, EC2, ECS, Lightsail, Amplify)'}>
+//
+//                     <FaAws className={'text-yellow-300'}/>
+//                 </IconPane>
+//             </IconContext.Provider>
+//         </div>
+//         <span>for specifics, check out my <Link className={'link'} to={'/experience'}>experience</Link> </span>
+//     </p>,
+//     <p className={'font-rubik flex flex-col gap-2 items-center justify-center'}>
+//         <p className={'text-xl'}>Here's what I <em className={'link'}>really</em> do:</p>
+//         <TextReplace className={'font-fira'} textArray={[
+//             'Develop code',
+//             'Design ideas',
+//             'Create action',
+//             'Curate taste',
+//             'Break things',
+//             '... then fix them.',
+//             'Overcomplicate',
+//             'Simplify',
+//             'Refactor'
+//         ]}/>
+//     </p>,
+//     <p className={'font-rubik text-center'}>
+//         <span className={'text-xl'}>My Mantra</span>
+//         <br/>
+//         <span>I learn. I make. I do. I have fun.</span>
+//     </p>,
+//     <p className={'font-rubik text-center'}>At the heart of my soul, I am creative and never like to sit still. My
+//         passion is in finding new things and learning about the
+//         fundamentals.</p>,
+//     <p className={'font-rubik text-center'}>Gaming, Computers, Software, Audio/Video Production & Editing, DJing,
+//         Animals, Sketching & Painting, Tinkering.</p>,
+//     <p className={'font-rubik text-center'}>I'm inspired by new, sleek, modern designs - while at the same time,
+//         love the nostalgia of the 90s/Y2K era.</p>,
+//     <p className={'font-rubik text-center'}>I love thrifting and vintage. I love animals - rats, cats, dogs, bears,
+//         snakes.</p>,
+//     <p className={'font-rubik text-center'}>Obsessed with cyberpunk/dystopia/sci-fi. Akira, Lain, Ghost In The
+//         Shell, Tokyo Ghost, Sandman,
+//         Blade Runner, Blade, Matrix.</p>,
+//     <pre className={'font-fira text-[.25rem]'}>
+//         <TextReplace time={250} textArray={[
+//             open,
+//             closing,
+//             closed,
+//             closing,
+//             open,
+//         ]}/>
+//     </pre>,
+//     <TextReplace textArray={dancing} time={500} className={'text-3xl'}/>,
+// ]
 
 export default function About({}) {
 
-    const w = window.innerWidth
-    const h = window.innerHeight
+    const rootRef = useRef(null)
 
+    const {scrollYProgress} = useScroll()
 
-    // console.log('bounding: ', {bounding})
+    const [canScroll, setCanScroll] = useState(true)
 
-
-    const content: Node[] = contentChildren.map((x, i) => {
-        return {
-            id: i,
-            children: (
-                <Content>
-                    {x}
-                </Content>
-            )
+    useMotionValueEvent(scrollYProgress, "change", (latest) => {
+        if (latest >= 0.1) {
+            setCanScroll(false)
+        } else if (!canScroll) {
+            setCanScroll(true)
         }
     })
 
-    //given that we know the height AND width in VIEWPORT units, and the bounding box is "centered"
-    //thus, the allowed area for Panes will be in the range defined by the box where x is the known length
-    // (1/2)*(100-x)
+    const hobbyRef = useRef(null)
+    const {scrollYProgress: hobbyProgress} = useScroll({target: hobbyRef, offset: ['start center', 'end end']})
+
+    const hobbySpring = useSpring(hobbyProgress)
 
     return (
         <>
-            <NodeContainer contentList={content}/>
+            <div
+                className={'w-screen  flex flex-col gap-12 items-center justify-start scrollbar-none'}
+                ref={rootRef}>
 
+                <TransparentPane className={'flex justify-center mt-[30vh]'}>
+                    <p className={'font-rubik text-2xl md:text-5xl text-center flex flex-col gap-3'}>
+                        <span
+                            className={'font-tabi font-bold text-6xl md:text-9xl scale-x-110 scale-y-150 letter-breath'}>hello</span>
+                        <div className={`w-full h-[1px] bg-slate-900 self-center`}/>
+                        <span>i'm darko. <span>:)</span> </span>
+                    </p>
+                </TransparentPane>
+
+                <Marquee gradient={false} autoFill={true}
+                         className={'h-[30vh] skew-y-[45deg] select-none'}>
+                    <p className={'salt text-6xl md:text-8xl hard-shadow rounded-full mx-3 px-10 skew-y-6 bg-orange-400 font-unique font-bold uppercase text-white'}>Developer</p>
+                    <p className={'salt text-6xl md:text-8xl hard-shadow rounded-full mx-3 px-10 -skew-y-6 bg-orange-400 font-unique font-bold uppercase text-white'}>Designer</p>
+                    <p className={'salt text-6xl md:text-8xl hard-shadow rounded-full mx-3 px-10 skew-y-6 bg-orange-400 font-unique font-bold uppercase text-white'}>Engineer</p>
+                    <p className={'salt text-6xl md:text-8xl hard-shadow rounded-full mx-3 px-10 -skew-y-[8deg] bg-orange-400 font-unique font-bold uppercase text-white'}>Maker</p>
+                </Marquee>
+
+                <DescriptionBlock>
+                    Fullstack web developer, passionate in visual experiences.
+                </DescriptionBlock>
+
+                <motion.div
+                    ref={hobbyRef}
+                    className={'w-screen relative h-[80vh] z-20 scale-110'}
+                >
+                    <UnrollStripes content={hobbies} progress={hobbySpring}/>
+                </motion.div>
+
+                <DescriptionBlock>
+                    Symphony of colors, shapes, and ideas.
+                </DescriptionBlock>
+
+                <IconGrid/>
+
+                <DescriptionBlock>
+                    <TextReplace className={' uppercase'} textArray={[
+                        'Develop code',
+                        'Design systems',
+                        'Create action',
+                        'Curate taste',
+                        'Break things',
+                        '... then fix them.',
+                        'Overcomplicate',
+                        'Simplify',
+                        'Refactor'
+                    ]}/>
+                </DescriptionBlock>
+
+                <DescriptionBlock>
+                    Modern aesthetics fused with Y2K flavor.
+                </DescriptionBlock>
+
+            </div>
+
+            <AnimatePresence>
+                {canScroll &&
+                    <ScrollIndicator/>
+                }
+            </AnimatePresence>
         </>
+    );
+}
+
+const IconGrid = () => {
+
+    const ref = useRef(null)
+    const {scrollYProgress} = useScroll({target: ref, offset: ['start center', 'end center']})
+    const transformSkew = useTransform(scrollYProgress, [0, 1], ['0deg', '-2deg'])
+
+    return (
+        <motion.div
+            ref={ref}
+            className={'w-[90%] p-2 flex flex-wrap gap-24 items-center justify-center overflow-hidden'}
+            style={{
+                skewY: transformSkew,
+            }}
+        >
+            <IconContext.Provider value={{size: '4rem', className: 'drop-shadow-hard'}}>
+
+                <IconPane title={'TypeScript'}>
+                    <SiTypescript className={'text-yellow-300'}/>
+                </IconPane>
+
+                <IconPane title={'JavaScript/ES6'}>
+
+                    <SiJavascript className={'text-green-600'}/>
+                </IconPane>
+
+                <IconPane title={'Python 3'}>
+
+                    <FaPython className={'text-red-500'}/>
+                </IconPane>
+
+                <IconPane title={'CLANG (C/C++)'}>
+
+                    <TbBrandCpp className={'text-red-500'}/>
+                </IconPane>
+
+                <IconPane title={'Java'}>
+
+                    <FaJava className={'text-red-500'}/>
+                </IconPane>
+
+                <IconPane title={'ReactJS'}>
+
+                    <FaReact className={'text-green-600'}/>
+                </IconPane>
+
+                <IconPane title={'ThreeJS'}>
+
+                    <TbBrandThreejs className={'text-yellow-300'}/>
+                </IconPane>
+
+                <IconPane title={'NodeJS'}>
+
+                    <FaNodeJs className={'text-green-600'}/>
+                </IconPane>
+
+                <IconPane title={'Git/VCS'}>
+
+                    <FaGit className={'text-green-600'}/>
+                </IconPane>
+
+                <IconPane title={'PassportJS'}>
+
+                    <SiPassport className={'text-green-600'}/>
+                </IconPane>
+
+                <IconPane title={'ExpressJS'}>
+
+                    <SiExpress className={'text-green-600'}/>
+                </IconPane>
+
+                <IconPane title={'MySQL'}>
+
+                    <SiMysql className={'text-green-600'}/>
+                </IconPane>
+
+                <IconPane title={'Redis'}>
+
+                    <SiRedis className={'text-yellow-600'}/>
+                </IconPane>
+
+                <IconPane title={'Linux'}>
+
+                    <FaLinux className={'text-green-600'}/>
+                </IconPane>
+
+                <IconPane title={'Blender'}>
+
+                    <SiBlender className={'text-red-500'}/>
+                </IconPane>
+
+                <IconPane title={'Illustrator'}>
+
+                    <SiAdobeillustrator className={'text-yellow-300'}/>
+                </IconPane>
+
+                <IconPane title={'Photoshop'}>
+
+                    <SiAdobephotoshop className={'text-green-600'}/>
+                </IconPane>
+
+                <IconPane title={'Premiere Pro'}>
+
+                    <SiAdobepremierepro className={'text-green-600'}/>
+                </IconPane>
+
+                <IconPane title={'Figma'}>
+
+                    <FaFigma className={'text-red-600'}/>
+                </IconPane>
+
+                <IconPane title={'AWS'}>
+
+                    <FaAws className={'text-yellow-300'}/>
+                </IconPane>
+            </IconContext.Provider>
+
+            <div className={'flex flex-wrap justify-center items-center gap-5 p-4 shadow-lg rounded-full'}>
+                <div className={'flex flex-col justify-center items-center'}>
+                    <BsFillSquareFill className={'text-green-600'}/> Experienced
+                </div>
+                <div className={'flex flex-col justify-center items-center'}>
+                    <BsFillSquareFill className={'text-yellow-300'}/> Intermediate
+                </div>
+                <div className={'flex flex-col justify-center items-center'}>
+                    <BsFillSquareFill className={'text-red-600'}/> Beginner
+                </div>
+            </div>
+
+        </motion.div>
+    )
+}
+
+const FillBlock = () => {
+    const ref = useRef(null)
+    const {scrollYProgress} = useScroll({target: ref, offset: ['start end', 'end start']})
+    const transformSkew = useTransform(scrollYProgress, [0, 1], ['0deg', '5deg'])
+
+    return (
+        <motion.div
+            ref={ref}
+            // className={`w-[90%] rounded-md skew-x-1 md:skew-x-3 hard-shadow bg-slate-900/90 text-[1.5rem] md:text-[5rem] p-3 z-30 mix-blend-darken`}>
+            className={`w-screen h-[30vh] bg-cover bg-center bg-fixed`}
+            style={{
+                skewY: transformSkew,
+                backgroundImage: "url('https://images.unsplash.com/photo-1684670179697-7b6d0213f152?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80')"
+            }}
+        >
+        </motion.div>
+    )
+}
+
+const DescriptionBlock = ({children, className = ''}: {
+    children: ReactChild,
+    className?: string
+}) => {
+
+    const ref = useRef(null)
+    const {scrollYProgress} = useScroll({target: ref, offset: ['start end', 'end start']})
+    const transformSkew = useTransform(scrollYProgress, [0, 1], ['0deg', '5deg'])
+
+    return (
+        <motion.div
+            ref={ref}
+            // className={`w-[90%] rounded-md skew-x-1 md:skew-x-3 hard-shadow bg-slate-900/90 text-[1.5rem] md:text-[5rem] p-3 z-30 mix-blend-darken`}>
+            className={`select-none w-screen bg-slate-900/90 text-[2rem] md:text-[5rem] p-3 z-30 mix-blend-darken ${className}`}
+            style={{
+                skewY: transformSkew
+            }}
+        >
+            <p className={'break-words text-white font-nineties text-center text-shadow-hard'}>
+                {children}
+            </p>
+        </motion.div>
+    )
+}
+
+const IconPane = ({children, title}: {
+    children: ReactChild,
+    title: string
+}) => {
+    return (
+        <motion.div
+            className={`flex flex-col gap-2 font-aeonik items-center justify-center `}>
+            <span>
+                {children}
+            </span>
+            <p className={'break-words'}>
+                {title}
+            </p>
+        </motion.div>
+    )
+}
+
+const hobbies = [
+    'video editing',
+    'music production',
+    'DJing',
+    'gaming',
+    'graphic illustration',
+    'photoshop',
+    '3d rendering',
+    'visual design',
+    'hobby crafting',
+    'woodwork',
+    'collecting',
+    'microcomputers',
+    'tinkering',
+
+]
+
+
+const UnrollStripes = ({content, progress}: {
+    content: string[],
+    progress: MotionValue<number>,
+}) => {
+
+    const heightNumber = 5
+    const heightCSS = `${heightNumber}vh` //h-[5vh]
+
+    let array = []
+    for (let i = 0; i < content.length; i++) {
+
+        array.push(
+            <ScrollStripe i={i} N={content.length} height={{
+                number: heightNumber,
+                css: heightCSS
+            }} progress={progress}>
+                {content[i]}
+            </ScrollStripe>
+        )
+    }
+
+    return (
+        <>
+            {array}
+        </>
+    )
+}
+
+const ScrollStripe = ({children, progress, height, i, N}: {
+    children: ReactChild,
+    progress: MotionValue<number>,
+    height: {
+        number: number,
+        css: string,
+    },
+    i: number,
+    N: number
+}) => {
+
+    const translateY = useTransform(progress, [0, 0.8], [`${i * 1.3}vh`, `${height.number * (i * 1.3)}vh`])
+
+    // const translateX = useTransform(progress, [0.9, 1], ['0vw', `${100}vh`])
+    // const rotateZ = useTransform(progress, [0.9, 1], ['0deg', `${height.number * 10}deg`])
+
+
+    const half = Math.floor(N / 2)
+    const halfdiff = i - half
+
+
+    const skewY = useTransform(progress, [0.7, 1], ['0deg', `${halfdiff}deg`])
+
+    return (
+        <motion.div
+            style={{
+                translateY,
+                skewY,
+
+                // rotateZ,
+                // translateX,
+
+                height: height.css,
+            }}
+            className={`absolute p-2 w-screen flex justify-center items-center ${bgColorMap[i]} shadow-lg`}
+            data-bg={bgColorMap[i]}>
+            <p className={`text-2xl lowercase text-center font-maru`}>
+                {children}
+            </p>
+        </motion.div>
+    )
+
+}
+
+const ScrollIndicator = () => {
+
+    const variants = {
+        hidden: {
+            opacity: 0,
+            x: 100
+        },
+        visible: {
+            opacity: 1,
+            x: 0
+        }
+    }
+
+    return createPortal(
+        <motion.div className={'fixed top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 '}>
+            <motion.span
+                variants={variants}
+                initial={"hidden"}
+                animate={"visible"}
+                exit={"hidden"}
+            >
+
+                {/*<div className={'flex gap-8 justify-center items-center text-xl font-rubik'}>*/}
+                {/*    <span>scroll</span>*/}
+                {/*    <PaneOutlineWrapper>*/}
+                {/*        /!*<TbCircleArrowDownFilled size={'2rem'}/>*!/*/}
+                {/*        <TbArrowNarrowDown className={'h-full w-full'}/>*/}
+                {/*    </PaneOutlineWrapper>*/}
+                {/*    <span>down</span>*/}
+                {/*</div>*/}
+
+                <PaneOutlineWrapper className={'animate-bounce'}>
+                    {/*<TbCircleArrowDownFilled size={'2rem'}/>*/}
+                    <TbArrowNarrowDown className={'h-full w-full '}/>
+                </PaneOutlineWrapper>
+
+
+            </motion.span>
+        </motion.div>,
+        document.body
     )
 }

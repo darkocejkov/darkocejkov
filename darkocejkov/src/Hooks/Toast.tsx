@@ -79,7 +79,7 @@ export const useToast = (): ToastFunctions => {
     } as ToastFunctions
 }
 
-const animationTransitionS = 0.1
+const animationTransitionS = 0.24
 const animationTransitionMS = 1000 * animationTransitionS
 const toastDuration = 5
 
@@ -105,10 +105,11 @@ export const Toast = ({children, id, options}: {
         hidden: {
             opacity: 0,
             translateX: '-100%',
-            rotateZ: '40deg',
+            rotateZ: '3deg',
             scale: 0.9,
             transition: {
                 duration: animationTransitionS
+
             }
         },
     }

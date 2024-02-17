@@ -168,6 +168,14 @@ export function humanFileSize(bytes: number, si = false, dp = 1) {
     return bytes.toFixed(dp) + ' ' + units[u];
 }
 
+export const radToDeg = (rad: number) => {
+    return rad * (180 / Math.PI)
+}
+
+export const degToRad = (deg: number) => {
+    return deg * (Math.PI / 180)
+}
+
 export const randomFromList = (array: Array<any>) => {
     return array[Math.floor(Math.random() * array.length)]
 }
@@ -240,3 +248,8 @@ const icons = [
     'terminal',
     'cube',
 ]
+export const isExternalLink = (url: string) => {
+    const tmp = document.createElement('a');
+    tmp.href = url;
+    return tmp.host !== window.location.host;
+};
