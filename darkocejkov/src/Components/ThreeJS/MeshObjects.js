@@ -1,7 +1,7 @@
 import React, {useRef, useState} from "react";
 import {useFrame} from "@react-three/fiber";
 import {useMotionValueEvent, useScroll} from "framer-motion";
-import {last} from "../../GlobalFunctions";
+import {last} from "../../helpers";
 
 const DEFAULT_COLOR = "#FFFFFF"
 

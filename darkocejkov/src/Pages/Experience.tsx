@@ -1,20 +1,14 @@
 import React, {ReactElement} from "react";
-import {
-    BoxCarousel,
-    CardBox,
-    Pane,
-    Link,
-    SubtitleRule,
-    TextBox,
-    TitleRule,
-    TooltipWrapper, Chip, GlobalTooltipWrapper
-} from "../Components/Basics.tsx";
 import Marquee from "react-fast-marquee";
 import {ReactChild} from "../types.ts";
 import {Tooltip} from "antd";
 
 import {FaExternalLinkAlt, FaInfoCircle} from "react-icons/fa";
-import {Rule} from "../Components/Layout.tsx";
+import {Rule, SubtitleRule, TitleRule} from "../Components/Layout.tsx";
+import {Pane} from "../Components/Window.tsx";
+import {GlobalTooltipWrapper, TooltipWrapper} from "../Components/Tooltip.tsx";
+import {CardBox, TextBox} from "../Components/Display.tsx";
+import {BoxCarousel} from "../Components/Carousel.tsx";
 
 type Tech = {
     label: string,

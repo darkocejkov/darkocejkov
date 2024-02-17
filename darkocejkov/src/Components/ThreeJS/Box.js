@@ -1,7 +1,7 @@
 import React, { useRef, useState} from 'react'
 import {  useFrame } from '@react-three/fiber'
 import {useMotionValueEvent, useScroll} from "framer-motion";
-import {last} from "../../GlobalFunctions";
+import {last} from "../../helpers";
 
 export default function Box({play, position}) {
     // This reference gives us direct access to the THREE.Mesh object

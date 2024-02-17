@@ -1,5 +1,4 @@
 import React, {createContext, MouseEventHandler, useContext, useEffect, useState} from "react";
-import {BasicLink, Pane, Spinner} from "../Components/Basics.tsx";
 import {motion} from "framer-motion";
 
 import {
@@ -11,6 +10,9 @@ import {LipSum5} from "../helpers.ts";
 import {repoContents, treeContents} from "../api/knowledge.ts";
 import {InfiniteQueryObserverResult} from "@tanstack/query-core/build/lib/types";
 import {Tooltip} from "antd";
+import {Pane} from "../Components/Window.tsx";
+import {BasicLink} from "../Components/Navigation.tsx";
+import {Spinner} from "../Components/Display.tsx";
 
 type FileType = 'dir' | 'file'
 type File = {

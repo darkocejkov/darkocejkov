@@ -1,5 +1,6 @@
 import React from "react";
-import {SubtitleRule} from "../Components/Basics.tsx";
+
+import {SubtitleRule} from "../Components/Layout.tsx";
 
 export default function NotFound({}) {
     return (

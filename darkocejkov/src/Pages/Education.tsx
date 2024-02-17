@@ -1,6 +1,9 @@
 import React from "react";
-import {InfoBox, Link, StatBox, TitleRule, TooltipWrapper, Pane, TextBox} from "../Components/Basics.tsx";
 import {Tooltip} from "antd";
+import {Pane} from "../Components/Window.tsx";
+import {TooltipWrapper} from "../Components/Tooltip.tsx";
+import {TitleRule} from "../Components/Layout.tsx";
+import {StatBox, TextBox} from "../Components/Display.tsx";
 
 export default function Education() {
 

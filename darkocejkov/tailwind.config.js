@@ -13,11 +13,16 @@ module.exports = {
         // sectra: ['GT Sectra Fine', 'serif'],
 
         tabi: ['Tabi', 'serif'],
-
         maru: ["GT Maru", "san-serif"],
         rubik: ['Rubik', 'sans-serif'],
         aeonik: ['Aeonik TRIAL', 'sans-serif'],
-        fira: ['Fira Code', 'sans-serif']
+        fira: ['Fira Code', 'sans-serif'],
+        unique: ['Unique'],
+        kica: ['Kica'],
+        kiosk: ['Kiosk'],
+        mazaeni: ['Mazaeni'],
+        monopol: ['Monopol'],
+        nineties: ['Nineties Display'],
       }
     },
   },

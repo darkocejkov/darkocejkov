@@ -7,7 +7,7 @@
 
  */
 
-import React from "react";
+import React, {useState, useEffect, useRef} from "react";
 
 type Scale = {
     x: number,
@@ -46,12 +46,14 @@ const scaleWidth = 500;
 const scaleHeight = 500;
 
 
-const Canvas = () => {
+export const Canvas = ({drawFunction}: {
+    drawFunction: () => void
+}) => {
 
-    const [scale, setScale] = React.useState<Scale>({x: 1, y: 1});
-    const [size, setSize] = React.useState<Size>({w: 0, h: 0});
+    const [scale, setScale] = useState<Scale>({x: 1, y: 1});
+    const [size, setSize] = useState<Size>({w: 0, h: 0});
 
-    const canvas = React.useRef<HTMLCanvasElement>(null);
+    const canvas = useRef<HTMLCanvasElement>(null);
 
     const resized = () => {
         if (!canvas.current) return
@@ -60,8 +62,8 @@ const Canvas = () => {
         setSize({w: document.body.clientWidth, h: document.body.clientHeight});
     };
 
-    // React.useEffect(() => resized(), []);
-    React.useEffect(() => {
+    // useEffect(() => resized(), []);
+    useEffect(() => {
         resized()
 
         if (!canvas.current) return
@@ -73,9 +75,9 @@ const Canvas = () => {
 
     }, []);
 
-    React.useEffect(() => {
-        if (!canvas.current) return
-        drawName(canvas.current.getContext("2d"), document.body.clientWidth, document.body.clientHeight, scale.x, scale.y);
+    useEffect(() => {
+        if (!canvas.current || !drawFunction) return
+        // drawName(canvas.current.getContext("2d"), document.body.clientWidth, document.body.clientHeight, scale.x, scale.y);
 
 
     }, [size]);

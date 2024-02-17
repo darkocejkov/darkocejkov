@@ -1,6 +1,6 @@
 import React, {useMemo} from "react";
-import {Pane} from '../Components/Basics.tsx'
 import {random} from "../helpers.ts";
+import {Pane} from "../Components/Window.tsx";
 
 export default function Projects({}) {
 

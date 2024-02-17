@@ -1,11 +1,8 @@
 import React, {useReducer, useState} from 'react'
-import {Canvas} from "@react-three/fiber";
-import {ControlButton} from '../Components/Basics.tsx'
 import {ReactChild} from "../types.ts";
 import {useToast} from "../Hooks/Toast.tsx";
-import useSound from "use-sound";
-
-import {CgLinear} from 'react-icons/cg'
+import {ControlButton} from "./Buttons.tsx";
+import {useControls} from "leva";
 
 type ControlMode = {
     label: string,
@@ -199,6 +196,27 @@ function SketchControls({}) {
             <ControlButton onClick={() => null} label={"Next Sketch"}>
                 <i className="fa-solid fa-chevron-right fa-xl"></i>
             </ControlButton>
+        </>
+    )
+}
+
+export const GlobalControls = () => {
+
+    const {} = useControls('Metadata', {
+        showLighting: true,
+        showStats: true
+    })
+
+    return null
+
+}
+export const WorldControls = ({}) => {
+
+    const {name, aNumber} = useControls({name: 'World', aNumber: 0})
+
+    return (
+        <>
+            <GlobalControls/>
         </>
     )
 }

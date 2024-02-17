@@ -6,8 +6,8 @@ import {motion} from 'framer-motion'
 import Box from './ThreeJS/Box';
 import {useMotionValueEvent, useScroll} from "framer-motion";
 
-import {MyApp, SketchControls} from "./Basics";
 import {CubeGrid, SphereGrid} from "../Sketches/Grids";
+import {WorldControls} from "./Controller";
 
 
 
@@ -242,7 +242,7 @@ export const SketchComposition = ({play, front, hide, controls, sketch = null, c
             </motion.div>
 
             {controls &&
-                <SketchControls />
+                <WorldControls/>
             }
         </>
     )
@@ -294,7 +294,7 @@ export default function Background({showFront, play, hide, blind, className = ''
             </motion.div>
 
             {controls &&
-                <SketchControls />
+                <WorldControls/>
             }
         </>
 
