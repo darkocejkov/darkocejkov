@@ -18,8 +18,6 @@ export default function RootLayout({
 	children: React.ReactNode;
 }>) {
 
-	const HEIGHT = 10
-
 	return (
 		<html lang="en" className={inter.className}>
 			<body className={'bg-stone-900'}>
