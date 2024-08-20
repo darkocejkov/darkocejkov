@@ -1,4 +1,9 @@
+import Content from "@/components/Content";
 
-export default function Home() {
-  return null;
+export default function Page() {
+  return (
+      <Content>
+        Education
+      </Content>
+  );
 }
