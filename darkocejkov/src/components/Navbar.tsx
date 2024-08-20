@@ -2,10 +2,9 @@ import React from "react";
 
 type Direction = 'top' | 'bottom'
 
-const Navbar = ({direction, children, height = 10}: {
+const Navbar = ({direction, children}: {
     direction: Direction,
-    children: React.ReactNode,
-    height?: number
+    children: React.ReactNode
 }) => {
 
     switch(direction) {

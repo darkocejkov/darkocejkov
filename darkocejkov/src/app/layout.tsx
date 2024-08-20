@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Rubik } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import React from "react";
 import Link from "next/link";
@@ -24,7 +24,7 @@ export default function RootLayout({
 		<html lang="en" className={inter.className}>
 			<body className={'bg-stone-900'}>
 				<div className={'w-screen h-screen overflow-hidden'}>
-					<Navbar direction={'top'} height={HEIGHT}>
+					<Navbar direction={'top'}>
 						<Link href={'/exp'}>
 							experience
 						</Link>
@@ -40,7 +40,7 @@ export default function RootLayout({
 						{children}
 					</div>
 
-					<Navbar direction={'bottom'} height={HEIGHT}>
+					<Navbar direction={'bottom'}>
 						<Link href={'/soci'}>
 							socials
 						</Link>
