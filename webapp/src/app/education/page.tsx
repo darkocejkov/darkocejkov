@@ -5,15 +5,15 @@ import axios from "axios";
 
 export default function Page() {
   const { data } = useQuery({
-    queryKey: ["hobbies"],
+    queryKey: ["diplomas"],
     queryFn: async () => {
-      return await axios("http://localhost:1337/api/hobbies");
+      return await axios("http://localhost:1337/api/diplomas");
     },
   });
 
   return (
     <Content>
-      Me <code>{JSON.stringify(data?.data, null, 2)}</code>
+      Education <code>{JSON.stringify(data?.data, null, 2)}</code>
     </Content>
   );
 }
