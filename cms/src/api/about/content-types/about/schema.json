@@ -1,0 +1,45 @@
+{
+  "kind": "singleType",
+  "collectionName": "about",
+  "info": {
+    "singularName": "about",
+    "pluralName": "abouts",
+    "displayName": "About Me",
+    "description": "Singleton About Me page"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "displayName": {
+      "type": "string",
+      "required": true
+    },
+    "headline": {
+      "type": "string"
+    },
+    "shortBio": {
+      "type": "text"
+    },
+    "content": {
+      "type": "richtext"
+    },
+    "avatar": {
+      "type": "media",
+      "allowedTypes": ["images"],
+      "multiple": false
+    },
+    "gallery": {
+      "type": "media",
+      "allowedTypes": ["images"],
+      "multiple": true
+    },
+    "openToWork": {
+      "type": "boolean",
+      "default": false
+    },
+    "metaDescription": {
+      "type": "text"
+    }
+  }
+}

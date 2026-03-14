@@ -1,0 +1,54 @@
+{
+  "kind": "collectionType",
+  "collectionName": "educations",
+  "info": {
+    "singularName": "education",
+    "pluralName": "educations",
+    "displayName": "Education",
+    "description": "Academic education entry"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "school": {
+      "type": "string",
+      "required": true
+    },
+    "degree": {
+      "type": "string",
+      "required": true
+    },
+    "location": {
+      "type": "string"
+    },
+    "url": {
+      "type": "string"
+    },
+    "startDate": {
+      "type": "date",
+      "required": true
+    },
+    "endDate": {
+      "type": "date"
+    },
+    "current": {
+      "type": "boolean",
+      "default": false
+    },
+    "gradeScale": {
+      "type": "decimal",
+      "description": "The maximum possible grade in the scoring system (e.g. 4.0, 12.0, 100)"
+    },
+    "grade": {
+      "type": "decimal",
+      "description": "Achieved grade within the gradeScale"
+    },
+    "courses": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::course.course",
+      "mappedBy": "education"
+    }
+  }
+}

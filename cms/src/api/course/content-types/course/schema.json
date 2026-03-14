@@ -5,37 +5,27 @@
     "singularName": "course",
     "pluralName": "courses",
     "displayName": "Course",
-    "description": ""
+    "description": "An individual course linked to an education entry"
   },
   "options": {
     "draftAndPublish": true
   },
-  "pluginOptions": {},
   "attributes": {
-    "title": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "grade": {
       "type": "string"
     },
     "description": {
-      "type": "blocks"
+      "type": "richtext"
     },
-    "grade": {
-      "type": "decimal"
-    },
-    "date": {
-      "type": "date"
-    },
-    "projects": {
+    "education": {
       "type": "relation",
-      "relation": "oneToMany",
-      "target": "api::project.project"
-    },
-    "diploma": {
-      "type": "relation",
-      "relation": "oneToOne",
-      "target": "api::diploma.diploma"
-    },
-    "code": {
-      "type": "string"
+      "relation": "manyToOne",
+      "target": "api::education.education",
+      "inversedBy": "courses"
     }
   }
 }

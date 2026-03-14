@@ -5,7 +5,7 @@
     "singularName": "job",
     "pluralName": "jobs",
     "displayName": "Job",
-    "description": ""
+    "description": "Professional work experience entry"
   },
   "options": {
     "draftAndPublish": true
@@ -13,34 +13,50 @@
   "pluginOptions": {},
   "attributes": {
     "title": {
-      "type": "string"
+      "type": "string",
+      "required": true
     },
     "company": {
+      "type": "string",
+      "required": true
+    },
+    "location": {
       "type": "string"
     },
-    "link": {
+    "url": {
       "type": "string"
+    },
+    "startDate": {
+      "type": "date",
+      "required": true
+    },
+    "endDate": {
+      "type": "date"
+    },
+    "current": {
+      "type": "boolean",
+      "default": false
+    },
+    "summary": {
+      "type": "richtext",
+      "required": true
+    },
+    "description": {
+      "type": "richtext"
+    },
+    "skills": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::skill.skill",
+      "mappedBy": "jobs"
     },
     "type": {
       "type": "enumeration",
       "enum": [
-        "freelance",
-        "professional"
+        "internship",
+        "full-time",
+        "part-time"
       ]
-    },
-    "start": {
-      "type": "date"
-    },
-    "end": {
-      "type": "date"
-    },
-    "description": {
-      "type": "blocks"
-    },
-    "skills": {
-      "type": "relation",
-      "relation": "oneToMany",
-      "target": "api::skill.skill"
     }
   }
 }

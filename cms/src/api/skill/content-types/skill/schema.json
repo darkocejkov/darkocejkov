@@ -5,30 +5,67 @@
     "singularName": "skill",
     "pluralName": "skills",
     "displayName": "Skill",
-    "description": ""
+    "description": "A skill or technology that can be referenced across jobs, projects, and more"
   },
   "options": {
-    "draftAndPublish": true
+    "draftAndPublish": false
   },
   "pluginOptions": {},
   "attributes": {
-    "title": {
-      "type": "string"
-    },
-    "proficiency": {
-      "type": "integer",
-      "max": 10,
-      "min": 1,
+    "name": {
+      "type": "string",
       "required": true,
-      "default": 1
+      "unique": true
     },
-    "tags": {
-      "type": "relation",
-      "relation": "oneToMany",
-      "target": "api::tag.tag"
+    "slug": {
+      "type": "uid",
+      "targetField": "name",
+      "required": true
     },
-    "notes": {
+    "category": {
+      "type": "enumeration",
+      "required": true,
+      "default": "other",
+      "enum": [
+        "frontend",
+        "backend",
+        "module",
+        "cloud",
+        "devops",
+        "design",
+        "data",
+        "mobile",
+        "testing",
+        "other",
+        "software"
+      ]
+    },
+    "level": {
+      "type": "enumeration",
+      "required": true,
+      "enum": [
+        "familiar",
+        "beginner",
+        "intermediate",
+        "advanced",
+        "expert"
+      ]
+    },
+    "description": {
       "type": "text"
+    },
+    "icon": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "jobs": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::job.job",
+      "inversedBy": "skills"
     }
   }
 }
