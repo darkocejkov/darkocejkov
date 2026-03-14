@@ -5,3 +5,9 @@
   --font-sans: var(--font-rubik);
   --font-funnel: var(--font-funnel-display);
 }
+
+@layer utilities {
+  [class*="rounded"] {
+    corner-shape: squircle;
+  }
+}

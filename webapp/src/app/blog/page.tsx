@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import Header from "@/components/Header";
 import { strapiGet, type StrapiList, type BlogPost, type BlogCategory } from "@/lib/strapi";
 
@@ -26,6 +27,7 @@ async function getPosts(category?: BlogCategory): Promise<BlogPost[]> {
       "fields[5]": "featured",
       "fields[6]": "readingTime",
       "fields[7]": "publishedAt",
+      "populate[coverImage]": "true",
     };
     if (category) params["filters[category][$eq]"] = category;
     const res = await strapiGet<StrapiList<BlogPost>>("/blog-posts", params);
@@ -94,29 +96,42 @@ export default async function Blog({
           <ol className="flex flex-col divide-y divide-gray-100">
             {posts.map((post) => (
               <li key={post.id} className="py-6 first:pt-0 last:pb-0">
-                <div className="flex flex-wrap items-center gap-2 mb-1">
-                  <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-500">
-                    {categoryLabel[post.category]}
-                  </span>
-                  {post.featured && (
-                    <span className="rounded-full bg-yellow-50 px-2 py-0.5 text-xs text-yellow-600 border border-yellow-200">
-                      Featured
-                    </span>
+                <Link href={`/blog/${post.slug}`} className="group flex gap-4 items-start">
+                  {post.coverImage && (
+                    <div className="shrink-0 w-20 h-20 rounded-md overflow-hidden bg-gray-100">
+                      <img
+                        src={`${process.env.NEXT_PUBLIC_CMS_URL ?? "http://localhost:1337"}${post.coverImage.url}`}
+                        alt={post.coverImage.alternativeText ?? post.title}
+                        width={80}
+                        height={80}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
                   )}
-                </div>
-                <Link href={`/blog/${post.slug}`} className="group">
-                  <h2 className="font-funnel text-xl font-semibold group-hover:underline">
-                    {post.title}
-                  </h2>
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-center gap-2 mb-1">
+                      <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-500">
+                        {categoryLabel[post.category]}
+                      </span>
+                      {post.featured && (
+                        <span className="rounded-full bg-yellow-50 px-2 py-0.5 text-xs text-yellow-600 border border-yellow-200">
+                          Featured
+                        </span>
+                      )}
+                    </div>
+                    <h2 className="font-funnel text-xl font-semibold group-hover:underline">
+                      {post.title}
+                    </h2>
+                    <p className="mt-1 text-sm text-gray-500 line-clamp-2">{post.excerpt}</p>
+                    <div className="mt-2 flex items-center gap-3 text-xs text-gray-400">
+                      <span>{formatDate(post.publishedAt)}</span>
+                      {post.readingTime && <span>{post.readingTime} min read</span>}
+                      {post.tags && post.tags.length > 0 && (
+                        <span>{post.tags.join(", ")}</span>
+                      )}
+                    </div>
+                  </div>
                 </Link>
-                <p className="mt-1 text-sm text-gray-500 line-clamp-2">{post.excerpt}</p>
-                <div className="mt-2 flex items-center gap-3 text-xs text-gray-400">
-                  <span>{formatDate(post.publishedAt)}</span>
-                  {post.readingTime && <span>{post.readingTime} min read</span>}
-                  {post.tags && post.tags.length > 0 && (
-                    <span>{post.tags.join(", ")}</span>
-                  )}
-                </div>
               </li>
             ))}
           </ol>

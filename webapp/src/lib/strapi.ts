@@ -95,6 +95,13 @@ export interface BlogPost {
   featured: boolean;
   readingTime: number | null;
   publishedAt: string;
+  coverImage: StrapiMedia | null;
+}
+
+export interface BlogPostFull extends BlogPost {
+  content: string;
+  coverImage: StrapiMedia | null;
+  metaDescription: string | null;
 }
 
 export type SkillCategory =

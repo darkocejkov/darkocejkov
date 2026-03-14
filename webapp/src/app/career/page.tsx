@@ -39,7 +39,7 @@ export default async function Career() {
           {jobs.map((job) => (
             <li key={job.id} className="relative">
               {job.current ? (
-                <span className="absolute F top-1.5 flex h-4 w-4 items-center justify-center rounded-full border border-gray-300 bg-slate-900" />
+                <span className="absolute -left-[2.5rem] top-1.5 flex h-4 w-4 items-center justify-center rounded-full border border-gray-300 bg-slate-900" />
               )
               : (
                 <span className="absolute -left-[2.5rem] top-1.5 flex h-4 w-4 items-center justify-center rounded-full border border-gray-300 bg-white" />
