@@ -4,7 +4,8 @@
       "Bash(npx create-next-app@latest webapp --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\" --no-turbopack)",
       "Bash(npm install:*)",
       "Bash(curl -s -X POST http://localhost:1337/api/courses -H \"Content-Type: application/json\" -d '{\"\"\"\"data\"\"\"\":{\"\"\"\"name\"\"\"\":\"\"\"\"test\"\"\"\"}}')",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(find /f/LABORATORY/darkocejkov/cms -maxdepth 3 -not -path */node_modules* -not -path */.strapi* -not -path */.tmp* -not -path */dist* -type d)"
     ]
   }
 }

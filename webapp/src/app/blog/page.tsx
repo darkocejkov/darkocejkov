@@ -1,6 +1,5 @@
 import Link from "next/link";
 import Image from "next/image";
-import Header from "@/components/Header";
 import { strapiGet, type StrapiList, type BlogPost, type BlogCategory } from "@/lib/strapi";
 
 const categoryLabel: Record<BlogCategory, string> = {
@@ -59,7 +58,6 @@ export default async function Blog({
 
   return (
     <>
-      <Header />
       <main className="px-8 py-12">
         <h1 className="font-funnel mb-6 text-4xl font-bold">Blog</h1>
 

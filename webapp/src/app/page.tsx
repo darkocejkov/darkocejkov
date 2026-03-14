@@ -1,4 +1,3 @@
-import Header from "@/components/Header";
 import Markdown from "@/components/Markdown";
 import { strapiGet, type StrapySingle, type About } from "@/lib/strapi";
 
@@ -18,7 +17,6 @@ export default async function Home() {
 
   return (
     <>
-      <Header />
       <main className="px-8 py-12 flex-1">
         {about ? (
           <div className="flex flex-col gap-4">

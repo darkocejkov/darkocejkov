@@ -2,7 +2,6 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import Header from "@/components/Header";
 import { strapiGet, type StrapiList, type BlogPostFull, type BlogCategory } from "@/lib/strapi";
 
 const categoryLabel: Record<BlogCategory, string> = {
@@ -48,7 +47,6 @@ export default async function BlogPostPage({
 
   return (
     <>
-      <Header />
       <main className="px-8 py-12">
         <div className="max-w-2xl mx-auto">
           <Link

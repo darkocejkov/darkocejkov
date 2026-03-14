@@ -1,4 +1,3 @@
-import Header from "@/components/Header";
 import Markdown from "@/components/Markdown";
 import JobDescription from "@/components/JobDescription";
 import { strapiGet, type StrapiList, type Job } from "@/lib/strapi";
@@ -32,7 +31,6 @@ export default async function Career() {
 
   return (
     <>
-      <Header />
       <main className="px-8 py-12">
         <h1 className="font-funnel mb-10 text-4xl font-bold">Career</h1>
         <ol className="relative flex flex-col gap-10 border-l border-gray-200 pl-8">

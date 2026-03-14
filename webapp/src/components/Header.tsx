@@ -1,4 +1,5 @@
 import Link from "next/link";
+import MaintenanceBanner from "./MaintenanceBanner";
 
 const links = [
   { href: "/blog", label: "Blog" },
@@ -9,17 +10,24 @@ const links = [
 
 export default function Header() {
   return (
-    <header className="backdrop-blur-2xl z-20 sticky top-0 flex items-center justify-between px-8 py-4 border-b border-gray-200">
-      <Link href="/" className="font-funnel font-semibold text-lg">
-        Darko Cejkov
-      </Link>
-      <nav className="flex gap-6">
-        {links.map(({ href, label }) => (
-          <Link key={href} href={href} className="text-sm hover:underline">
-            {label}
+    <header className="backdrop-blur-2xl z-20 sticky top-0">
+      <MaintenanceBanner />
+      <div className="flex flex-col">
+
+        <div className=" flex items-center justify-between px-8 py-4 border-b border-gray-200">
+          <Link href="/" className="font-funnel font-semibold text-lg">
+            Darko Cejkov
           </Link>
-        ))}
-      </nav>
+          <nav className="flex gap-6">
+            {links.map(({ href, label }) => (
+              <Link key={href} href={href} className="text-sm hover:underline">
+                {label}
+              </Link>
+            ))}
+          </nav>
+        </div>
+      </div>
+
     </header>
   );
 }

@@ -457,6 +457,7 @@ export interface ApiAboutAbout extends Struct.SingleTypeSchema {
     openToWork: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
     publishedAt: Schema.Attribute.DateTime;
     shortBio: Schema.Attribute.Text;
+    underMaintenance: Schema.Attribute.Boolean;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;

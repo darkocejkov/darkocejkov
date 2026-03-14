@@ -31,6 +31,7 @@ export interface About {
   shortBio: string | null;
   content: string | null;
   openToWork: boolean;
+  underMaintenance: boolean;
   metaDescription: string | null;
   avatar: StrapiMedia | null;
   gallery: StrapiMedia[] | null;

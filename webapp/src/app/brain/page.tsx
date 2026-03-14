@@ -1,4 +1,3 @@
-import Header from "@/components/Header";
 import { strapiGet, type StrapiList, type Skill, type SkillCategory } from "@/lib/strapi";
 
 async function getSkills(): Promise<Skill[]> {
@@ -54,7 +53,6 @@ export default async function Brain() {
 
   return (
     <>
-      <Header />
       <main className="px-8 py-12">
         <h1 className="font-funnel mb-10 text-4xl font-bold">Brain</h1>
         <div className="flex flex-col gap-10">
