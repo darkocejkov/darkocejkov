@@ -1,9 +1,35 @@
 @import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
 @plugin "@tailwindcss/typography";
 
 @theme inline {
   --font-sans: var(--font-rubik);
   --font-funnel: var(--font-funnel-display);
+
+  --color-brand-dark: #011627;
+  --color-brand-red: #F71735;
+  --color-brand-cyan: #41EAD4;
+  --color-brand-white: #FDFFFC;
+  --color-brand-orange: #FF9F1C;
+}
+
+@layer base {
+
+  /* Remap Tailwind's gray scale in dark mode so all gray text/borders adapt automatically */
+  .dark {
+    --color-gray-950: oklch(74.945% 0.13405 250.063);
+    --color-gray-900: oklch(95% 0.004 240);
+    --color-gray-800: oklch(88% 0.006 240);
+    --color-gray-700: oklch(80% 0.008 240);
+    --color-gray-600: oklch(70% 0.008 240);
+    --color-gray-500: oklch(60% 0.007 240);
+    --color-gray-400: oklch(50% 0.006 240);
+    --color-gray-300: oklch(35% 0.008 240);
+    --color-gray-200: oklch(22% 0.01 240);
+    --color-gray-100: oklch(16% 0.008 240);
+    --color-gray-50: oklch(12% 0.006 240);
+  }
 }
 
 @layer utilities {
@@ -13,8 +39,13 @@
 }
 
 @keyframes marquee {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
 }
 
 .animate-marquee {

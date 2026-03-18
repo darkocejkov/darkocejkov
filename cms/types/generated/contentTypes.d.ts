@@ -684,6 +684,7 @@ export interface ApiSkillSkill extends Struct.CollectionTypeSchema {
     description: Schema.Attribute.Text;
     icon: Schema.Attribute.Media<'images'>;
     jobs: Schema.Attribute.Relation<'manyToMany', 'api::job.job'>;
+    lastUsed: Schema.Attribute.Date;
     level: Schema.Attribute.Enumeration<
       ['familiar', 'beginner', 'intermediate', 'advanced', 'expert']
     > &

@@ -3,12 +3,12 @@ import Image from "next/image";
 import { strapiGet, type StrapiList, type BlogPost, type BlogCategory } from "@/lib/strapi";
 
 const categoryLabel: Record<BlogCategory, string> = {
-  general:    "General",
+  general: "General",
   technology: "Technology",
-  project:    "Project",
-  design:     "Design",
-  career:     "Career",
-  personal:   "Personal",
+  project: "Project",
+  design: "Design",
+  career: "Career",
+  personal: "Personal",
 };
 
 const ALL_CATEGORIES = Object.keys(categoryLabel) as BlogCategory[];
@@ -65,11 +65,10 @@ export default async function Blog({
         <div className="mb-10 flex flex-wrap gap-2">
           <Link
             href="/blog"
-            className={`rounded-full px-3 py-1 text-sm transition-colors ${
-              !activeCategory
-                ? "bg-gray-900 text-white"
-                : "border border-gray-200 text-gray-600 hover:border-gray-400"
-            }`}
+            className={`rounded-full px-3 py-1 text-sm transition-colors ${!activeCategory
+              ? "bg-brand-orange text-white"
+              : "border border-gray-200 text-gray-600 hover:border-gray-400"
+              }`}
           >
             All
           </Link>
@@ -77,11 +76,10 @@ export default async function Blog({
             <Link
               key={cat}
               href={`/blog?category=${cat}`}
-              className={`rounded-full px-3 py-1 text-sm transition-colors ${
-                activeCategory === cat
-                  ? "bg-gray-900 text-white"
-                  : "border border-gray-200 text-gray-600 hover:border-gray-400"
-              }`}
+              className={`rounded-full px-3 py-1 text-sm transition-colors ${activeCategory === cat
+                ? "bg-brand-orange text-white"
+                : "border border-gray-200 text-gray-600 hover:border-gray-400"
+                }`}
             >
               {categoryLabel[cat]}
             </Link>

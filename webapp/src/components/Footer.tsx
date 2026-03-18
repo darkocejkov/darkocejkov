@@ -1,4 +1,6 @@
 import { strapiGet, type StrapiList, type SocialLink, type Resume } from "@/lib/strapi";
+import ThemeToggle from "@/components/ThemeToggle";
+import SocialIcon from "@/components/SocialIcon";
 
 const CMS_URL = process.env.NEXT_PUBLIC_CMS_URL ?? "http://localhost:1337";
 
@@ -30,35 +32,37 @@ export default async function Footer() {
   const professional = links.filter((l) => l.category === "professional");
 
   return (
-    <footer className="sticky backdrop-blur-2xl bottom-0 mt-auto border-t border-gray-200 px-8 py-6 text-sm text-gray-500">
+    <footer className="sticky backdrop-blur-2xl bottom-0 mt-auto border-t border-brand-dark/10 dark:border-brand-white/10 px-8 py-6 text-sm text-brand-dark/50 dark:text-brand-white/50">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex flex-wrap gap-8">
           {professional.length > 0 && (
-            <div className="flex gap-4">
+            <div className="flex gap-4 items-center">
               {professional.map((link) => (
                 <a
                   key={link.id}
                   href={link.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:text-gray-900 hover:underline"
+                  title={link.title}
+                  className="hover:text-brand-dark dark:hover:text-brand-white transition-colors"
                 >
-                  {link.title}
+                  <SocialIcon url={link.url} title={link.title} />
                 </a>
               ))}
             </div>
           )}
           {personal.length > 0 && (
-            <div className="flex gap-4">
+            <div className="flex gap-4 items-center">
               {personal.map((link) => (
                 <a
                   key={link.id}
                   href={link.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:text-gray-900 hover:underline"
+                  title={link.title}
+                  className="hover:text-brand-dark dark:hover:text-brand-white transition-colors"
                 >
-                  {link.title}
+                  <SocialIcon url={link.url} title={link.title} />
                 </a>
               ))}
             </div>
@@ -72,13 +76,14 @@ export default async function Footer() {
                 key={resume.id}
                 href={`${CMS_URL}${resume.file?.url}`}
                 download
-                className="hover:text-gray-900 hover:underline"
+                className="hover:text-brand-dark dark:hover:text-brand-white hover:underline"
               >
                 {resume.label}
               </a>
             ))}
           </div>
         )}
+        <ThemeToggle />
       </div>
     </footer>
   );

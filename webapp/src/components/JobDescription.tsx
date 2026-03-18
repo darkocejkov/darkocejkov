@@ -23,7 +23,7 @@ export default function JobDescription({ description }: { description: string })
         {open ? "Hide description" : "Show description"}
       </button>
       {open && (
-        <div className="mt-2 bg-slate-100 p-5 rounded-xl">
+        <div className="mt-2 dark:bg-brand-white/10 bg-brand-dark/10 p-5 rounded-xl">
           <Markdown>{description}</Markdown>
         </div>
       )}

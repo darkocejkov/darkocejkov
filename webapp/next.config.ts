@@ -9,7 +9,17 @@ const nextConfig: NextConfig = {
         port: "1337",
         pathname: "/uploads/**",
       },
+      {
+        protocol: "https",
+        hostname: "deserving-connection-0787b59d66.strapiapp.com",
+        pathname: "/uploads/**",
+      },
     ],
+  },
+  logging: {
+    fetches: {
+      fullUrl: true,
+    },
   },
 };
 

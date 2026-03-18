@@ -125,6 +125,7 @@ export interface Skill {
   category: SkillCategory;
   level: "familiar" | "beginner" | "intermediate" | "advanced" | "expert";
   description: string | null;
+  lastUsed: string | null;
 }
 
 export interface Resume {

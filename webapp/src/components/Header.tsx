@@ -14,7 +14,7 @@ export default function Header() {
       <MaintenanceBanner />
       <div className="flex flex-col">
 
-        <div className=" flex items-center justify-between px-8 py-4 border-b border-gray-200">
+        <div className="flex items-center justify-between px-8 py-4 border-b border-brand-dark/10 dark:border-brand-white/10">
           <Link href="/" className="font-funnel font-semibold text-lg">
             Darko Cejkov
           </Link>

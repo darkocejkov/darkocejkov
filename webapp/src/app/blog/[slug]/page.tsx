@@ -87,7 +87,7 @@ export default async function BlogPostPage({
             />
           )}
 
-          <article className="prose prose-gray max-w-none">
+          <article className="prose prose-gray dark:prose-invert max-w-none">
             <ReactMarkdown remarkPlugins={[remarkGfm]}>
               {post.content}
             </ReactMarkdown>
