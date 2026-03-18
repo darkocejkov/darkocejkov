@@ -23,6 +23,8 @@ function formatDate(date: string) {
 export default async function Education() {
   const entries = await getEducation();
 
+  console.log('getting education:', { entries })
+
   return (
     <>
       <main className="px-8 py-12">
