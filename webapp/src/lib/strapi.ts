@@ -1,5 +1,20 @@
 const CMS_URL = process.env.NEXT_PUBLIC_CMS_URL ?? "http://localhost:1337";
 
+export async function checkHealth(): Promise<{ ok: boolean; status: number | null; ms: number }> {
+  const start = Date.now();
+  try {
+    const res = await fetch(`${CMS_URL}/_health`, { cache: "no-store" });
+    const ms = Date.now() - start;
+    const ok = res.status === 204 || res.ok;
+    console.log(`[strapi] health ${ok ? "✓" : "✗"} ${res.status} (${ms}ms)`);
+    return { ok, status: res.status, ms };
+  } catch (e) {
+    const ms = Date.now() - start;
+    console.error(`[strapi] health ✗ unreachable (${ms}ms)`, e);
+    return { ok: false, status: null, ms };
+  }
+}
+
 export async function strapiGet<T>(
   path: string,
   params?: Record<string, string>
@@ -8,8 +23,22 @@ export async function strapiGet<T>(
   if (params) {
     Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
   }
-  const res = await fetch(url.toString(), { next: { revalidate: 60 } });
-  if (!res.ok) throw new Error(`Strapi fetch failed: ${path} (${res.status})`);
+  const fullUrl = url.toString();
+  const start = Date.now();
+  console.log(`[strapi] ⏳ GET ${path}`);
+  let res: Response;
+  try {
+    res = await fetch(fullUrl, { next: { revalidate: 60 } });
+  } catch (e) {
+    console.error(`[strapi] ✗ GET ${path} — network error (${Date.now() - start}ms)`, e);
+    throw e;
+  }
+  const ms = Date.now() - start;
+  if (!res.ok) {
+    console.error(`[strapi] ✗ GET ${path} — ${res.status} (${ms}ms)`);
+    throw new Error(`Strapi fetch failed: ${path} (${res.status})`);
+  }
+  console.log(`[strapi] ✓ GET ${path} — ${res.status} (${ms}ms)`);
   return res.json();
 }
 
