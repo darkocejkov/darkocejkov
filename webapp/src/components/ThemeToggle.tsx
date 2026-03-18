@@ -6,6 +6,7 @@ export default function ThemeToggle() {
   const [dark, setDark] = useState(false);
 
   useEffect(() => {
+    console.log("[CMS_URL]", process.env.NEXT_PUBLIC_CMS_URL);
     setDark(document.documentElement.classList.contains("dark"));
   }, []);
 
