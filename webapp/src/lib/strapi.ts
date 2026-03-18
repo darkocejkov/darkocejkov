@@ -8,8 +8,15 @@ export async function strapiGet<T>(
   if (params) {
     Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
   }
+  const start = Date.now();
+  console.log(`[strapi] GET ${url.toString()}`);
   const res = await fetch(url.toString(), { next: { revalidate: 60 } });
-  if (!res.ok) throw new Error(`Strapi fetch failed: ${path} (${res.status})`);
+  const ms = Date.now() - start;
+  if (!res.ok) {
+    console.error(`[strapi] ${res.status} ${path} (${ms}ms)`);
+    throw new Error(`Strapi fetch failed: ${path} (${res.status})`);
+  }
+  console.log(`[strapi] ${res.status} ${path} (${ms}ms)`);
   return res.json();
 }
 
