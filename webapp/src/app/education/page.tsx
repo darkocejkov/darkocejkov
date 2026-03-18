@@ -1,3 +1,5 @@
+"use client"
+
 import CourseList from "@/components/CourseList";
 import { strapiGet, type StrapiList, type Education } from "@/lib/strapi";
 
