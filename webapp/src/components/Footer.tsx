@@ -74,7 +74,7 @@ export default async function Footer() {
             {resumes.map((resume) => (
               <a
                 key={resume.id}
-                href={`${CMS_URL}${resume.file?.url}`}
+                href={resume.file?.url}
                 download
                 className="hover:text-brand-dark dark:hover:text-brand-white hover:underline"
               >
