@@ -1,5 +1,5 @@
 import React from "react";
-import { strapiGet, type StrapiList, type Skill, type SkillCategory } from "@/lib/strapi";
+import { strapiGet, type StrapiList, type Skill } from "@/lib/strapi";
 
 async function getSkills(): Promise<Skill[]> {
   try {
@@ -13,7 +13,7 @@ async function getSkills(): Promise<Skill[]> {
   }
 }
 
-const categoryLabel: Record<SkillCategory, string> = {
+const categoryLabel: Record<string, string> = {
   frontend:  "Frontend",
   backend:   "Backend",
   module:    "Libraries",
@@ -27,7 +27,7 @@ const categoryLabel: Record<SkillCategory, string> = {
   other:     "Other",
 };
 
-const categoryIcon: Record<SkillCategory, React.ReactNode> = {
+const categoryIcon: Record<string, React.ReactNode> = {
   frontend: (
     // Monitor / browser window
     <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
@@ -158,8 +158,10 @@ export default async function Brain() {
         <ul className="flex flex-wrap gap-2">
           {sorted.map((skill) => {
             const bucket = getRecencyBucket(skill.lastUsed);
+            const iconKey = skill.iconKey && categoryIcon[skill.iconKey] ? skill.iconKey : "other";
             const tooltip = [
-              categoryLabel[skill.category],
+              categoryLabel[iconKey],
+              skill.proficiency ? `Proficiency: ${skill.proficiency}` : null,
               skill.lastUsed
                 ? `Last used: ${new Date(skill.lastUsed).toLocaleDateString("en-US", { month: "short", year: "numeric" })}`
                 : null,
@@ -171,7 +173,7 @@ export default async function Brain() {
                 title={tooltip}
                 className={`flex cursor-default items-center gap-1.5 rounded-full border px-3 py-1 text-sm transition-opacity hover:opacity-70 ${recencyChipClass[bucket]}`}
               >
-                <span className="opacity-60">{categoryIcon[skill.category]}</span>
+                <span className="opacity-60">{categoryIcon[iconKey]}</span>
                 {skill.name}
               </li>
             );

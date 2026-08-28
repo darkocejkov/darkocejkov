@@ -26,9 +26,9 @@ export default function CourseList({ courses }: { courses: Course[] }) {
         <ul className="mt-2 grid grid-cols-1 gap-1 gap-x-10 sm:grid-cols-2">
           {courses.map((course) => (
             <li key={course.id} className="flex items-center justify-between gap-4 text-sm">
-              <span className="text-gray-700">{course.name}</span>
-              {course.grade && (
-                <span className="shrink-0 text-xs text-gray-400">{course.grade}</span>
+              <span className="text-gray-700 dark:text-gray-300">{course.name}</span>
+              {course.year && (
+                <span className="shrink-0 text-xs text-gray-400">{course.year}</span>
               )}
             </li>
           ))}
@@ -36,5 +36,4 @@ export default function CourseList({ courses }: { courses: Course[] }) {
       )}
     </div>
   );
-
 }

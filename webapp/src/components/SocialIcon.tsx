@@ -1,6 +1,8 @@
 interface Props {
   url: string;
   title: string;
+  /** Explicit key from the CMS; falls back to sniffing the URL when absent. */
+  iconKey?: string | null;
 }
 
 function detect(url: string, title: string): string {
@@ -148,7 +150,7 @@ const icons: Record<string, React.ReactNode> = {
   ),
 };
 
-export default function SocialIcon({ url, title }: Props) {
-  const key = detect(url, title);
+export default function SocialIcon({ url, title, iconKey }: Props) {
+  const key = iconKey && icons[iconKey] ? iconKey : detect(url, title);
   return <>{icons[key]}</>;
 }

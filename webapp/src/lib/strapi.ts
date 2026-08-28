@@ -1,4 +1,12 @@
+import type { BlocksContent } from "@strapi/blocks-react-renderer";
+
 const CMS_URL = process.env.NEXT_PUBLIC_CMS_URL ?? "http://localhost:1337";
+
+/** Strapi returns relative media paths (/uploads/...), so they need the CMS origin. */
+export function mediaUrl(media: StrapiMedia | null | undefined): string | null {
+  if (!media?.url) return null;
+  return media.url.startsWith("http") ? media.url : `${CMS_URL}${media.url}`;
+}
 
 export async function checkHealth(): Promise<{ ok: boolean; status: number | null; ms: number }> {
   const start = Date.now();
@@ -42,124 +50,194 @@ export async function strapiGet<T>(
   return res.json();
 }
 
+/* ------------------------------------------------------------------ */
+/* Envelopes                                                           */
+/* ------------------------------------------------------------------ */
+
 export interface StrapiList<T> {
   data: T[];
 }
 
-export interface SocialLink {
-  id: number;
-  title: string;
-  url: string;
-  category: "personal" | "professional";
-}
-
-export interface About {
-  id: number;
-  displayName: string;
-  headline: string | null;
-  shortBio: string | null;
-  content: string | null;
-  openToWork: boolean;
-  underMaintenance: boolean;
-  metaDescription: string | null;
-  avatar: StrapiMedia | null;
-  gallery: StrapiMedia[] | null;
+export interface StrapiSingle<T> {
+  data: T;
 }
 
 export interface StrapiMedia {
   id: number;
+  documentId: string;
   url: string;
   alternativeText: string | null;
   width: number;
   height: number;
 }
 
-export interface StrapySingle<T> {
-  data: T;
+export type { BlocksContent };
+
+/* ------------------------------------------------------------------ */
+/* Taxonomy                                                            */
+/* ------------------------------------------------------------------ */
+
+/** The FORMAT of an article (Note, Essay, Log...), not its subject. */
+export interface Category {
+  id: number;
+  documentId: string;
+  name: string;
+  slug: string;
+  description: string | null;
 }
 
-export interface Job {
+/** Global subject taxonomy, shared across every content type. */
+export interface Tag {
   id: number;
+  documentId: string;
+  name: string;
+  slug: string;
+  description: string | null;
+}
+
+export type Proficiency = "novice" | "working" | "fluent" | "deep";
+
+export interface Skill {
+  id: number;
+  documentId: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  proficiency: Proficiency | null;
+  lastUsed: string | null;
+  iconKey: string | null;
+}
+
+/* ------------------------------------------------------------------ */
+/* Content                                                             */
+/* ------------------------------------------------------------------ */
+
+export interface Article {
+  id: number;
+  documentId: string;
   title: string;
-  company: string;
+  slug: string;
+  summary: string | null;
+  publishedAt: string;
+  cover: StrapiMedia | null;
+  category: Category | null;
+  tags: Tag[];
+  skills: Skill[];
+}
+
+export interface ArticleFull extends Article {
+  body: BlocksContent;
+  related: Pick<Article, "id" | "documentId" | "title" | "slug" | "summary">[];
+  backlinks: Pick<Article, "id" | "documentId" | "title" | "slug" | "summary">[];
+}
+
+export interface Highlight {
+  id: number;
+  text: string;
+}
+
+export interface Experience {
+  id: number;
+  documentId: string;
+  role: string;
+  organization: string;
   location: string | null;
-  url: string | null;
   startDate: string;
   endDate: string | null;
   current: boolean;
-  type: "internship" | "full-time" | "part-time" | null;
   summary: string | null;
-  description: string | null;
+  highlights: Highlight[];
+  skills: Skill[];
 }
 
 export interface Course {
   id: number;
   name: string;
-  grade: string | null;
+  description: string | null;
+  year: string | null;
 }
 
 export interface Education {
   id: number;
-  school: string;
-  degree: string;
-  location: string | null;
-  url: string | null;
-  startDate: string;
+  documentId: string;
+  title: string;
+  institution: string;
+  summary: string | null;
+  startDate: string | null;
   endDate: string | null;
-  current: boolean;
-  grade: number | null;
-  gradeScale: number | null;
   courses: Course[];
+  skills: Skill[];
 }
 
-export type BlogCategory = "general" | "technology" | "project" | "design" | "career" | "personal";
+export interface SiteLink {
+  id: number;
+  documentId: string;
+  label: string;
+  url: string;
+  iconKey: string | null;
+  order: number;
+}
 
-export interface BlogPost {
+export interface Download {
   id: number;
   documentId: string;
   title: string;
   slug: string;
-  excerpt: string;
-  category: BlogCategory;
-  tags: string[] | null;
-  featured: boolean;
-  readingTime: number | null;
-  publishedAt: string;
-  coverImage: StrapiMedia | null;
-}
-
-export interface BlogPostFull extends BlogPost {
-  content: string;
-  coverImage: StrapiMedia | null;
-  metaDescription: string | null;
-}
-
-export type SkillCategory =
-  | "frontend"
-  | "backend"
-  | "module"
-  | "cloud"
-  | "devops"
-  | "design"
-  | "data"
-  | "mobile"
-  | "testing"
-  | "software"
-  | "other";
-
-export interface Skill {
-  id: number;
-  name: string;
-  slug: string;
-  category: SkillCategory;
-  level: "familiar" | "beginner" | "intermediate" | "advanced" | "expert";
   description: string | null;
-  lastUsed: string | null;
+  version: string | null;
+  file: StrapiMedia | null;
 }
 
-export interface Resume {
+export interface SiteNotification {
   id: number;
-  label: string;
-  order: number;
-  file: StrapiMedia;
+  message: string;
+  level: "info" | "success" | "warning";
+  url: string | null;
+  startsAt: string | null;
+  endsAt: string | null;
+}
+
+export interface SiteMeta {
+  id: number;
+  documentId: string;
+  displayName: string;
+  headline: string | null;
+  shortBio: string | null;
+  bio: BlocksContent | null;
+  metaDescription: string | null;
+  avatar: StrapiMedia | null;
+  lookingForWork: boolean;
+  underConstruction: boolean;
+  notifications: SiteNotification[];
+}
+
+/* ------------------------------------------------------------------ */
+/* Helpers                                                             */
+/* ------------------------------------------------------------------ */
+
+/** Flatten a Blocks tree to plain text — used for reading-time estimates. */
+export function blocksToPlainText(blocks: BlocksContent | null | undefined): string {
+  if (!Array.isArray(blocks)) return "";
+  const walk = (node: unknown): string => {
+    if (!node || typeof node !== "object") return "";
+    const n = node as { text?: string; children?: unknown[] };
+    if (typeof n.text === "string") return n.text;
+    if (Array.isArray(n.children)) return n.children.map(walk).join(" ");
+    return "";
+  };
+  return blocks.map(walk).join(" ");
+}
+
+/** Reading time in minutes, computed rather than stored in the CMS. */
+export function readingTime(blocks: BlocksContent | null | undefined): number | null {
+  const words = blocksToPlainText(blocks).trim().split(/\s+/).filter(Boolean).length;
+  if (!words) return null;
+  return Math.max(1, Math.round(words / 200));
+}
+
+/** A notification is live when now falls inside its optional window. */
+export function isNotificationActive(n: SiteNotification, now = new Date()): boolean {
+  if (n.startsAt && new Date(n.startsAt) > now) return false;
+  if (n.endsAt && new Date(n.endsAt) < now) return false;
+  return true;
 }
