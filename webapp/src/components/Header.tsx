@@ -2,10 +2,10 @@ import Link from "next/link";
 import MaintenanceBanner from "./MaintenanceBanner";
 
 const links = [
+  { href: "/projects", label: "Work" },
   { href: "/blog", label: "Blog" },
-  { href: "/education", label: "Education" },
-  { href: "/career", label: "Career" },
   { href: "/brain", label: "Brain" },
+  { href: "/links", label: "Links" },
 ];
 
 export default function Header() {

@@ -5,12 +5,12 @@ import {
   mediaUrl,
   type StrapiList,
   type Article,
-  type Category,
+  type ArticleCategory,
 } from "@/lib/strapi";
 
-async function getCategories(): Promise<Category[]> {
+async function getCategories(): Promise<ArticleCategory[]> {
   try {
-    const res = await strapiGet<StrapiList<Category>>("/categories", { sort: "name:asc" });
+    const res = await strapiGet<StrapiList<ArticleCategory>>("/article-categories", { sort: "name:asc" });
     return res.data;
   } catch {
     return [];

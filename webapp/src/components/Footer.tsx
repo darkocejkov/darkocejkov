@@ -1,10 +1,22 @@
-import { strapiGet, mediaUrl, type StrapiList, type SiteLink, type Download } from "@/lib/strapi";
+import {
+  strapiGet,
+  mediaUrl,
+  SOCIAL_CATEGORY_SLUG,
+  type StrapiList,
+  type SiteLink,
+  type Download,
+} from "@/lib/strapi";
 import ThemeToggle from "@/components/ThemeToggle";
 import SocialIcon from "@/components/SocialIcon";
 
-async function getLinks(): Promise<SiteLink[]> {
+/** Only my own accounts belong in the footer; bookmarks live on /links. */
+async function getSocialLinks(): Promise<SiteLink[]> {
   try {
-    const res = await strapiGet<StrapiList<SiteLink>>("/links", { sort: "order:asc" });
+    const res = await strapiGet<StrapiList<SiteLink>>("/links", {
+      sort: "order:asc",
+      [`filters[category][slug][$eq]`]: SOCIAL_CATEGORY_SLUG,
+      "populate[category][fields][0]": "slug",
+    });
     return res.data;
   } catch {
     return [];
@@ -24,7 +36,7 @@ async function getDownloads(): Promise<Download[]> {
 }
 
 export default async function Footer() {
-  const [links, downloads] = await Promise.all([getLinks(), getDownloads()]);
+  const [links, downloads] = await Promise.all([getSocialLinks(), getDownloads()]);
 
   return (
     <footer className="sticky backdrop-blur-2xl bottom-0 mt-auto border-t border-brand-dark/10 dark:border-brand-white/10 px-8 py-6 text-sm text-brand-dark/50 dark:text-brand-white/50">
@@ -37,10 +49,10 @@ export default async function Footer() {
                 href={link.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                title={link.label}
+                title={link.title}
                 className="hover:text-brand-dark dark:hover:text-brand-white transition-colors"
               >
-                <SocialIcon url={link.url} title={link.label} iconKey={link.iconKey} />
+                <SocialIcon url={link.url} title={link.title} iconKey={link.iconKey} />
               </a>
             ))}
           </div>

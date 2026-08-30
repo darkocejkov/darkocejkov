@@ -78,7 +78,7 @@ export type { BlocksContent };
 /* ------------------------------------------------------------------ */
 
 /** The FORMAT of an article (Note, Essay, Log...), not its subject. */
-export interface Category {
+export interface ArticleCategory {
   id: number;
   documentId: string;
   name: string;
@@ -94,6 +94,21 @@ export interface Tag {
   slug: string;
   description: string | null;
 }
+
+/**
+ * What KIND of link something is. The `social` slug is load-bearing: it marks
+ * an account of mine, and every other category is a bookmark.
+ */
+export interface LinkCategory {
+  id: number;
+  documentId: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  order: number;
+}
+
+export const SOCIAL_CATEGORY_SLUG = "social";
 
 export type Proficiency = "novice" | "working" | "fluent" | "deep";
 
@@ -120,7 +135,7 @@ export interface Article {
   summary: string | null;
   publishedAt: string;
   cover: StrapiMedia | null;
-  category: Category | null;
+  category: ArticleCategory | null;
   tags: Tag[];
   skills: Skill[];
 }
@@ -131,51 +146,25 @@ export interface ArticleFull extends Article {
   backlinks: Pick<Article, "id" | "documentId" | "title" | "slug" | "summary">[];
 }
 
-export interface Highlight {
-  id: number;
-  text: string;
-}
-
-export interface Experience {
-  id: number;
-  documentId: string;
-  role: string;
-  organization: string;
-  location: string | null;
-  startDate: string;
-  endDate: string | null;
-  current: boolean;
-  summary: string | null;
-  highlights: Highlight[];
-  skills: Skill[];
-}
-
-export interface Course {
-  id: number;
-  name: string;
-  description: string | null;
-  year: string | null;
-}
-
-export interface Education {
-  id: number;
-  documentId: string;
-  title: string;
-  institution: string;
-  summary: string | null;
-  startDate: string | null;
-  endDate: string | null;
-  courses: Course[];
-  skills: Skill[];
-}
-
+/**
+ * One type covering both my own accounts and bookmarks. `category.slug` is the
+ * discriminator - see SOCIAL_CATEGORY_SLUG.
+ */
 export interface SiteLink {
   id: number;
   documentId: string;
-  label: string;
+  title: string;
   url: string;
+  description: string | null;
   iconKey: string | null;
   order: number;
+  savedAt: string | null;
+  category: LinkCategory | null;
+  tags: Tag[];
+}
+
+export function isSocial(link: SiteLink): boolean {
+  return link.category?.slug === SOCIAL_CATEGORY_SLUG;
 }
 
 export interface Download {
@@ -186,6 +175,40 @@ export interface Download {
   description: string | null;
   version: string | null;
   file: StrapiMedia | null;
+}
+
+export interface GalleryItem {
+  id: number;
+  image: StrapiMedia | null;
+  caption: string | null;
+}
+
+export type ProjectStage = "concept" | "in-progress" | "shipped" | "archived";
+
+export interface Project {
+  id: number;
+  documentId: string;
+  title: string;
+  slug: string;
+  summary: string | null;
+  cover: StrapiMedia | null;
+  year: string | null;
+  materials: string | null;
+  featured: boolean;
+  order: number;
+  stage: ProjectStage | null;
+  startDate: string | null;
+  endDate: string | null;
+  repoUrl: string | null;
+  liveUrl: string | null;
+  tags: Tag[];
+  skills: Skill[];
+}
+
+export interface ProjectFull extends Project {
+  body: BlocksContent;
+  gallery: GalleryItem[];
+  articles: Pick<Article, "id" | "title" | "slug" | "summary">[];
 }
 
 export interface SiteNotification {

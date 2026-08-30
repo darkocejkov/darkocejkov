@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import type { Article, Category } from "@/lib/strapi";
+import type { Article, ArticleCategory } from "@/lib/strapi";
 
 function formatDate(date: string) {
   return new Date(date).toLocaleDateString("en-US", {
@@ -17,7 +17,7 @@ export default function BlogList({
   categories,
 }: {
   articles: (Article & { coverUrl: string | null })[];
-  categories: Category[];
+  categories: ArticleCategory[];
 }) {
   const searchParams = useSearchParams();
   const raw = searchParams.get("category") ?? undefined;
