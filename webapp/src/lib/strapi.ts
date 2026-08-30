@@ -220,16 +220,28 @@ export interface SiteNotification {
   endsAt: string | null;
 }
 
-export interface SiteMeta {
+/** Who the site belongs to. Site chrome state lives on SiteMeta. */
+export interface About {
   id: number;
   documentId: string;
   displayName: string;
+  pronouns: string | null;
   headline: string | null;
+  portrait: StrapiMedia | null;
   shortBio: string | null;
   bio: BlocksContent | null;
-  metaDescription: string | null;
-  avatar: StrapiMedia | null;
+  statement: BlocksContent | null;
+  currently: string | null;
+  location: string | null;
+  email: string | null;
   lookingForWork: boolean;
+  metaDescription: string | null;
+}
+
+/** Site chrome state only - the banner and its notifications. */
+export interface SiteMeta {
+  id: number;
+  documentId: string;
   underConstruction: boolean;
   notifications: SiteNotification[];
 }
