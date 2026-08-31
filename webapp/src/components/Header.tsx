@@ -4,9 +4,7 @@ import MaintenanceBanner from "./MaintenanceBanner";
 const links = [
   { href: "/projects", label: "Work" },
   { href: "/blog", label: "Blog" },
-  { href: "/brain", label: "Brain" },
   { href: "/bookmarks", label: "Bookmarks" },
-  { href: "/about", label: "About" },
 ];
 
 export default function Header() {
