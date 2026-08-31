@@ -11,10 +11,13 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
-        hostname: "deserving-connection-0787b59d66.strapiapp.com",
+        hostname: "cms.darkocejkov.ca",
         pathname: "/uploads/**",
       },
     ],
+  },
+  async redirects() {
+    return [{ source: "/links", destination: "/bookmarks", permanent: true }];
   },
   logging: {
     fetches: {

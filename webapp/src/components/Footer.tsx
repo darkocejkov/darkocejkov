@@ -14,6 +14,7 @@ async function getSocialLinks(): Promise<SiteLink[]> {
   try {
     const res = await strapiGet<StrapiList<SiteLink>>("/links", {
       sort: "order:asc",
+      "pagination[pageSize]": "100",
       [`filters[category][slug][$eq]`]: SOCIAL_CATEGORY_SLUG,
       "populate[category][fields][0]": "slug",
     });
