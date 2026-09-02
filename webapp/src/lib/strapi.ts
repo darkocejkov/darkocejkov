@@ -95,21 +95,6 @@ export interface Tag {
   description: string | null;
 }
 
-/**
- * What KIND of link something is. The `social` slug is load-bearing: it marks
- * an account of mine, and every other category is a bookmark.
- */
-export interface LinkCategory {
-  id: number;
-  documentId: string;
-  name: string;
-  slug: string;
-  description: string | null;
-  order: number;
-}
-
-export const SOCIAL_CATEGORY_SLUG = "social";
-
 export type Proficiency = "novice" | "working" | "fluent" | "deep";
 
 export interface Skill {
@@ -150,6 +135,12 @@ export interface ArticleFull extends Article {
  * One type covering both my own accounts and bookmarks. `category.slug` is the
  * discriminator - see SOCIAL_CATEGORY_SLUG.
  */
+export type LinkType = "social" | "bookmark";
+
+/**
+ * One type covering both my own accounts and bookmarks, split by `type`:
+ * social links render in the footer, bookmarks on /bookmarks.
+ */
 export interface SiteLink {
   id: number;
   documentId: string;
@@ -159,12 +150,12 @@ export interface SiteLink {
   iconKey: string | null;
   order: number;
   savedAt: string | null;
-  category: LinkCategory | null;
+  type: LinkType;
   tags: Tag[];
 }
 
 export function isSocial(link: SiteLink): boolean {
-  return link.category?.slug === SOCIAL_CATEGORY_SLUG;
+  return link.type === "social";
 }
 
 export interface Download {
@@ -177,6 +168,46 @@ export interface Download {
   file: StrapiMedia | null;
 }
 
+export type EmploymentType = "internship" | "full-time" | "part-time" | "contract";
+
+export interface Experience {
+  id: number;
+  documentId: string;
+  title: string;
+  company: string;
+  companyUrl: string | null;
+  type: EmploymentType | null;
+  isCurrent: boolean;
+  startDate: string;
+  endDate: string | null;
+  summary: BlocksContent | null;
+  skills: Skill[];
+}
+
+/** A single type - one qualification, not a list. */
+export interface Education {
+  id: number;
+  documentId: string;
+  title: string;
+  institution: string | null;
+  summary: BlocksContent | null;
+  date: string | null;
+}
+
+export type ThingType = "book" | "record" | "tool" | "gear" | "furniture" | "other";
+
+/** Objects I own or collect. isSelf marks the ones I made. */
+export interface Thing {
+  id: number;
+  documentId: string;
+  name: string;
+  type: ThingType | null;
+  isSelf: boolean;
+  media: StrapiMedia[];
+  notes: string | null;
+  tags: Tag[];
+}
+
 export interface GalleryItem {
   id: number;
   image: StrapiMedia | null;
@@ -184,6 +215,16 @@ export interface GalleryItem {
 }
 
 export type ProjectStage = "concept" | "in-progress" | "shipped" | "archived";
+
+/** What KIND of project this is - editable in the admin. */
+export interface ProjectType {
+  id: number;
+  documentId: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  order: number;
+}
 
 export interface Project {
   id: number;
@@ -197,6 +238,8 @@ export interface Project {
   featured: boolean;
   order: number;
   stage: ProjectStage | null;
+  type: ProjectType | null;
+  embedUrl: string | null;
   startDate: string | null;
   endDate: string | null;
   repoUrl: string | null;

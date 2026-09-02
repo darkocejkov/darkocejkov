@@ -11,6 +11,7 @@ async function getProjects(): Promise<Project[]> {
       "populate[cover][fields][1]": "alternativeText",
       "populate[tags][fields][0]": "name",
       "populate[skills][fields][0]": "name",
+      "populate[type][fields][0]": "name",
     });
     return res.data;
   } catch {
@@ -75,7 +76,8 @@ export default async function Projects() {
                       <p className="mt-1 text-sm text-gray-500 line-clamp-2">{project.summary}</p>
                     )}
                     <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-gray-400">
-                      {project.stage && <span>{stageLabel[project.stage] ?? project.stage}</span>}
+                      {project.type && <span>{project.type.name}</span>}
+                      {project.stage && <span>· {stageLabel[project.stage] ?? project.stage}</span>}
                       {project.materials && <span>· {project.materials}</span>}
                     </div>
                   </div>

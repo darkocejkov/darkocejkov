@@ -1,7 +1,6 @@
 import {
   strapiGet,
   mediaUrl,
-  SOCIAL_CATEGORY_SLUG,
   type StrapiList,
   type SiteLink,
   type Download,
@@ -15,8 +14,7 @@ async function getSocialLinks(): Promise<SiteLink[]> {
     const res = await strapiGet<StrapiList<SiteLink>>("/links", {
       sort: "order:asc",
       "pagination[pageSize]": "100",
-      [`filters[category][slug][$eq]`]: SOCIAL_CATEGORY_SLUG,
-      "populate[category][fields][0]": "slug",
+      "filters[type][$eq]": "social",
     });
     return res.data;
   } catch {

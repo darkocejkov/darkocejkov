@@ -28,6 +28,7 @@ async function getProject(slug: string): Promise<ProjectFull | null> {
       "populate[gallery][populate]": "image",
       "populate[tags][fields][0]": "name",
       "populate[skills][fields][0]": "name",
+      "populate[type][fields][0]": "name",
       "populate[articles][fields][0]": "title",
       "populate[articles][fields][1]": "slug",
       "populate[articles][fields][2]": "summary",
@@ -77,6 +78,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
 
         <dl className="mt-6 flex flex-wrap gap-x-10 gap-y-4 border-y border-gray-100 dark:border-gray-800 py-4">
           <Meta label="Year" value={project.year} />
+          <Meta label="Type" value={project.type?.name} />
           <Meta label="Stage" value={project.stage ? stageLabel[project.stage] : null} />
           <Meta label="Made with" value={project.materials} />
           <Meta
@@ -112,6 +114,21 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
         <div className="mt-10">
           <RichText content={project.body} />
         </div>
+
+        {project.embedUrl && (
+          <div className="mt-10 aspect-video w-full overflow-hidden rounded-lg bg-brand-dark/5 dark:bg-brand-white/5">
+            <iframe
+              src={project.embedUrl}
+              title={`${project.title} embed`}
+              className="h-full w-full"
+              loading="lazy"
+              // The CMS stores a URL, never markup, so nothing here can inject
+              // script into the page. Sandboxed as a further precaution.
+              sandbox="allow-scripts allow-same-origin allow-presentation"
+              allowFullScreen
+            />
+          </div>
+        )}
 
         {project.gallery?.length > 0 && (
           <ul className="mt-10 flex flex-col gap-8">
