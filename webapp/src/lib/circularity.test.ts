@@ -47,7 +47,7 @@ describe("ringGeometry", () => {
     // k=0 has u=0 so its amplitude is still 0 and it stays a circle.
     expect(rings[0].d).toBeUndefined();
     expect(rings[3].d).toBeDefined();
-    expect(rings[3].d!.startsWith("M")).toBe(true);
+    expect(rings[3].d?.startsWith("M")).toBe(true);
   });
 
   it("emits path data once the outer shape is a polygon", () => {
