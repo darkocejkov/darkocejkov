@@ -680,7 +680,7 @@ Per-frame values live in motion values, never in React state.
 - Create: `webapp/src/components/eye/usePointer.ts`
 
 **Interfaces:**
-- Consumes: `maxPupilOffset` from `@/lib/orbit`.
+- Consumes: nothing. (The travel bound is applied by Task 7, the caller — not here.)
 - Produces: `usePointer(): { px: MotionValue<number>; py: MotionValue<number>; reduced: boolean }` where `px`/`py` are spring-smoothed and normalised to `-1 … 1`, and `useParallax(px, py, depth): { x: MotionValue<number>; y: MotionValue<number> }`.
 
 - [ ] **Step 1: Create the hook**
@@ -998,8 +998,11 @@ export default function Scene({ children }: { children: React.ReactNode }) {
   const phase = useSceneStore((s) => s.phase);
 
   useEffect(() => {
-    setPhase(pathname === "/" ? "home" : "docked");
-    setActiveNode(nodeIndexForPath(pathname));
+    const home = pathname === "/";
+    setPhase(home ? "home" : "docked");
+    // On "/" the rotary owns activeNode. Writing here would run after the
+    // rotary's own mount effect and reset the selection to -1.
+    if (!home) setActiveNode(nodeIndexForPath(pathname));
   }, [pathname, setPhase, setActiveNode]);
 
   // Pupil travel is bounded so it can never cross its ring.
@@ -1135,7 +1138,7 @@ EOF
 - Modify: `webapp/src/components/eye/Scene.tsx`
 
 **Interfaces:**
-- Consumes: `Eye`, `Orbit`, `NODES`, `useSceneStore`.
+- Consumes: `Eye`, `NODES`, `useSceneStore`. (Rail builds its own dot list; it does not render `Orbit`.)
 - Produces: default export `Rail`, props `{ pupilX?: MotionValue<number>; pupilY?: MotionValue<number> }`.
 
 - [ ] **Step 1: Create `Rail.tsx`**
@@ -1206,7 +1209,7 @@ export default function Rail({
 
 - [ ] **Step 2: Render the Rail from Scene when docked**
 
-In `Scene.tsx`, import `Rail`:
+In `Scene.tsx`, add the `Rail` import:
 
 ```tsx
 import Rail from "./Rail";
@@ -1228,10 +1231,12 @@ Then replace the single `{children}` line with a docked layout that sits beside 
 
 - [ ] **Step 3: Animate the bloom across the transition**
 
-Still in `Scene.tsx`, add the bloom. Import `useMotionValue`, `useMotionValueEvent` and `animate` from `motion/react`, plus `useState`:
+Still in `Scene.tsx`, add the bloom. **Extend the existing import lines — do not
+add second imports from `motion/react` or `react`, which would be a duplicate
+declaration.** After editing, the two lines must read exactly:
 
 ```tsx
-import { animate, useMotionValue, useMotionValueEvent, useTransform } from "motion/react";
+import { animate, motion, useMotionValue, useMotionValueEvent, useTransform } from "motion/react";
 import { useEffect, useState } from "react";
 ```
 
@@ -1422,12 +1427,14 @@ export function useMediaQuery(query: string): boolean {
 
 - [ ] **Step 3: Drive the orbit from the rotary on small screens only**
 
-In `Scene.tsx`, add the imports:
+In `Scene.tsx`, add the two new hook imports and **extend** the existing
+`@/config/nodes` import with `NODES` — `nodeIndexForPath` is already imported
+from Task 7, so restating it is a duplicate declaration:
 
 ```tsx
 import { useRotary } from "./useRotary";
 import { useMediaQuery } from "./useMediaQuery";
-import { NODES, nodeIndexForPath } from "@/config/nodes";
+import { NODES, nodeIndexForPath } from "@/config/nodes";  // <- one line, not two
 ```
 
 Call both hooks unconditionally, then apply the bindings only on narrow viewports
@@ -1833,7 +1840,7 @@ EOF
 
 ### Task 12: Fit the existing content routes to the docked layout
 
-The blog, projects and bookmarks pages each wrap themselves in `<main className="flex-1 px-8 py-12">`, which now double-wraps the `<main>` that `Scene` provides. Strip the outer element from each.
+The blog, projects and bookmarks pages — plus `error.tsx` and `loading.tsx` — each wrap themselves in their own `<main>`, which now double-wraps the `<main>` that `Scene` provides. Strip the outer element from each. All seven files are listed below; `loading.tsx` is easy to miss and Step 3's assertion fails without it.
 
 **Files:**
 - Modify: `webapp/src/app/blog/page.tsx`
@@ -1842,6 +1849,7 @@ The blog, projects and bookmarks pages each wrap themselves in `<main className=
 - Modify: `webapp/src/app/projects/[slug]/page.tsx`
 - Modify: `webapp/src/app/bookmarks/page.tsx`
 - Modify: `webapp/src/app/error.tsx`
+- Modify: `webapp/src/app/loading.tsx`
 
 - [ ] **Step 1: Find every duplicated wrapper**
 
