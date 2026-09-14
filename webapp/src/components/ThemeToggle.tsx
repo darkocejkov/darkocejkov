@@ -32,7 +32,8 @@ export default function ThemeToggle() {
     <button
       onClick={toggle}
       title={dark ? "Switch to light mode" : "Switch to dark mode"}
-      className="text-gray-400 transition-colors hover:text-gray-900 dark:hover:text-gray-100"
+      aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
+      className="rounded-full text-gray-400 outline-none transition-colors hover:text-gray-900 focus-visible:ring-2 focus-visible:ring-brand-orange focus-visible:ring-offset-2 dark:hover:text-gray-100"
     >
       {dark ? (
         // Sun

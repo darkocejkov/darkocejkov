@@ -10,8 +10,9 @@ import { useParallax, usePointer } from "./usePointer";
 import { useRotary } from "./useRotary";
 import { useMediaQuery } from "./useMediaQuery";
 import { useElementSize } from "./useElementSize";
+import ThemeToggle from "@/components/ThemeToggle";
 import { NODES, nodeIndexForPath } from "@/config/nodes";
-import { maxPupilOffset } from "@/lib/orbit";
+import { maxPupilOffset, nearestNodeIndex } from "@/lib/orbit";
 import { useSceneStore } from "@/stores/scene";
 
 /** Resting eye: pupil plus exactly one ring — the mockup. */
@@ -25,12 +26,12 @@ export default function Scene({
   maintenanceBanner?: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const { px, py } = usePointer();
+  const { px, py, reduced } = usePointer();
   const setPhase = useSceneStore((s) => s.setPhase);
   const setActiveNode = useSceneStore((s) => s.setActiveNode);
 
   const isNarrow = useMediaQuery("(max-width: 639px)");
-  const { rotation, bind } = useRotary(NODES.length, isNarrow);
+  const { rotation, bind } = useRotary(NODES.length);
   const rotaryBind = isNarrow ? bind : {};
 
   // The eye container scales with the viewport (78vmin, uncapped), so the
@@ -44,10 +45,18 @@ export default function Scene({
   useEffect(() => {
     const home = pathname === "/";
     setPhase(home ? "home" : "docked");
-    // On "/" the rotary owns activeNode. Writing here would run after the
-    // rotary's own mount effect and reset the selection to -1.
-    if (!home) setActiveNode(nodeIndexForPath(pathname));
-  }, [pathname, setPhase, setActiveNode]);
+    // The sole owner of activeNode. The write is total — every branch writes,
+    // none skip — so nothing is ever left stale. On "/" the rotary is only
+    // live (and thus only meaningful) when narrow; otherwise nothing is
+    // selected. Off "/" the node is derived from the route. Depending on
+    // isNarrow means crossing the breakpoint on a content route re-derives
+    // too, instead of leaving a stale desktop-rotary value in place.
+    setActiveNode(
+      home
+        ? (isNarrow ? nearestNodeIndex(rotation.get(), NODES.length) : -1)
+        : nodeIndexForPath(pathname),
+    );
+  }, [pathname, setPhase, setActiveNode, isNarrow, rotation]);
 
   // Ring count blooms 2 -> 8 -> 2 on every navigation. Held in a motion value so
   // the tween itself is frame-driven; mirrored into state only because
@@ -57,13 +66,17 @@ export default function Scene({
   useMotionValueEvent(bloom, "change", setBloomT);
 
   useEffect(() => {
+    if (reduced) {
+      bloom.set(0);
+      return;
+    }
     const controls = animate(bloom, [0, 1, 0], {
       duration: 0.9,
       times: [0, 0.45, 1],
       ease: "easeInOut",
     });
     return () => controls.stop();
-  }, [pathname, bloom]);
+  }, [pathname, bloom, reduced]);
 
   const eyeParams = {
     pupil: HOME_EYE.pupil,
@@ -77,8 +90,11 @@ export default function Scene({
   const pupilX = useTransform(px, (v) => v * travel);
   const pupilY = useTransform(py, (v) => v * travel);
 
-  // Outer layers move less than the pupil — nearer things move more.
-  const orbitLayer = useParallax(px, py, travel * 1.6);
+  // Outer layers move less than the pupil — nearer things move more. Disabled
+  // on touch: there is no hovering cursor to cue depth from, and on mobile the
+  // rotary drag itself is the only pointer motion — feeding it into this
+  // layer displaces the snapped dot off the selector by several pixels.
+  const orbitLayer = useParallax(px, py, isNarrow ? 0 : travel * 1.6);
 
   const isHome = pathname === "/";
 
@@ -99,7 +115,7 @@ export default function Scene({
           style={{
             width: "78vmin",
             height: "78vmin",
-            touchAction: isNarrow ? "none" : undefined,
+            touchAction: isNarrow && isHome ? "none" : undefined,
           }}
           {...rotaryBind}
         >
@@ -112,6 +128,17 @@ export default function Scene({
             )}
           </motion.div>
         </div>
+      </div>
+
+      {/* Sibling of the inert overlay, not inside it — otherwise it would be
+          unreachable (hit-testing and Tab) on content routes. Single mount for
+          every route: the original site's footer rendered it everywhere.
+          z-20: the content wrapper below is also stacked (z-10) and, on
+          content routes, comes later in DOM order — without a higher
+          z-index its <main> would win the paint order and swallow clicks
+          here even though this sits at a fixed, on-screen position. */}
+      <div className="fixed bottom-6 right-6 z-20">
+        <ThemeToggle />
       </div>
 
       {!isHome && (

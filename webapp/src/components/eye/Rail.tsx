@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useMotionValue, useTransform, type MotionValue } from "motion/react";
 import Eye from "./Eye";
-import ThemeToggle from "@/components/ThemeToggle";
 import { NODES } from "@/config/nodes";
 import { maxPupilOffset } from "@/lib/orbit";
 import { useSceneStore } from "@/stores/scene";
@@ -76,11 +75,6 @@ export default function Rail({
           );
         })}
       </nav>
-
-      {/* Re-homed from the deleted footer. */}
-      <div className="mt-auto pt-4">
-        <ThemeToggle />
-      </div>
     </div>
   );
 }

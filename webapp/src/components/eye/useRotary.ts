@@ -14,11 +14,11 @@ const SNAP_DELAY_MS = 140;
  * Turns scroll and drag into orbit rotation, snapping to the nearest node like a
  * rotary dial. The node parked at the 9 o'clock selector becomes activeNode.
  *
- * `enabled` gates whether this hook owns `activeNode` on mount. The rotary is
- * mobile-only (see Scene.tsx's `isNarrow` gate); on desktop it never receives
- * gesture input, so it must not claim node 0 as active there.
+ * Scene.tsx owns the single write to `activeNode` for every other case (mount,
+ * route change, breakpoint crossing); this hook's `scheduleSnap` is the only
+ * write that happens *during* a drag/wheel gesture, once the gesture settles.
  */
-export function useRotary(total: number, enabled: boolean) {
+export function useRotary(total: number) {
   const rotation = useMotionValue(rotationForNode(0, total));
   const setActiveNode = useSceneStore((s) => s.setActiveNode);
   const reduced = useReducedMotion() ?? false;
@@ -78,11 +78,10 @@ export function useRotary(total: number, enabled: boolean) {
   );
 
   useEffect(() => {
-    if (enabled) setActiveNode(nearestNodeIndex(rotation.get(), total));
     return () => {
       if (snapTimer.current) clearTimeout(snapTimer.current);
     };
-  }, [rotation, total, setActiveNode, enabled]);
+  }, []);
 
   return { rotation, bind: { onWheel, onPointerDown } };
 }
