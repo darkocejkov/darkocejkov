@@ -46,7 +46,7 @@ export default function Scene({ children }: { children: React.ReactNode }) {
           "transition-opacity duration-500",
           isHome ? "opacity-100" : "opacity-0",
         ].join(" ")}
-        aria-hidden={!isHome}
+        inert={!isHome}
       >
         <div
           className="pointer-events-auto relative"
