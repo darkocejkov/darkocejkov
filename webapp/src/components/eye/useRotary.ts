@@ -13,8 +13,12 @@ const SNAP_DELAY_MS = 140;
 /**
  * Turns scroll and drag into orbit rotation, snapping to the nearest node like a
  * rotary dial. The node parked at the 9 o'clock selector becomes activeNode.
+ *
+ * `enabled` gates whether this hook owns `activeNode` on mount. The rotary is
+ * mobile-only (see Scene.tsx's `isNarrow` gate); on desktop it never receives
+ * gesture input, so it must not claim node 0 as active there.
  */
-export function useRotary(total: number) {
+export function useRotary(total: number, enabled: boolean) {
   const rotation = useMotionValue(rotationForNode(0, total));
   const setActiveNode = useSceneStore((s) => s.setActiveNode);
   const reduced = useReducedMotion() ?? false;
@@ -54,25 +58,31 @@ export function useRotary(total: number) {
       function onMove(ev: PointerEvent) {
         rotation.set(startRotation + (ev.clientY - startY) * SENSITIVITY);
       }
+      // pointercancel is routine on touch (an OS gesture conflict, an
+      // interrupting alert, lost capture) and never fires pointerup. Without
+      // also tearing down on cancel, a fresh onPointerDown next time would
+      // add another live pointermove listener on top of this stale one.
       function onUp() {
         target.releasePointerCapture(e.pointerId);
         window.removeEventListener("pointermove", onMove);
         window.removeEventListener("pointerup", onUp);
+        window.removeEventListener("pointercancel", onUp);
         scheduleSnap();
       }
 
       window.addEventListener("pointermove", onMove);
       window.addEventListener("pointerup", onUp);
+      window.addEventListener("pointercancel", onUp);
     },
     [rotation, scheduleSnap],
   );
 
   useEffect(() => {
-    setActiveNode(nearestNodeIndex(rotation.get(), total));
+    if (enabled) setActiveNode(nearestNodeIndex(rotation.get(), total));
     return () => {
       if (snapTimer.current) clearTimeout(snapTimer.current);
     };
-  }, [rotation, total, setActiveNode]);
+  }, [rotation, total, setActiveNode, enabled]);
 
   return { rotation, bind: { onWheel, onPointerDown } };
 }

@@ -29,7 +29,7 @@ export default function Scene({
   const setActiveNode = useSceneStore((s) => s.setActiveNode);
 
   const isNarrow = useMediaQuery("(max-width: 639px)");
-  const { rotation, bind } = useRotary(NODES.length);
+  const { rotation, bind } = useRotary(NODES.length, isNarrow);
   const rotaryBind = isNarrow ? bind : {};
 
   useEffect(() => {
@@ -100,7 +100,7 @@ export default function Scene({
             <Orbit
               radius={isNarrow ? 110 : 210}
               dotSize={isNarrow ? 16 : 22}
-              rotation={rotation}
+              rotation={isNarrow ? rotation : undefined}
             />
           </motion.div>
         </div>
