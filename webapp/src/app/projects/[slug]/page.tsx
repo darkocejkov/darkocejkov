@@ -64,7 +64,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
   const cover = mediaUrl(project.cover);
 
   return (
-    <main className="px-8 py-12">
+    <div>
       <div className="mx-auto max-w-3xl">
         <Link
           href="/projects"
@@ -185,6 +185,6 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
           </section>
         )}
       </div>
-    </main>
+    </div>
   );
 }

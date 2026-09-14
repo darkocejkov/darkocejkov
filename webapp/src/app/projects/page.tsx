@@ -30,7 +30,7 @@ export default async function Projects() {
   const projects = await getProjects();
 
   return (
-    <main className="px-8 py-12">
+    <div>
       <h1 className="font-funnel mb-2 text-4xl font-bold">Work</h1>
       <p className="mb-10 max-w-prose text-gray-500">
         Software, objects, and things that fall between.
@@ -87,6 +87,6 @@ export default async function Projects() {
           })}
         </ul>
       )}
-    </main>
+    </div>
   );
 }

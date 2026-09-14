@@ -19,7 +19,6 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       { source: "/links", destination: "/bookmarks", permanent: true },
-      { source: "/about", destination: "/", permanent: true },
       { source: "/brain", destination: "/", permanent: true },
     ];
   },

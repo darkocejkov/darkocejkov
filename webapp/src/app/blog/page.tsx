@@ -46,11 +46,11 @@ export default async function Blog() {
   const withCovers = articles.map((a) => ({ ...a, coverUrl: mediaUrl(a.cover) }));
 
   return (
-    <main className="px-8 py-12">
+    <div>
       <h1 className="font-funnel mb-6 text-4xl font-bold">Blog</h1>
       <Suspense fallback={<p className="text-sm text-gray-400">Loading…</p>}>
         <BlogList articles={withCovers} categories={categories} />
       </Suspense>
-    </main>
+    </div>
   );
 }

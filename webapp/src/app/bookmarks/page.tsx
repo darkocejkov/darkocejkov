@@ -33,7 +33,7 @@ export default async function Bookmarks() {
   const bookmarks = await getBookmarks();
 
   return (
-    <main className="px-8 py-12">
+    <div>
       <h1 className="font-funnel mb-2 text-4xl font-bold">Bookmarks</h1>
       <p className="mb-10 max-w-prose text-gray-500">Things worth coming back to.</p>
 
@@ -63,6 +63,6 @@ export default async function Bookmarks() {
           })}
         </ul>
       )}
-    </main>
+    </div>
   );
 }

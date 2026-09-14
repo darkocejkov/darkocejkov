@@ -100,7 +100,7 @@ export default async function BlogPostPage({
   const minutes = readingTime(article.body);
 
   return (
-    <main className="px-8 py-12">
+    <div>
       <div className="max-w-2xl mx-auto">
         <Link
           href="/blog"
@@ -149,6 +149,6 @@ export default async function BlogPostPage({
           items={article.backlinks ?? []}
         />
       </div>
-    </main>
+    </div>
   );
 }
