@@ -29,6 +29,7 @@ export default function Eye({ params, size, pupilX, pupilY, className }: EyeProp
       className={className}
       aria-hidden="true"
       focusable="false"
+      overflow="visible"
     >
       <g transform={`translate(${centre} ${centre})`}>
         {rings.map((ring) => {

@@ -103,7 +103,7 @@ export default function Scene({
           }}
           {...rotaryBind}
         >
-          <Eye params={eyeParams} size={420} pupilX={pupilX} pupilY={pupilY} className="h-full w-full" />
+          <Eye params={eyeParams} size={320} pupilX={pupilX} pupilY={pupilY} className="h-full w-full" />
           {/* motion.div, not div: reading a motion value with .get() inside a
               style object would sample it once at render and never update. */}
           <motion.div className="absolute inset-0" style={{ x: orbitLayer.x, y: orbitLayer.y }}>
