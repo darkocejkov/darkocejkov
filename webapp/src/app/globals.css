@@ -32,12 +32,6 @@
   }
 }
 
-@layer utilities {
-  [class*="rounded"] {
-    corner-shape: squircle;
-  }
-}
-
 @keyframes marquee {
   0% {
     transform: translateX(0);
