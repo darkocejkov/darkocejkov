@@ -7,7 +7,9 @@ import Eye from "./Eye";
 import Orbit from "./Orbit";
 import Rail from "./Rail";
 import { useParallax, usePointer } from "./usePointer";
-import { nodeIndexForPath } from "@/config/nodes";
+import { useRotary } from "./useRotary";
+import { useMediaQuery } from "./useMediaQuery";
+import { NODES, nodeIndexForPath } from "@/config/nodes";
 import { maxPupilOffset } from "@/lib/orbit";
 import { useSceneStore } from "@/stores/scene";
 
@@ -25,6 +27,10 @@ export default function Scene({
   const { px, py } = usePointer();
   const setPhase = useSceneStore((s) => s.setPhase);
   const setActiveNode = useSceneStore((s) => s.setActiveNode);
+
+  const isNarrow = useMediaQuery("(max-width: 639px)");
+  const { rotation, bind } = useRotary(NODES.length);
+  const rotaryBind = isNarrow ? bind : {};
 
   useEffect(() => {
     const home = pathname === "/";
@@ -80,13 +86,18 @@ export default function Scene({
       >
         <div
           className="pointer-events-auto relative"
-          style={{ width: "min(70vmin, 520px)", height: "min(70vmin, 520px)" }}
+          style={{
+            width: "min(70vmin, 520px)",
+            height: "min(70vmin, 520px)",
+            touchAction: isNarrow ? "none" : undefined,
+          }}
+          {...rotaryBind}
         >
           <Eye params={eyeParams} size={320} pupilX={pupilX} pupilY={pupilY} className="h-full w-full" />
           {/* motion.div, not div: reading a motion value with .get() inside a
               style object would sample it once at render and never update. */}
           <motion.div className="absolute inset-0" style={{ x: orbitLayer.x, y: orbitLayer.y }}>
-            <Orbit radius={210} dotSize={22} />
+            <Orbit radius={210} dotSize={22} rotation={rotation} />
           </motion.div>
         </div>
       </div>

@@ -41,7 +41,10 @@ export default function Rail({
         <Eye params={RAIL_EYE} size={100} pupilX={pupilX} pupilY={pupilY} className="h-full w-full" />
       </Link>
 
-      <nav aria-label="Sections" className="flex flex-col items-center gap-4">
+      <nav
+        aria-label="Sections"
+        className="flex flex-col items-center gap-4 [&>*:nth-child(2)]:translate-x-1.5 [&>*:nth-child(3)]:translate-x-2 [&>*:nth-child(4)]:translate-x-1.5 sm:[&>*]:translate-x-0"
+      >
         {NODES.map((node, i) => {
           const isActive = activeNode === i;
           return (
