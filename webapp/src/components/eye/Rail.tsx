@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { type MotionValue } from "motion/react";
+import { useMotionValue, useTransform, type MotionValue } from "motion/react";
 import Eye from "./Eye";
 import ThemeToggle from "@/components/ThemeToggle";
 import { NODES } from "@/config/nodes";
+import { maxPupilOffset } from "@/lib/orbit";
 import { useSceneStore } from "@/stores/scene";
 
 /** Docked eye: same parameters, smaller stroke so it stays legible at 56px. */
@@ -15,13 +16,24 @@ const RAIL_EYE = { pupil: 17, spacing: 15, count: 2, stroke: 9 };
  * beneath the eye; on mobile it becomes an arc pinned to the left edge.
  */
 export default function Rail({
-  pupilX,
-  pupilY,
+  px,
+  py,
 }: {
-  pupilX?: MotionValue<number>;
-  pupilY?: MotionValue<number>;
+  px?: MotionValue<number>;
+  py?: MotionValue<number>;
 }) {
   const activeNode = useSceneStore((s) => s.activeNode);
+
+  // A stable zero value for the no-pointer case, so the transforms below are
+  // always given a real MotionValue — hooks cannot be called conditionally.
+  // Same pattern as Orbit's optional `rotation` prop.
+  const staticZero = useMotionValue(0);
+
+  // Own bound: RAIL_EYE's geometry, not the home eye's. The pupil must never
+  // travel further than this eye's own ring clearance allows.
+  const railTravel = maxPupilOffset(RAIL_EYE.spacing, RAIL_EYE.stroke);
+  const pupilX = useTransform(px ?? staticZero, (v) => v * railTravel);
+  const pupilY = useTransform(py ?? staticZero, (v) => v * railTravel);
 
   return (
     <div className="flex flex-col items-center gap-5 py-6">
@@ -48,8 +60,12 @@ export default function Rail({
                     : "h-2.5 w-2.5 opacity-40 group-hover:opacity-100",
                 ].join(" ")}
               />
-              {/* Label appears on hover and focus; always present for assistive tech. */}
-              <span className="pointer-events-none absolute left-7 whitespace-nowrap text-xs opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
+              {/* Visual-only: revealed on hover/focus. The sr-only twin below
+                  carries the accessible name so screen readers hear it once. */}
+              <span
+                aria-hidden="true"
+                className="pointer-events-none absolute left-7 whitespace-nowrap text-xs opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
+              >
                 {node.label}
               </span>
               <span className="sr-only">{node.label}</span>
