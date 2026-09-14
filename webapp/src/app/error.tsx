@@ -14,7 +14,7 @@ export default function Error({
   }, [error]);
 
   return (
-    <main className="flex flex-1 items-center justify-center px-8 py-12">
+    <div className="flex items-center justify-center">
       <div className="flex flex-col items-center gap-6 text-center">
         <div className="flex h-12 w-12 items-center justify-center rounded-full border border-brand-red/20 bg-brand-red/10">
           <svg viewBox="0 0 20 20" fill="currentColor" className="h-5 w-5 text-brand-red">
@@ -34,6 +34,6 @@ export default function Error({
           Try again
         </button>
       </div>
-    </main>
+    </div>
   );
 }
