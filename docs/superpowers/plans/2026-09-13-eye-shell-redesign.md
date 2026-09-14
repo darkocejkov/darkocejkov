@@ -1136,9 +1136,20 @@ EOF
 **Files:**
 - Create: `webapp/src/components/eye/Rail.tsx`
 - Modify: `webapp/src/components/eye/Scene.tsx`
+- Modify: `webapp/src/app/layout.tsx` (pass `MaintenanceBanner` into `Scene`)
+
+**Re-mounting the kept chrome.** Task 7 deleted `Header` and `Footer`, which were the
+only things rendering `ThemeToggle` and `MaintenanceBanner`. Both are components the
+site is keeping, so this task re-mounts them or they become dead files:
+
+- `ThemeToggle` goes in the `Rail`, below the nav dots.
+- `MaintenanceBanner` is an async **server** component, so it cannot be imported into
+  the client-side `Scene`. Pass it from `layout.tsx` as a prop instead — a server
+  component rendered into a client component's props is the standard App Router
+  pattern — and render it above everything in `Scene`.
 
 **Interfaces:**
-- Consumes: `Eye`, `NODES`, `useSceneStore`. (Rail builds its own dot list; it does not render `Orbit`.)
+- Consumes: `Eye`, `NODES`, `useSceneStore`, `ThemeToggle`. (Rail builds its own dot list; it does not render `Orbit`.)
 - Produces: default export `Rail`, props `{ pupilX?: MotionValue<number>; pupilY?: MotionValue<number> }`.
 
 - [ ] **Step 1: Create `Rail.tsx`**
@@ -1149,6 +1160,7 @@ EOF
 import Link from "next/link";
 import { type MotionValue } from "motion/react";
 import Eye from "./Eye";
+import ThemeToggle from "@/components/ThemeToggle";
 import { NODES } from "@/config/nodes";
 import { useSceneStore } from "@/stores/scene";
 
@@ -1202,6 +1214,11 @@ export default function Rail({
           );
         })}
       </nav>
+
+      {/* Re-homed from the deleted footer. */}
+      <div className="mt-auto pt-4">
+        <ThemeToggle />
+      </div>
     </div>
   );
 }
