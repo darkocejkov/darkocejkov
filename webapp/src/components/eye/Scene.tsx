@@ -9,6 +9,7 @@ import Rail from "./Rail";
 import { useParallax, usePointer } from "./usePointer";
 import { useRotary } from "./useRotary";
 import { useMediaQuery } from "./useMediaQuery";
+import { useElementSize } from "./useElementSize";
 import { NODES, nodeIndexForPath } from "@/config/nodes";
 import { maxPupilOffset } from "@/lib/orbit";
 import { useSceneStore } from "@/stores/scene";
@@ -31,6 +32,14 @@ export default function Scene({
   const isNarrow = useMediaQuery("(max-width: 639px)");
   const { rotation, bind } = useRotary(NODES.length, isNarrow);
   const rotaryBind = isNarrow ? bind : {};
+
+  // The eye container scales with the viewport (78vmin, uncapped), so the
+  // orbit radius/dot size must be measured proportions of its rendered size
+  // rather than fixed pixels — otherwise satellites drift off the rings as
+  // the eye grows or shrinks.
+  const { ref: eyeContainerRef, width: containerWidth } = useElementSize<HTMLDivElement>();
+  const orbitRadius = (containerWidth ?? 0) * 0.404;
+  const orbitDot = (containerWidth ?? 0) * (isNarrow ? 0.0586 : 0.0423);
 
   useEffect(() => {
     const home = pathname === "/";
@@ -85,23 +94,22 @@ export default function Scene({
         inert={!isHome}
       >
         <div
+          ref={eyeContainerRef}
           className="pointer-events-auto relative"
           style={{
-            width: "min(70vmin, 520px)",
-            height: "min(70vmin, 520px)",
+            width: "78vmin",
+            height: "78vmin",
             touchAction: isNarrow ? "none" : undefined,
           }}
           {...rotaryBind}
         >
-          <Eye params={eyeParams} size={320} pupilX={pupilX} pupilY={pupilY} className="h-full w-full" />
+          <Eye params={eyeParams} size={420} pupilX={pupilX} pupilY={pupilY} className="h-full w-full" />
           {/* motion.div, not div: reading a motion value with .get() inside a
               style object would sample it once at render and never update. */}
           <motion.div className="absolute inset-0" style={{ x: orbitLayer.x, y: orbitLayer.y }}>
-            <Orbit
-              radius={isNarrow ? 110 : 210}
-              dotSize={isNarrow ? 16 : 22}
-              rotation={isNarrow ? rotation : undefined}
-            />
+            {containerWidth !== null && (
+              <Orbit radius={orbitRadius} dotSize={orbitDot} rotation={isNarrow ? rotation : undefined} />
+            )}
           </motion.div>
         </div>
       </div>
