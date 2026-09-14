@@ -18,7 +18,6 @@ export default function Scene({ children }: { children: React.ReactNode }) {
   const { px, py } = usePointer();
   const setPhase = useSceneStore((s) => s.setPhase);
   const setActiveNode = useSceneStore((s) => s.setActiveNode);
-  const phase = useSceneStore((s) => s.phase);
 
   useEffect(() => {
     const home = pathname === "/";
@@ -36,7 +35,7 @@ export default function Scene({ children }: { children: React.ReactNode }) {
   // Outer layers move less than the pupil — nearer things move more.
   const orbitLayer = useParallax(px, py, travel * 1.6);
 
-  const isHome = phase === "home";
+  const isHome = pathname === "/";
 
   return (
     <div className="relative min-h-screen text-brand-dark dark:text-brand-white">
