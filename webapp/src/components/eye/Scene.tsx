@@ -97,7 +97,11 @@ export default function Scene({
           {/* motion.div, not div: reading a motion value with .get() inside a
               style object would sample it once at render and never update. */}
           <motion.div className="absolute inset-0" style={{ x: orbitLayer.x, y: orbitLayer.y }}>
-            <Orbit radius={210} dotSize={22} rotation={rotation} />
+            <Orbit
+              radius={isNarrow ? 110 : 210}
+              dotSize={isNarrow ? 16 : 22}
+              rotation={rotation}
+            />
           </motion.div>
         </div>
       </div>
