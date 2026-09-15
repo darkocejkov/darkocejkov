@@ -58,7 +58,7 @@ export default function Rail({
                 className={[
                   "block rounded-full bg-current transition-all duration-200",
                   isActive
-                    ? "h-5 w-5 ring-4 ring-brand-orange ring-offset-4"
+                    ? "h-4 w-4 ring-4 ring-brand-orange ring-offset-2"
                     : "h-2.5 w-2.5 opacity-40 group-hover:opacity-100",
                 ].join(" ")}
               />
