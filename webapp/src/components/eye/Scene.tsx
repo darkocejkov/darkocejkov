@@ -136,7 +136,11 @@ export default function Scene({
           style={{
             width: "78vmin",
             height: "78vmin",
-            touchAction: isNarrow && isHome ? "none" : undefined,
+            // Only while the rotary is live. Dragging is touch-only but is
+            // not width-gated (a tablet in landscape still drags), and on a
+            // content route this would otherwise be a dead scroll zone
+            // sitting over the article.
+            touchAction: rotaryLive ? "none" : undefined,
           }}
           {...rotaryBind}
         >

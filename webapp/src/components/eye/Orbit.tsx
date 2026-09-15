@@ -48,7 +48,9 @@ function Satellite({
           aria-hidden="true"
           className={[
             "block rounded-full bg-current transition-transform duration-200",
-            isActive ? "scale-125 ring-2 ring-brand-orange ring-offset-2" : "group-hover:scale-110",
+            isActive
+              ? "scale-[1.6] ring-4 ring-brand-orange ring-offset-4"
+              : "group-hover:scale-110",
           ].join(" ")}
           style={{ width: dotSize, height: dotSize }}
         />
