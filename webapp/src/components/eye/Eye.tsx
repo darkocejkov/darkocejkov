@@ -17,6 +17,14 @@ interface EyeProps {
    */
   ringX?: MotionValue<number>;
   ringY?: MotionValue<number>;
+  /**
+   * Index of the fade front during a transition. Rings at k below this have
+   * faded out, with a one-ring soft edge, so the set empties from the inside
+   * outwards. Rings 0 and 1 — the pupil and the resting ring — are never
+   * faded, which is what lets the transition end without the resting eye
+   * popping back into view.
+   */
+  innerFade?: number;
   className?: string;
 }
 
@@ -34,12 +42,16 @@ export default function Eye({
   pupilY,
   ringX,
   ringY,
+  innerFade = 0,
   className,
 }: EyeProps) {
   const rings = ringGeometry(params);
   const centre = size / 2;
   const pupil = rings.find((r) => r.k === 0);
   const outer = rings.filter((r) => r.k > 0);
+
+  const opacityOf = (ring: (typeof rings)[number]) =>
+    ring.k < 2 ? ring.opacity : ring.opacity * Math.min(1, Math.max(0, ring.k - innerFade));
 
   return (
     <svg
@@ -60,7 +72,7 @@ export default function Eye({
                 fill="none"
                 stroke="currentColor"
                 strokeWidth={ring.strokeWidth}
-                opacity={ring.opacity}
+                opacity={opacityOf(ring)}
               />
             ) : (
               <circle
@@ -69,7 +81,7 @@ export default function Eye({
                 fill="none"
                 stroke="currentColor"
                 strokeWidth={ring.strokeWidth}
-                opacity={ring.opacity}
+                opacity={opacityOf(ring)}
               />
             ),
           )}

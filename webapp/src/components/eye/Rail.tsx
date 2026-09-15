@@ -42,7 +42,7 @@ export default function Rail({
 
       <nav
         aria-label="Sections"
-        className="flex flex-col items-center gap-4 [&>*:nth-child(2)]:translate-x-1.5 [&>*:nth-child(3)]:translate-x-2 [&>*:nth-child(4)]:translate-x-1.5 sm:[&>*]:translate-x-0"
+        className="flex flex-col items-center gap-4"
       >
         {NODES.map((node, i) => {
           const isActive = activeNode === i;

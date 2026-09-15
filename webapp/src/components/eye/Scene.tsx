@@ -18,6 +18,13 @@ import { useSceneStore } from "@/stores/scene";
 /** Resting eye: pupil plus exactly one ring — the mockup. */
 const HOME_EYE = { pupil: 46, spacing: 40, count: 2, stroke: 26 };
 
+/** Seconds the page-transition wave takes end to end. */
+const BLOOM_DURATION = 2.2;
+/** Rings the wave adds beyond the resting eye at full extent. */
+const BLOOM_RINGS = 12;
+/** Fraction of the wave elapsed before the inner rings start fading out. */
+const FADE_START = 0.3;
+
 export default function Scene({
   children,
   maintenanceBanner,
@@ -72,31 +79,51 @@ export default function Scene({
   const [bloomT, setBloomT] = useState(0);
   useMotionValueEvent(bloom, "change", setBloomT);
 
+  // Derived, not separate state: the wave is running exactly when bloom is
+  // off its resting value, and bloomT is already mirrored into React for
+  // ringGeometry. A second useState here would duplicate that and have to be
+  // written from inside the effect.
+  const transitioning = bloomT > 0;
+
   useEffect(() => {
     if (reduced) {
       bloom.set(0);
       return;
     }
-    const controls = animate(bloom, [0, 1, 0], {
-      duration: 2.2,
-      times: [0, 0.45, 1],
-      ease: "easeInOut",
+    const controls = animate(bloom, 1, {
+      duration: BLOOM_DURATION,
+      ease: "easeOut",
+      // Every ring past the resting one has already faded to nothing by the
+      // end of the wave, so resetting the count here is invisible.
+      onComplete: () => bloom.set(0),
     });
     return () => controls.stop();
   }, [pathname, bloom, reduced]);
 
-  // Only the ring count animates. Spacing and stroke stay constant, so the
-  // rings keep a uniform weight and an even gap and simply march outward —
-  // no taper, no crowding. Ring k sits at pupil + spacing * k, so the
-  // outermost reaches 46 + 40 * 11 = 486 units at full bloom, roughly five
-  // times the resting eye's extent. The SVG is overflow:visible, so it spills
+  // The transition is a wave, not a bloom-and-retract. Rings are born just
+  // outside the resting ring and march outward for the whole animation, while
+  // a fade front chases them from the inside — so the set fills outward and
+  // then empties in the same direction, rather than expanding and reversing.
+  //
+  // Spacing and stroke stay constant, so the rings keep a uniform weight and
+  // an even gap. Ring k sits at pupil + spacing * k, so the outermost reaches
+  // 46 + 40 * 13 = 566 units. The SVG is overflow:visible, so the wave spills
   // past its box rather than being clipped.
   const eyeParams = {
     pupil: HOME_EYE.pupil,
     spacing: HOME_EYE.spacing,
-    count: HOME_EYE.count + bloomT * 10,
+    count: HOME_EYE.count + bloomT * BLOOM_RINGS,
     stroke: HOME_EYE.stroke,
   };
+
+  // The fade front sets off once the wave has some depth to eat into, and is
+  // scaled so it reaches the outermost ring exactly as the wave ends. Running
+  // it faster empties the set well before the animation is over and leaves a
+  // stretch of nothing on screen.
+  const innerFade =
+    bloomT <= FADE_START
+      ? 0
+      : ((bloomT - FADE_START) / (1 - FADE_START)) * (BLOOM_RINGS + 2);
 
   // Pupil travel is bounded so it can never cross its ring. Constant now that
   // spacing and stroke no longer animate, but still derived rather than
@@ -126,7 +153,7 @@ export default function Scene({
         className={[
           "pointer-events-none fixed inset-0 z-0 flex items-center justify-center",
           "transition-opacity duration-500",
-          isHome ? "opacity-100" : "opacity-0",
+          isHome || transitioning ? "opacity-100" : "opacity-0",
         ].join(" ")}
         inert={!isHome}
       >
@@ -151,6 +178,7 @@ export default function Scene({
             pupilY={pupilY}
             ringX={ringX}
             ringY={ringY}
+            innerFade={innerFade}
             className="h-full w-full"
           />
           {/* motion.div, not div: reading a motion value with .get() inside a
