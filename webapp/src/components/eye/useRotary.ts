@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { animate, useMotionValue, useReducedMotion } from "motion/react";
 import { nearestNodeIndex, rotationForNode } from "@/lib/orbit";
 import { useSceneStore } from "@/stores/scene";
@@ -17,14 +17,22 @@ const SNAP_DELAY_MS = 140;
  * Scene.tsx owns the single write to `activeNode` for every other case (mount,
  * route change, breakpoint crossing); this hook's `scheduleSnap` is the only
  * write that happens *during* a drag/wheel gesture, once the gesture settles.
+ *
+ * Rests at rotation 0, which leaves satellite 0 at 12 o'clock and nothing
+ * parked on the selector. `engaged` stays false until the first gesture, so
+ * the homepage shows no selected node until the reader actually picks one —
+ * highlighting whichever node happened to fall nearest the selector at rest
+ * would be arbitrary.
  */
 export function useRotary(total: number) {
-  const rotation = useMotionValue(rotationForNode(0, total));
+  const rotation = useMotionValue(0);
+  const [engaged, setEngaged] = useState(false);
   const setActiveNode = useSceneStore((s) => s.setActiveNode);
   const reduced = useReducedMotion() ?? false;
   const snapTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const scheduleSnap = useCallback(() => {
+    setEngaged(true);
     if (snapTimer.current) clearTimeout(snapTimer.current);
     snapTimer.current = setTimeout(() => {
       const index = nearestNodeIndex(rotation.get(), total);
@@ -83,5 +91,5 @@ export function useRotary(total: number) {
     };
   }, []);
 
-  return { rotation, bind: { onWheel, onPointerDown } };
+  return { rotation, engaged, bind: { onWheel, onPointerDown } };
 }

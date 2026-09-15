@@ -17,6 +17,29 @@ async function getMeta(): Promise<SiteMeta | null> {
   }
 }
 
+const SYMBOLS = ["◖", "▨", "×", "◉", "↖"];
+
+/**
+ * The strip of pulsing glyphs flanking the message. Decorative, so it stays
+ * out of the accessibility tree; the message itself carries the meaning.
+ */
+function Symbols({ reverse = false }: { reverse?: boolean }) {
+  const glyphs = reverse ? [...SYMBOLS].reverse() : SYMBOLS;
+  return (
+    <span className="flex gap-1.5" aria-hidden="true">
+      {glyphs.map((glyph, i) => (
+        <span
+          key={i}
+          className="animate-symbol-pulse inline-block"
+          style={{ animationDelay: `${i * 0.16}s` }}
+        >
+          {glyph}
+        </span>
+      ))}
+    </span>
+  );
+}
+
 export default async function MaintenanceBanner() {
   const meta = await getMeta();
   if (!meta) return null;
@@ -27,17 +50,15 @@ export default async function MaintenanceBanner() {
   const message = active[0]?.message ?? (meta.underConstruction ? "under active redesign" : null);
   if (!message) return null;
 
-  const symbols = " ◖ ▨ × ◉ ↖ ";
-
+  // Centred rather than a marquee: a scrolling strip makes the reader wait
+  // for the text to come round, and the message is short enough to read at a
+  // glance. The symbols carry the motion instead.
   return (
-    <div className="sticky top-0 bg-yellow-400 text-yellow-900 text-sm font-medium py-2 overflow-hidden whitespace-nowrap font-funnel">
-      <div className="animate-marquee inline-block">
-        {Array.from({ length: 6 }).map((_, i) => (
-          <React.Fragment key={i}>
-            <span>{symbols}</span>
-            <span className="mx-12">{message}</span>
-          </React.Fragment>
-        ))}
+    <div className="sticky top-0 z-30 bg-brand-orange py-2 font-funnel text-sm font-medium text-brand-dark">
+      <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 px-4 text-center">
+        <Symbols />
+        <span>{message}</span>
+        <Symbols reverse />
       </div>
     </div>
   );

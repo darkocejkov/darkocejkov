@@ -31,8 +31,15 @@ export default function Scene({
   const setActiveNode = useSceneStore((s) => s.setActiveNode);
 
   const isNarrow = useMediaQuery("(max-width: 639px)");
-  const { rotation, bind } = useRotary(NODES.length);
-  const rotaryBind = isNarrow ? bind : {};
+  const isHome = pathname === "/";
+  const { rotation, engaged, bind } = useRotary(NODES.length);
+
+  // The rotary runs on every width, but only on the homepage. That is what
+  // makes it safe on desktop: "/" renders no page content, so there is no
+  // document scroll for the wheel handler to hijack. On content routes it
+  // stays off at every width, where hijacking the scroll would be real.
+  const rotaryLive = isHome;
+  const rotaryBind = rotaryLive ? bind : {};
 
   // The eye container scales with the viewport (78vmin, uncapped), so the
   // orbit radius/dot size must be measured proportions of its rendered size
@@ -53,10 +60,10 @@ export default function Scene({
     // too, instead of leaving a stale desktop-rotary value in place.
     setActiveNode(
       home
-        ? (isNarrow ? nearestNodeIndex(rotation.get(), NODES.length) : -1)
+        ? (engaged ? nearestNodeIndex(rotation.get(), NODES.length) : -1)
         : nodeIndexForPath(pathname),
     );
-  }, [pathname, setPhase, setActiveNode, isNarrow, rotation]);
+  }, [pathname, setPhase, setActiveNode, engaged, rotation]);
 
   // Ring count blooms 2 -> 8 -> 2 on every navigation. Held in a motion value so
   // the tween itself is frame-driven; mirrored into state only because
@@ -71,32 +78,46 @@ export default function Scene({
       return;
     }
     const controls = animate(bloom, [0, 1, 0], {
-      duration: 0.9,
+      duration: 2.2,
       times: [0, 0.45, 1],
       ease: "easeInOut",
     });
     return () => controls.stop();
   }, [pathname, bloom, reduced]);
 
+  // Only the ring count animates. Spacing and stroke stay constant, so the
+  // rings keep a uniform weight and an even gap and simply march outward —
+  // no taper, no crowding. Ring k sits at pupil + spacing * k, so the
+  // outermost reaches 46 + 40 * 11 = 486 units at full bloom, roughly five
+  // times the resting eye's extent. The SVG is overflow:visible, so it spills
+  // past its box rather than being clipped.
   const eyeParams = {
     pupil: HOME_EYE.pupil,
-    spacing: HOME_EYE.spacing - bloomT * 22,
-    count: HOME_EYE.count + bloomT * 6,
-    stroke: HOME_EYE.stroke - bloomT * 18,
+    spacing: HOME_EYE.spacing,
+    count: HOME_EYE.count + bloomT * 10,
+    stroke: HOME_EYE.stroke,
   };
 
-  // Pupil travel is bounded so it can never cross its ring.
+  // Pupil travel is bounded so it can never cross its ring. Constant now that
+  // spacing and stroke no longer animate, but still derived rather than
+  // hardcoded so retuning HOME_EYE cannot silently break containment.
   const travel = maxPupilOffset(eyeParams.spacing, eyeParams.stroke);
   const pupilX = useTransform(px, (v) => v * travel);
   const pupilY = useTransform(py, (v) => v * travel);
 
-  // Outer layers move less than the pupil — nearer things move more. Disabled
-  // on touch: there is no hovering cursor to cue depth from, and on mobile the
-  // rotary drag itself is the only pointer motion — feeding it into this
-  // layer displaces the snapped dot off the selector by several pixels.
-  const orbitLayer = useParallax(px, py, isNarrow ? 0 : travel * 1.6);
+  // The rings drift with the pointer too, but less than the pupil, so the
+  // pupil leads and they trail. Without this the rings are nailed down and
+  // only the pupil moves, which reads as a flat sticker rather than depth.
+  const ringX = useTransform(px, (v) => v * travel * 0.35);
+  const ringY = useTransform(py, (v) => v * travel * 0.35);
 
-  const isHome = pathname === "/";
+  // The satellites counter-move against the pointer. Moving them *with* the
+  // pupil, only further, made them read as welded to the iris; opposing it
+  // puts them on their own plane in front of the eye, which is what separates
+  // the two. Disabled on touch: there is no hovering cursor to cue depth
+  // from, and on mobile the rotary drag is the only pointer motion — feeding
+  // it here displaces the snapped dot off the selector by several pixels.
+  const orbitLayer = useParallax(px, py, isNarrow ? 0 : -travel * 0.8);
 
   return (
     <div className="relative min-h-screen text-brand-dark dark:text-brand-white">
@@ -119,12 +140,24 @@ export default function Scene({
           }}
           {...rotaryBind}
         >
-          <Eye params={eyeParams} size={320} pupilX={pupilX} pupilY={pupilY} className="h-full w-full" />
+          <Eye
+            params={eyeParams}
+            size={320}
+            pupilX={pupilX}
+            pupilY={pupilY}
+            ringX={ringX}
+            ringY={ringY}
+            className="h-full w-full"
+          />
           {/* motion.div, not div: reading a motion value with .get() inside a
               style object would sample it once at render and never update. */}
           <motion.div className="absolute inset-0" style={{ x: orbitLayer.x, y: orbitLayer.y }}>
             {containerWidth !== null && (
-              <Orbit radius={orbitRadius} dotSize={orbitDot} rotation={isNarrow ? rotation : undefined} />
+              <Orbit
+                radius={orbitRadius}
+                dotSize={orbitDot}
+                rotation={rotaryLive ? rotation : undefined}
+              />
             )}
           </motion.div>
         </div>

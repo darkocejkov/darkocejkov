@@ -29,7 +29,7 @@ export default function RootLayout({
       <head>
         <script dangerouslySetInnerHTML={{ __html: `(function(){var t=localStorage.getItem('theme'),d=window.matchMedia('(prefers-color-scheme:dark)').matches;if(t==='dark'||(t===null&&d))document.documentElement.classList.add('dark');})()` }} />
       </head>
-      <body className={`${rubik.variable} ${funnelDisplay.variable} flex min-h-screen flex-col font-sans bg-brand-white text-brand-dark dark:bg-brand-dark dark:text-brand-white`}>
+      <body className={`${rubik.variable} ${funnelDisplay.variable} theme-fade grain flex min-h-screen flex-col font-sans bg-brand-white text-brand-dark dark:bg-brand-dark dark:text-brand-white`}>
         <Scene maintenanceBanner={<MaintenanceBanner />}>{children}</Scene>
       </body>
     </html>
