@@ -19,28 +19,29 @@ import { useSceneStore } from "@/stores/scene";
 const HOME_EYE = { pupil: 46, spacing: 40, count: 2, stroke: 26 };
 
 /** Seconds the page-transition wave takes end to end. */
-const BLOOM_DURATION = 2.2;
+const BLOOM_DURATION = 1.1;
 /** Rings the wave adds beyond the resting eye at full extent. */
 const BLOOM_RINGS = 12;
 /** Fraction of the wave elapsed before the inner rings start fading out. */
 const FADE_START = 0.3;
 /**
- * How much of a ring index an arriving ring takes to reach full opacity. Well
- * under one, so rings snap in at their full weight rather than drifting up.
+ * How much of a ring index an arriving ring takes to reach full opacity. Small
+ * enough that a ring is essentially on the moment it exists, rather than
+ * drifting up behind the wave front.
  */
-const RING_BIRTH_FADE = 0.22;
+const RING_BIRTH_FADE = 0.07;
 /** Seconds the eye takes to arrive or leave. */
-const PRESENCE_DURATION = 0.75;
+const PRESENCE_DURATION = 0.4;
 /** Radians the orbit sweeps through as the satellites arrive or leave. */
 const ORBIT_SPIN = Math.PI / 3;
 /** Seconds the satellites take to sweep out, starting immediately. */
-const ORBIT_EXIT = 0.55;
+const ORBIT_EXIT = 0.32;
 /** Seconds the satellites take to sweep in, and how long they hold off. */
-const ORBIT_ENTER = 0.9;
-const ORBIT_ENTER_DELAY = 0.35;
+const ORBIT_ENTER = 0.5;
+const ORBIT_ENTER_DELAY = 0.18;
 /**
  * Decelerating. The eye arrives quickly and settles; easing in at both ends
- * reads as sluggish over three quarters of a second.
+ * reads as sluggish even over this shorter run.
  */
 const PRESENCE_EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -208,11 +209,13 @@ export default function Scene({
   const fadeStart = protectCore ? FADE_START : 0;
   // The front has to overrun the outermost ring by the width of its own edge,
   // or the wave ends with that ring still partly drawn and the count reset
-  // snaps it away. At +2 it finished on 0.6 opacity.
+  // snaps it away. Overrunning by more than that is not free either: the set
+  // empties early and the tail of the wave plays to an empty screen. Sized
+  // against FADE_EDGE — at +4 with the narrow edge it finished 16% early.
   const innerFade =
     bloomT <= fadeStart
       ? 0
-      : ((bloomT - fadeStart) / (1 - fadeStart)) * (BLOOM_RINGS + 4);
+      : ((bloomT - fadeStart) / (1 - fadeStart)) * (BLOOM_RINGS + 2);
 
   // Pupil travel is bounded so it can never cross its ring. Constant now that
   // spacing and stroke no longer animate, but still derived rather than

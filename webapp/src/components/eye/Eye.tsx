@@ -3,8 +3,16 @@
 import { motion, type MotionValue } from "motion/react";
 import { ringGeometry, type RingParams } from "@/lib/circularity";
 
-/** Width of the fade front, in ring indices. */
-const FADE_EDGE = 2.5;
+/**
+ * Width of the fade front, in ring indices. Narrow enough that a ring is
+ * essentially cut rather than faded — the front reads as an edge sweeping
+ * outwards instead of a soft gradient trailing behind it.
+ *
+ * The iris is a single element the front crosses in one step, so at this
+ * width it snaps out rather than dissolving. That is the intent; widening
+ * this is what softens it again.
+ */
+const FADE_EDGE = 0.22;
 
 interface EyeProps {
   params: RingParams;
