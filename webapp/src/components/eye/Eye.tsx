@@ -11,6 +11,12 @@ import { ringGeometry, type RingParams } from "@/lib/circularity";
 const LID_SCALE = 1.06;
 
 /**
+ * Corner radius of the crescent's tips, as a fraction of the iris radius.
+ * Proportional so the rail's small eye rounds by the same amount relatively.
+ */
+const CORNER_ROUND = 0.085;
+
+/**
  * Width of the fade front, in ring indices. Narrow enough that a ring is
  * essentially cut rather than faded — the front reads as an edge sweeping
  * outwards instead of a soft gradient trailing behind it.
@@ -101,6 +107,9 @@ export default function Eye({
   const stillLid = useMotionValue(0);
   const lidY = useTransform(blink ?? stillLid, (t) => t * lidTravel);
 
+  const roundId = `round-${useId()}`;
+  const cornerRadius = (pupil?.r ?? 0) * CORNER_ROUND;
+
   const opacityOf = (ring: (typeof rings)[number]) => {
     if (protectCore && ring.k < 2) return ring.opacity;
     // A front wider than one ring: a hard edge makes the iris blink rather
@@ -148,6 +157,33 @@ export default function Eye({
               <circle cx={0} cy={-lidTravel} r={lidR} fill="black" />
             </motion.g>
           </mask>
+
+          {/* Rounds the crescent's tips. Where the lid crosses the iris the
+              two circles meet at a cusp; blurring and then hard-thresholding
+              the alpha turns each cusp into an arc of roughly the blur's
+              radius, leaving the rest of the outline where it was.
+
+              It has to sit on a PARENT of the masked group: on the same
+              element SVG applies the filter before the mask, so it would
+              round nothing the mask went on to cut. */}
+          <filter
+            id={roundId}
+            x="-20%"
+            y="-20%"
+            width="140%"
+            height="140%"
+            colorInterpolationFilters="sRGB"
+          >
+            <feGaussianBlur stdDeviation={cornerRadius} result="softened" />
+            <feColorMatrix
+              in="softened"
+              type="matrix"
+              values="1 0 0 0 0
+                      0 1 0 0 0
+                      0 0 1 0 0
+                      0 0 0 18 -9"
+            />
+          </filter>
         </defs>
       )}
       <g transform={`translate(${centre} ${centre})`}>
@@ -177,13 +213,15 @@ export default function Eye({
         </motion.g>
 
         {pupil && (
-          <motion.g style={{ x: pupilX, y: pupilY }} mask={`url(#${maskId})`}>
-            {pupil.d ? (
-              <path d={pupil.d} fill="currentColor" opacity={opacityOf(pupil)} />
-            ) : (
-              <circle r={pupil.r} fill="currentColor" opacity={opacityOf(pupil)} />
-            )}
-          </motion.g>
+          <g filter={`url(#${roundId})`}>
+            <motion.g style={{ x: pupilX, y: pupilY }} mask={`url(#${maskId})`}>
+              {pupil.d ? (
+                <path d={pupil.d} fill="currentColor" opacity={opacityOf(pupil)} />
+              ) : (
+                <circle r={pupil.r} fill="currentColor" opacity={opacityOf(pupil)} />
+              )}
+            </motion.g>
+          </g>
         )}
       </g>
     </svg>

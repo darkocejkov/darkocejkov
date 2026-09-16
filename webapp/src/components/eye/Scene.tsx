@@ -311,7 +311,7 @@ export default function Scene({
       {!isHome && (
         <div className="relative z-10 flex min-h-screen">
           <aside className="sticky top-0 h-screen flex-none border-r border-brand-dark/10 dark:border-brand-white/10">
-            <Rail px={px} py={py} />
+            <Rail px={px} py={py} blink={blink} onBlinkTrigger={triggerBlink} />
           </aside>
           <main className="min-w-0 flex-1 px-8 py-12">{children}</main>
         </div>

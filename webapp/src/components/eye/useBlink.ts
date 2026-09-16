@@ -1,26 +1,28 @@
 "use client";
 
 import { useCallback, useEffect, useRef } from "react";
-import { animate, useMotionValue, useReducedMotion } from "motion/react";
+import { useMotionValue, useReducedMotion } from "motion/react";
 
-/** Seconds the lid takes to come down. */
-const CLOSE = 0.09;
-/** Seconds it rests shut. */
-const HOLD = 0.04;
-/** Seconds the lid takes to lift. Opening slower than closing is what stops a
- *  blink looking like a glitch — real lids snap shut and drift back up. */
-const OPEN = 0.16;
+/**
+ * The blink, as discrete frames rather than a tween. Each value is how far
+ * shut the lid is, held for FRAME_MS and then cut to the next — so it reads as
+ * stop-motion, in the same spirit as the frames it was drawn from, instead of
+ * sweeping smoothly closed.
+ */
+const FRAMES = [0.25, 0.5, 0.75, 0.5, 0.25, 0];
+/** Milliseconds each frame is held. */
+const FRAME_MS = 55;
 
 /** Shortest and longest gap between unprompted blinks, in seconds. */
 const IDLE_MIN = 3.2;
 const IDLE_MAX = 8.5;
 
 /** Ignore a prompt arriving while a blink is already running. */
-const REFRACTORY = (CLOSE + HOLD + OPEN) * 1000;
+const REFRACTORY = FRAMES.length * FRAME_MS;
 
 /**
  * Drives the eyelid. Returns a value from 0 (open) to 1 (shut) for the mask to
- * follow, and a `blink` to prompt one by hand.
+ * follow, and a `trigger` to prompt a blink by hand.
  *
  * Blinks on its own at irregular intervals — a fixed period reads as a
  * metronome rather than something alive, so each gap is drawn fresh.
@@ -33,20 +35,27 @@ export function useBlink() {
   const reduced = useReducedMotion() ?? false;
 
   const busyUntil = useRef(0);
-  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const idleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const frameTimers = useRef<ReturnType<typeof setTimeout>[]>([]);
 
-  const blink = useCallback(() => {
+  const clearFrames = useCallback(() => {
+    frameTimers.current.forEach(clearTimeout);
+    frameTimers.current = [];
+  }, []);
+
+  const trigger = useCallback(() => {
     if (reduced) return;
     const now = Date.now();
     if (now < busyUntil.current) return;
     busyUntil.current = now + REFRACTORY;
 
-    animate(blinkValue, [0, 1, 1, 0], {
-      duration: CLOSE + HOLD + OPEN,
-      times: [0, CLOSE / (CLOSE + HOLD + OPEN), (CLOSE + HOLD) / (CLOSE + HOLD + OPEN), 1],
-      ease: "easeInOut",
+    clearFrames();
+    // One timer per frame rather than an interval: a dropped tick then costs
+    // that frame alone instead of shifting every frame after it.
+    FRAMES.forEach((value, i) => {
+      frameTimers.current.push(setTimeout(() => blinkValue.set(value), i * FRAME_MS));
     });
-  }, [blinkValue, reduced]);
+  }, [blinkValue, reduced, clearFrames]);
 
   useEffect(() => {
     if (reduced) {
@@ -58,17 +67,18 @@ export function useBlink() {
     // so the rhythm never settles into one the eye can predict.
     const schedule = () => {
       const wait = (IDLE_MIN + Math.random() * (IDLE_MAX - IDLE_MIN)) * 1000;
-      timer.current = setTimeout(() => {
-        blink();
+      idleTimer.current = setTimeout(() => {
+        trigger();
         schedule();
       }, wait);
     };
     schedule();
 
     return () => {
-      if (timer.current) clearTimeout(timer.current);
+      if (idleTimer.current) clearTimeout(idleTimer.current);
+      clearFrames();
     };
-  }, [blink, blinkValue, reduced]);
+  }, [trigger, blinkValue, reduced, clearFrames]);
 
-  return { blink: blinkValue, trigger: blink };
+  return { blink: blinkValue, trigger };
 }
