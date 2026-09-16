@@ -121,13 +121,27 @@ export default function Eye({
         <defs>
           {/* White shows, black hides. The lid rides in on a translated group
               rather than an animated cy, because a transform is the one thing
-              every renderer animates the same way. */}
-          <mask id={maskId} maskUnits="userSpaceOnUse">
+              every renderer animates the same way.
+
+              x/y/width/height are set explicitly. Without them SVG falls back
+              to -10%/-10%/120%/120% resolved against the VIEWPORT, not the
+              masked object — which inside this group's translate cropped the
+              iris square on its left and top while leaving the other two sides
+              round. The region is given in the referencing element's own user
+              space, where the iris is centred on the origin. */}
+          <mask
+            id={maskId}
+            maskUnits="userSpaceOnUse"
+            x={-pupil.r * 3}
+            y={-pupil.r * 3}
+            width={pupil.r * 6}
+            height={pupil.r * 6}
+          >
             <rect
-              x={-pupil.r * 2}
-              y={-pupil.r * 2}
-              width={pupil.r * 4}
-              height={pupil.r * 4}
+              x={-pupil.r * 3}
+              y={-pupil.r * 3}
+              width={pupil.r * 6}
+              height={pupil.r * 6}
               fill="white"
             />
             <motion.g style={{ y: lidY }}>
