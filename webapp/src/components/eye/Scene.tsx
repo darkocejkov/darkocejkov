@@ -123,6 +123,18 @@ export default function Scene({
       return;
     }
 
+    // Restart the wave from the beginning. Stopping an animation leaves its
+    // value where it stood, so navigating again mid-wave used to resume from
+    // there — `animate(bloom, 1)` from 0.8 is nearly a no-op, which is why a
+    // quick second navigation appeared to play no animation at all.
+    const interrupted = bloom.get() > 0;
+    bloom.set(0);
+
+    // Coming in on top of an interrupted exit, the overlay is still up while
+    // the reset above has just restored every ring it had faded. Drop it and
+    // fade back in rather than letting that restoration show.
+    if (interrupted && !home) presence.set(0);
+
     // Arrive first, or hold if already here.
     const enter = animate(presence, 1, { duration: PRESENCE_DURATION, ease });
 
@@ -144,26 +156,22 @@ export default function Scene({
           animate(orbitSpin, ORBIT_SPIN, { duration: ORBIT_EXIT, ease: "easeIn" }),
         ];
 
-    let exit: ReturnType<typeof animate> | undefined;
-
     const wave = animate(bloom, 1, {
       duration: BLOOM_DURATION,
       ease: "easeOut",
       onComplete: () => {
-        // Every ring past the resting one has already faded to nothing by the
-        // end of the wave, so resetting the count here is invisible.
+        // Order matters. Resetting the wave restores every ring the fade
+        // front had consumed, so leaving, the overlay has to be down first or
+        // that restoration is visible as a flash. Nothing is lost by cutting
+        // it instantly: the front has already emptied the eye by this point.
+        if (!home) presence.set(0);
         bloom.set(0);
-        // Leaving, the fade front has already consumed every ring including
-        // the iris, so there is nothing left to see — this just clears the
-        // empty overlay. Arriving home, the eye stays.
-        if (!home) exit = animate(presence, 0, { duration: 0.2, ease });
       },
     });
 
     return () => {
       enter.stop();
       wave.stop();
-      exit?.stop();
       orbitAnims.forEach((a) => a.stop());
     };
   }, [pathname, bloom, presence, orbitPresence, orbitSpin, reduced]);
@@ -192,10 +200,13 @@ export default function Scene({
   // there and fading out as a whole once the wave is over.
   const protectCore = isHome;
   const fadeStart = protectCore ? FADE_START : 0;
+  // The front has to overrun the outermost ring by the width of its own edge,
+  // or the wave ends with that ring still partly drawn and the count reset
+  // snaps it away. At +2 it finished on 0.6 opacity.
   const innerFade =
     bloomT <= fadeStart
       ? 0
-      : ((bloomT - fadeStart) / (1 - fadeStart)) * (BLOOM_RINGS + 2);
+      : ((bloomT - fadeStart) / (1 - fadeStart)) * (BLOOM_RINGS + 4);
 
   // Pupil travel is bounded so it can never cross its ring. Constant now that
   // spacing and stroke no longer animate, but still derived rather than
