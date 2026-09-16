@@ -1,7 +1,20 @@
 "use client";
 
-import { motion, type MotionValue } from "motion/react";
+import { useId } from "react";
+import { motion, useMotionValue, useTransform, type MotionValue } from "motion/react";
 import { ringGeometry, type RingParams } from "@/lib/circularity";
+
+/**
+ * Lid radius as a multiple of the iris. Just over 1 so that at full travel it
+ * covers the iris outright instead of leaving a sliver at the edges.
+ */
+const LID_SCALE = 1.06;
+
+/**
+ * Corner radius of the crescent's tips, as a fraction of the iris radius.
+ * Proportional so the rail's small eye rounds by the same amount relatively.
+ */
+const CORNER_ROUND = 0.085;
 
 /**
  * Width of the fade front, in ring indices. Narrow enough that a ring is
@@ -35,6 +48,12 @@ interface EyeProps {
    */
   innerFade?: number;
   /**
+   * Eyelid position, 0 open to 1 shut. The lid is a circle subtracted from the
+   * iris, descending from above, so what remains is a bowl at the bottom that
+   * thins as it closes. Omit it and the iris simply stays open.
+   */
+  blink?: MotionValue<number>;
+  /**
    * Hold the pupil and the resting ring at full opacity, letting the front
    * pass over only the transition rings. Set when the transition ends on the
    * homepage, where the eye has to still be there afterwards; without it the
@@ -64,12 +83,32 @@ export default function Eye({
   ringY,
   innerFade = 0,
   protectCore = true,
+  blink,
   className,
 }: EyeProps) {
   const rings = ringGeometry(params);
   const centre = size / 2;
   const pupil = rings.find((r) => r.k === 0);
   const outer = rings.filter((r) => r.k > 0);
+
+  // Masks are referenced by id, and this component renders more than once on a
+  // content route — the centre eye and the rail's. Sharing an id would point
+  // both at whichever mounted last.
+  const maskId = `blink-${useId()}`;
+
+  // The lid is just another circle, subtracted from the iris. Slightly larger
+  // so that at full travel it clears the iris completely rather than leaving a
+  // rim. It starts tangent above, so at rest nothing is covered.
+  const lidR = (pupil?.r ?? 0) * LID_SCALE;
+  const lidTravel = (pupil?.r ?? 0) + lidR;
+
+  // Hooks cannot be conditional, so the fallback is always created and only
+  // its use is chosen — the same shape Orbit uses for its optional rotation.
+  const stillLid = useMotionValue(0);
+  const lidY = useTransform(blink ?? stillLid, (t) => t * lidTravel);
+
+  const roundId = `round-${useId()}`;
+  const cornerRadius = (pupil?.r ?? 0) * CORNER_ROUND;
 
   const opacityOf = (ring: (typeof rings)[number]) => {
     if (protectCore && ring.k < 2) return ring.opacity;
@@ -87,6 +126,66 @@ export default function Eye({
       focusable="false"
       overflow="visible"
     >
+      {pupil && (
+        <defs>
+          {/* White shows, black hides. The lid rides in on a translated group
+              rather than an animated cy, because a transform is the one thing
+              every renderer animates the same way.
+
+              x/y/width/height are set explicitly. Without them SVG falls back
+              to -10%/-10%/120%/120% resolved against the VIEWPORT, not the
+              masked object — which inside this group's translate cropped the
+              iris square on its left and top while leaving the other two sides
+              round. The region is given in the referencing element's own user
+              space, where the iris is centred on the origin. */}
+          <mask
+            id={maskId}
+            maskUnits="userSpaceOnUse"
+            x={-pupil.r * 3}
+            y={-pupil.r * 3}
+            width={pupil.r * 6}
+            height={pupil.r * 6}
+          >
+            <rect
+              x={-pupil.r * 3}
+              y={-pupil.r * 3}
+              width={pupil.r * 6}
+              height={pupil.r * 6}
+              fill="white"
+            />
+            <motion.g style={{ y: lidY }}>
+              <circle cx={0} cy={-lidTravel} r={lidR} fill="black" />
+            </motion.g>
+          </mask>
+
+          {/* Rounds the crescent's tips. Where the lid crosses the iris the
+              two circles meet at a cusp; blurring and then hard-thresholding
+              the alpha turns each cusp into an arc of roughly the blur's
+              radius, leaving the rest of the outline where it was.
+
+              It has to sit on a PARENT of the masked group: on the same
+              element SVG applies the filter before the mask, so it would
+              round nothing the mask went on to cut. */}
+          <filter
+            id={roundId}
+            x="-20%"
+            y="-20%"
+            width="140%"
+            height="140%"
+            colorInterpolationFilters="sRGB"
+          >
+            <feGaussianBlur stdDeviation={cornerRadius} result="softened" />
+            <feColorMatrix
+              in="softened"
+              type="matrix"
+              values="1 0 0 0 0
+                      0 1 0 0 0
+                      0 0 1 0 0
+                      0 0 0 18 -9"
+            />
+          </filter>
+        </defs>
+      )}
       <g transform={`translate(${centre} ${centre})`}>
         {/* Outer rings first so the pupil paints over them. */}
         <motion.g style={{ x: ringX, y: ringY }}>
@@ -114,13 +213,15 @@ export default function Eye({
         </motion.g>
 
         {pupil && (
-          <motion.g style={{ x: pupilX, y: pupilY }}>
-            {pupil.d ? (
-              <path d={pupil.d} fill="currentColor" opacity={opacityOf(pupil)} />
-            ) : (
-              <circle r={pupil.r} fill="currentColor" opacity={opacityOf(pupil)} />
-            )}
-          </motion.g>
+          <g filter={`url(#${roundId})`}>
+            <motion.g style={{ x: pupilX, y: pupilY }} mask={`url(#${maskId})`}>
+              {pupil.d ? (
+                <path d={pupil.d} fill="currentColor" opacity={opacityOf(pupil)} />
+              ) : (
+                <circle r={pupil.r} fill="currentColor" opacity={opacityOf(pupil)} />
+              )}
+            </motion.g>
+          </g>
         )}
       </g>
     </svg>

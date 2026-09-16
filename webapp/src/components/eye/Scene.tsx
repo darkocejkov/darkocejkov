@@ -8,6 +8,7 @@ import Orbit from "./Orbit";
 import Rail from "./Rail";
 import { useParallax, usePointer } from "./usePointer";
 import { useRotary } from "./useRotary";
+import { useBlink } from "./useBlink";
 import { useMediaQuery } from "./useMediaQuery";
 import { useElementSize } from "./useElementSize";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -60,6 +61,7 @@ export default function Scene({
   const isNarrow = useMediaQuery("(max-width: 639px)");
   const isHome = pathname === "/";
   const { rotation, engaged, bind } = useRotary(NODES.length);
+  const { blink, trigger: triggerBlink } = useBlink();
 
   // The rotary runs on every width, but only on the homepage. That is what
   // makes it safe on desktop: "/" renders no page content, so there is no
@@ -268,6 +270,7 @@ export default function Scene({
             touchAction: rotaryLive ? "none" : undefined,
           }}
           {...rotaryBind}
+          onPointerEnter={triggerBlink}
         >
           <Eye
             params={eyeParams}
@@ -278,6 +281,7 @@ export default function Scene({
             ringY={ringY}
             innerFade={innerFade}
             protectCore={protectCore}
+            blink={blink}
             className="h-full w-full"
           />
           {/* motion.div, not div: reading a motion value with .get() inside a
@@ -307,7 +311,7 @@ export default function Scene({
       {!isHome && (
         <div className="relative z-10 flex min-h-screen">
           <aside className="sticky top-0 h-screen flex-none border-r border-brand-dark/10 dark:border-brand-white/10">
-            <Rail px={px} py={py} />
+            <Rail px={px} py={py} blink={blink} onBlinkTrigger={triggerBlink} />
           </aside>
           <main className="min-w-0 flex-1 px-8 py-12">{children}</main>
         </div>

@@ -17,9 +17,13 @@ const RAIL_EYE = { pupil: 17, spacing: 15, count: 2, stroke: 9 };
 export default function Rail({
   px,
   py,
+  blink,
+  onBlinkTrigger,
 }: {
   px?: MotionValue<number>;
   py?: MotionValue<number>;
+  blink?: MotionValue<number>;
+  onBlinkTrigger?: () => void;
 }) {
   const activeNode = useSceneStore((s) => s.activeNode);
 
@@ -36,8 +40,20 @@ export default function Rail({
 
   return (
     <div className="flex flex-col items-center gap-5 py-6">
-      <Link href="/" aria-label="Home" className="block w-14 rounded-full outline-none focus-visible:ring-2 focus-visible:ring-brand-orange focus-visible:ring-offset-2">
-        <Eye params={RAIL_EYE} size={100} pupilX={pupilX} pupilY={pupilY} className="h-full w-full" />
+      <Link
+        href="/"
+        aria-label="Home"
+        onPointerEnter={onBlinkTrigger}
+        className="block w-14 rounded-full outline-none focus-visible:ring-2 focus-visible:ring-brand-orange focus-visible:ring-offset-2"
+      >
+        <Eye
+          params={RAIL_EYE}
+          size={100}
+          pupilX={pupilX}
+          pupilY={pupilY}
+          blink={blink}
+          className="h-full w-full"
+        />
       </Link>
 
       <nav
