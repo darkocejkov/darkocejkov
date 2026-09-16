@@ -1,7 +1,14 @@
 "use client";
 
-import { motion, type MotionValue } from "motion/react";
+import { useId } from "react";
+import { motion, useMotionValue, useTransform, type MotionValue } from "motion/react";
 import { ringGeometry, type RingParams } from "@/lib/circularity";
+
+/**
+ * Lid radius as a multiple of the iris. Just over 1 so that at full travel it
+ * covers the iris outright instead of leaving a sliver at the edges.
+ */
+const LID_SCALE = 1.06;
 
 /**
  * Width of the fade front, in ring indices. Narrow enough that a ring is
@@ -35,6 +42,12 @@ interface EyeProps {
    */
   innerFade?: number;
   /**
+   * Eyelid position, 0 open to 1 shut. The lid is a circle subtracted from the
+   * iris, descending from above, so what remains is a bowl at the bottom that
+   * thins as it closes. Omit it and the iris simply stays open.
+   */
+  blink?: MotionValue<number>;
+  /**
    * Hold the pupil and the resting ring at full opacity, letting the front
    * pass over only the transition rings. Set when the transition ends on the
    * homepage, where the eye has to still be there afterwards; without it the
@@ -64,12 +77,29 @@ export default function Eye({
   ringY,
   innerFade = 0,
   protectCore = true,
+  blink,
   className,
 }: EyeProps) {
   const rings = ringGeometry(params);
   const centre = size / 2;
   const pupil = rings.find((r) => r.k === 0);
   const outer = rings.filter((r) => r.k > 0);
+
+  // Masks are referenced by id, and this component renders more than once on a
+  // content route — the centre eye and the rail's. Sharing an id would point
+  // both at whichever mounted last.
+  const maskId = `blink-${useId()}`;
+
+  // The lid is just another circle, subtracted from the iris. Slightly larger
+  // so that at full travel it clears the iris completely rather than leaving a
+  // rim. It starts tangent above, so at rest nothing is covered.
+  const lidR = (pupil?.r ?? 0) * LID_SCALE;
+  const lidTravel = (pupil?.r ?? 0) + lidR;
+
+  // Hooks cannot be conditional, so the fallback is always created and only
+  // its use is chosen — the same shape Orbit uses for its optional rotation.
+  const stillLid = useMotionValue(0);
+  const lidY = useTransform(blink ?? stillLid, (t) => t * lidTravel);
 
   const opacityOf = (ring: (typeof rings)[number]) => {
     if (protectCore && ring.k < 2) return ring.opacity;
@@ -87,6 +117,25 @@ export default function Eye({
       focusable="false"
       overflow="visible"
     >
+      {pupil && (
+        <defs>
+          {/* White shows, black hides. The lid rides in on a translated group
+              rather than an animated cy, because a transform is the one thing
+              every renderer animates the same way. */}
+          <mask id={maskId} maskUnits="userSpaceOnUse">
+            <rect
+              x={-pupil.r * 2}
+              y={-pupil.r * 2}
+              width={pupil.r * 4}
+              height={pupil.r * 4}
+              fill="white"
+            />
+            <motion.g style={{ y: lidY }}>
+              <circle cx={0} cy={-lidTravel} r={lidR} fill="black" />
+            </motion.g>
+          </mask>
+        </defs>
+      )}
       <g transform={`translate(${centre} ${centre})`}>
         {/* Outer rings first so the pupil paints over them. */}
         <motion.g style={{ x: ringX, y: ringY }}>
@@ -114,7 +163,7 @@ export default function Eye({
         </motion.g>
 
         {pupil && (
-          <motion.g style={{ x: pupilX, y: pupilY }}>
+          <motion.g style={{ x: pupilX, y: pupilY }} mask={`url(#${maskId})`}>
             {pupil.d ? (
               <path d={pupil.d} fill="currentColor" opacity={opacityOf(pupil)} />
             ) : (
