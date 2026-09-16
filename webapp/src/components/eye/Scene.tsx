@@ -26,6 +26,13 @@ const BLOOM_RINGS = 12;
 const FADE_START = 0.3;
 /** Seconds the eye takes to arrive or leave. */
 const PRESENCE_DURATION = 0.75;
+/** Radians the orbit sweeps through as the satellites arrive or leave. */
+const ORBIT_SPIN = Math.PI / 3;
+/** Seconds the satellites take to sweep out, starting immediately. */
+const ORBIT_EXIT = 0.55;
+/** Seconds the satellites take to sweep in, and how long they hold off. */
+const ORBIT_ENTER = 0.9;
+const ORBIT_ENTER_DELAY = 0.35;
 /**
  * Decelerating. The eye arrives quickly and settles; easing in at both ends
  * reads as sluggish over three quarters of a second.
@@ -93,6 +100,12 @@ export default function Scene({
   // for as long as a transition is playing.
   const presence = useMotionValue(isHome ? 1 : 0);
 
+  // The satellites get their own arrival and departure, sweeping the orbit
+  // round as they go. Riding the overlay's opacity alone meant they vanished
+  // with it in one step at the very end — the same abruptness the eye had.
+  const orbitPresence = useMotionValue(isHome ? 1 : 0);
+  const orbitSpin = useMotionValue(isHome ? 0 : ORBIT_SPIN);
+
   // One effect owns the whole transition — the ring wave and the eye's own
   // arrival and departure. Splitting them meant the eye's target was computed
   // from `isHome`, which flips the instant the route changes, while the wave
@@ -105,11 +118,32 @@ export default function Scene({
     if (reduced) {
       bloom.set(0);
       presence.set(home ? 1 : 0);
+      orbitPresence.set(home ? 1 : 0);
+      orbitSpin.set(0);
       return;
     }
 
     // Arrive first, or hold if already here.
     const enter = animate(presence, 1, { duration: PRESENCE_DURATION, ease });
+
+    // The satellites sweep in behind the eye, or sweep out immediately — out
+    // early so they leave alongside the iris rather than after the wave, in
+    // late so they settle as it does.
+    //
+    // The sweep goes out and comes back rather than carrying on round: it is
+    // an offset on top of the dial, not a turn of it, so returning it to zero
+    // is what leaves the rotary's own position exactly where the reader left
+    // it. Measured at -18deg before leaving and -18deg on return.
+    const orbitAnims = home
+      ? [
+          animate(orbitPresence, 1, { duration: ORBIT_ENTER, ease, delay: ORBIT_ENTER_DELAY }),
+          animate(orbitSpin, 0, { duration: ORBIT_ENTER, ease, delay: ORBIT_ENTER_DELAY }),
+        ]
+      : [
+          animate(orbitPresence, 0, { duration: ORBIT_EXIT, ease: "easeIn" }),
+          animate(orbitSpin, ORBIT_SPIN, { duration: ORBIT_EXIT, ease: "easeIn" }),
+        ];
+
     let exit: ReturnType<typeof animate> | undefined;
 
     const wave = animate(bloom, 1, {
@@ -130,8 +164,9 @@ export default function Scene({
       enter.stop();
       wave.stop();
       exit?.stop();
+      orbitAnims.forEach((a) => a.stop());
     };
-  }, [pathname, bloom, presence, reduced]);
+  }, [pathname, bloom, presence, orbitPresence, orbitSpin, reduced]);
 
   // The transition is a wave, not a bloom-and-retract. Rings are born just
   // outside the resting ring and march outward for the whole animation, while
@@ -187,6 +222,10 @@ export default function Scene({
   // it here displaces the snapped dot off the selector by several pixels.
   const orbitLayer = useParallax(px, py, isNarrow ? 0 : -travel * 0.8);
 
+  // What the orbit is actually rotated by: the dial's own position plus the
+  // sweep it makes on the way in or out.
+  const orbitAngle = useTransform([rotation, orbitSpin], ([r, spin]: number[]) => r + spin);
+
   return (
     <div className="relative min-h-screen text-brand-dark dark:text-brand-white">
       {maintenanceBanner}
@@ -223,13 +262,12 @@ export default function Scene({
           />
           {/* motion.div, not div: reading a motion value with .get() inside a
               style object would sample it once at render and never update. */}
-          <motion.div className="absolute inset-0" style={{ x: orbitLayer.x, y: orbitLayer.y }}>
+          <motion.div
+            className="absolute inset-0"
+            style={{ x: orbitLayer.x, y: orbitLayer.y, opacity: orbitPresence }}
+          >
             {containerWidth !== null && (
-              <Orbit
-                radius={orbitRadius}
-                dotSize={orbitDot}
-                rotation={rotaryLive ? rotation : undefined}
-              />
+              <Orbit radius={orbitRadius} dotSize={orbitDot} rotation={orbitAngle} />
             )}
           </motion.div>
         </motion.div>
