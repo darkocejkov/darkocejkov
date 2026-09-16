@@ -29,6 +29,19 @@ const FADE_EDGE = 0.22;
 
 interface EyeProps {
   params: RingParams;
+  /**
+   * The transition wave, drawn outside the resting eye and on its own spacing
+   * and stroke. Separate because one uniform spacing cannot serve both: the
+   * resting eye wants a heavy ring held well clear of the iris (which is also
+   * what gives the pupil room to travel), while the wave wants many fine rings
+   * packed close. Tying them together means tightening the wave drags the
+   * resting ring inwards onto the iris.
+   *
+   * Its `pupil` is the radius of its innermost ring — nothing is filled here,
+   * every ring is stroked. Indices continue on from the resting eye's, so the
+   * fade front sweeps through both as one sequence.
+   */
+  wave?: RingParams;
   /** viewBox edge length. The eye is centred within it. */
   size: number;
   /** Pupil parallax offset. Bound these with maxPupilOffset before passing them in. */
@@ -76,6 +89,7 @@ interface EyeProps {
  */
 export default function Eye({
   params,
+  wave,
   size,
   pupilX,
   pupilY,
@@ -86,10 +100,18 @@ export default function Eye({
   blink,
   className,
 }: EyeProps) {
-  const rings = ringGeometry(params);
+  const core = ringGeometry(params);
   const centre = size / 2;
-  const pupil = rings.find((r) => r.k === 0);
-  const outer = rings.filter((r) => r.k > 0);
+  const pupil = core.find((r) => r.k === 0);
+
+  // The wave's own ring 0 is not a pupil — it is simply its innermost ring, so
+  // it is stroked along with the rest. Reindexing it to sit after the resting
+  // eye keeps k a single ascending sequence, which is what lets one fade front
+  // travel through both sets and keeps React keys unique.
+  const waveRings = wave
+    ? ringGeometry(wave).map((ring) => ({ ...ring, k: ring.k + core.length }))
+    : [];
+  const outer = [...core.filter((r) => r.k > 0), ...waveRings];
 
   // Masks are referenced by id, and this component renders more than once on a
   // content route — the centre eye and the rail's. Sharing an id would point
@@ -110,8 +132,10 @@ export default function Eye({
   const roundId = `round-${useId()}`;
   const cornerRadius = (pupil?.r ?? 0) * CORNER_ROUND;
 
-  const opacityOf = (ring: (typeof rings)[number]) => {
-    if (protectCore && ring.k < 2) return ring.opacity;
+  const opacityOf = (ring: (typeof core)[number]) => {
+    // The core is the resting eye — every ring the params set describes. The
+    // wave beyond it is always consumable.
+    if (protectCore && ring.k < core.length) return ring.opacity;
     // A front wider than one ring: a hard edge makes the iris blink rather
     // than dissolve, since it is a single element the front crosses in one step.
     const edge = (ring.k - innerFade + FADE_EDGE) / FADE_EDGE;

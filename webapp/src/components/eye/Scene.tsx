@@ -19,12 +19,33 @@ import { useSceneStore } from "@/stores/scene";
 /** Resting eye: pupil plus exactly one ring — the mockup. */
 const HOME_EYE = { pupil: 46, spacing: 40, count: 2, stroke: 26 };
 
-/** Seconds the page-transition wave takes end to end. */
-const BLOOM_DURATION = 1.1;
-/** Rings the wave adds beyond the resting eye at full extent. */
-const BLOOM_RINGS = 12;
-/** Fraction of the wave elapsed before the inner rings start fading out. */
-const FADE_START = 0.3;
+/** viewBox edge the eye is drawn in. The wave is sized in these units. */
+const EYE_VIEWBOX = 320;
+
+/**
+ * The wave's own spacing and stroke, far finer than the resting eye's. Kept
+ * separate rather than shared so tightening the wave cannot drag the resting
+ * ring in onto the iris — see Eye's `wave` prop.
+ */
+const WAVE_SPACING = 14;
+const WAVE_STROKE = 6;
+/**
+ * Radius of the wave's innermost ring: clear of the resting ring's outer edge
+ * by one of the wave's own gaps, so the two sets read as continuous.
+ */
+const WAVE_START = HOME_EYE.pupil + HOME_EYE.spacing + HOME_EYE.stroke / 2 + WAVE_SPACING;
+/** Floor for the ring count, used until the viewport has been measured. */
+const MIN_WAVE_RINGS = 12;
+
+/**
+ * The transition is two phases, not one. The wave first fills the screen
+ * outright, and only once it has covered everything does the fade front start
+ * from the centre and wipe it away. They used to overlap, which meant the
+ * rings were already thinning at the middle while the outside was still
+ * arriving and the screen was never actually full.
+ */
+const FILL_DURATION = 0.7;
+const DRAIN_DURATION = 0.45;
 /**
  * How much of a ring index an arriving ring takes to reach full opacity. Small
  * enough that a ring is essentially on the moment it exists, rather than
@@ -37,9 +58,13 @@ const PRESENCE_DURATION = 0.4;
 const ORBIT_SPIN = Math.PI / 3;
 /** Seconds the satellites take to sweep out, starting immediately. */
 const ORBIT_EXIT = 0.32;
-/** Seconds the satellites take to sweep in, and how long they hold off. */
-const ORBIT_ENTER = 0.5;
-const ORBIT_ENTER_DELAY = 0.18;
+/**
+ * Seconds the satellites take to sweep in, and how long they hold off. They
+ * wait out the fill and arrive on the wipe — coming in any earlier puts them
+ * on top of the densest part of the wave, where they just read as clutter.
+ */
+const ORBIT_ENTER = 0.45;
+const ORBIT_ENTER_DELAY = FILL_DURATION;
 /**
  * Decelerating. The eye arrives quickly and settles; easing in at both ends
  * reads as sluggish even over this shorter run.
@@ -78,6 +103,16 @@ export default function Scene({
   const orbitRadius = (containerWidth ?? 0) * 0.404;
   const orbitDot = (containerWidth ?? 0) * (isNarrow ? 0.0586 : 0.0423);
 
+  // The overlay is fixed inset-0, so measuring it measures the viewport. The
+  // wave has to reach the far corners for "filled" to be true, and how far
+  // that is depends on the aspect ratio — a fixed ring count covers 16:9 and
+  // falls short of an ultrawide.
+  const {
+    ref: viewportRef,
+    width: viewportWidth,
+    height: viewportHeight,
+  } = useElementSize<HTMLDivElement>();
+
   useEffect(() => {
     const home = pathname === "/";
     setPhase(home ? "home" : "docked");
@@ -94,12 +129,17 @@ export default function Scene({
     );
   }, [pathname, setPhase, setActiveNode, engaged, rotation]);
 
-  // Ring count blooms 2 -> 8 -> 2 on every navigation. Held in a motion value so
-  // the tween itself is frame-driven; mirrored into state only because
-  // ringGeometry runs at render time.
-  const bloom = useMotionValue(0);
-  const [bloomT, setBloomT] = useState(0);
-  useMotionValueEvent(bloom, "change", setBloomT);
+  // The two phases of the wave, each 0 -> 1 and run back to back: `fill` adds
+  // rings outwards until the screen is covered, then `drain` sweeps the fade
+  // front through them from the centre. Held in motion values so the tweens
+  // are frame-driven; mirrored into state only because ringGeometry runs at
+  // render time.
+  const fill = useMotionValue(0);
+  const drain = useMotionValue(0);
+  const [fillT, setFillT] = useState(0);
+  const [drainT, setDrainT] = useState(0);
+  useMotionValueEvent(fill, "change", setFillT);
+  useMotionValueEvent(drain, "change", setDrainT);
 
   // The eye's own entrance and exit, separate from the ring wave. Previously
   // the whole overlay just switched opacity, which took the pupil and resting
@@ -124,7 +164,8 @@ export default function Scene({
     const ease = PRESENCE_EASE;
 
     if (reduced) {
-      bloom.set(0);
+      fill.set(0);
+      drain.set(0);
       presence.set(home ? 1 : 0);
       orbitPresence.set(home ? 1 : 0);
       orbitSpin.set(0);
@@ -133,10 +174,11 @@ export default function Scene({
 
     // Restart the wave from the beginning. Stopping an animation leaves its
     // value where it stood, so navigating again mid-wave used to resume from
-    // there — `animate(bloom, 1)` from 0.8 is nearly a no-op, which is why a
+    // there — `animate(fill, 1)` from 0.8 is nearly a no-op, which is why a
     // quick second navigation appeared to play no animation at all.
-    const interrupted = bloom.get() > 0;
-    bloom.set(0);
+    const interrupted = fill.get() > 0 || drain.get() > 0;
+    fill.set(0);
+    drain.set(0);
 
     // Coming in on top of an interrupted exit, the overlay is still up while
     // the reset above has just restored every ring it had faded. Drop it and
@@ -164,60 +206,83 @@ export default function Scene({
           animate(orbitSpin, ORBIT_SPIN, { duration: ORBIT_EXIT, ease: "easeIn" }),
         ];
 
-    const wave = animate(bloom, 1, {
-      duration: BLOOM_DURATION,
+    // Phase two is started from phase one's completion rather than run
+    // alongside it on a delay, so the wipe can never begin against a fill that
+    // was cut short — the screen is always covered before anything leaves.
+    let wipe: ReturnType<typeof animate> | null = null;
+
+    const wave = animate(fill, 1, {
+      duration: FILL_DURATION,
       ease: "easeOut",
       onComplete: () => {
-        // Order matters. Resetting the wave restores every ring the fade
-        // front had consumed, so leaving, the overlay has to be down first or
-        // that restoration is visible as a flash. Nothing is lost by cutting
-        // it instantly: the front has already emptied the eye by this point.
-        if (!home) presence.set(0);
-        bloom.set(0);
+        wipe = animate(drain, 1, {
+          duration: DRAIN_DURATION,
+          // Linear: the front is a moving edge, and a constant ring-per-second
+          // sweep is what reads as one. Easing it makes the edge visibly
+          // hesitate at the centre or stall at the rim.
+          ease: "linear",
+          onComplete: () => {
+            // Order matters. Clearing `fill` drops every ring at once, and
+            // clearing `drain` restores the opacity of any the front had
+            // consumed — so leaving, the overlay has to be down first, and
+            // the rings have to go before the front that emptied them, or
+            // that restoration shows as a flash. Nothing is lost by cutting
+            // instantly: the screen is already empty by this point.
+            if (!home) presence.set(0);
+            fill.set(0);
+            drain.set(0);
+          },
+        });
       },
     });
 
     return () => {
       enter.stop();
       wave.stop();
+      wipe?.stop();
       orbitAnims.forEach((a) => a.stop());
     };
-  }, [pathname, bloom, presence, orbitPresence, orbitSpin, reduced]);
+  }, [pathname, fill, drain, presence, orbitPresence, orbitSpin, reduced]);
 
-  // The transition is a wave, not a bloom-and-retract. Rings are born just
-  // outside the resting ring and march outward for the whole animation, while
-  // a fade front chases them from the inside — so the set fills outward and
-  // then empties in the same direction, rather than expanding and reversing.
-  //
-  // Spacing and stroke stay constant, so the rings keep a uniform weight and
-  // an even gap. Ring k sits at pupil + spacing * k, so the outermost reaches
-  // 46 + 40 * 13 = 566 units. The SVG is overflow:visible, so the wave spills
-  // past its box rather than being clipped.
-  const eyeParams = {
-    pupil: HOME_EYE.pupil,
-    spacing: HOME_EYE.spacing,
-    count: HOME_EYE.count + bloomT * BLOOM_RINGS,
-    stroke: HOME_EYE.stroke,
+  // The eye itself is fixed — the resting pupil and its one ring, unchanged
+  // through the whole transition. Everything that moves is the wave outside it.
+  const eyeParams = HOME_EYE;
+
+  // How many rings it takes to clear the furthest corner. The container is
+  // sized in vmin but drawn in a fixed viewBox, so pixels convert to user
+  // units through its measured width — which means this comes out the same on
+  // any monitor of a given shape, and only grows for wider ones.
+  const unitsPerPx = containerWidth ? EYE_VIEWBOX / containerWidth : 0;
+  const reach =
+    viewportWidth && viewportHeight
+      ? 0.5 * Math.hypot(viewportWidth, viewportHeight) * unitsPerPx
+      : 0;
+  const waveRings = Math.max(
+    MIN_WAVE_RINGS,
+    Math.ceil((reach - WAVE_START) / WAVE_SPACING) + 1,
+  );
+
+  // Rings march outward for the whole fill, at constant spacing and stroke so
+  // they keep a uniform weight and an even gap. The SVG is overflow:visible,
+  // so the wave spills past its box rather than being clipped at it.
+  const waveParams = {
+    pupil: WAVE_START,
+    spacing: WAVE_SPACING,
+    count: fillT * waveRings,
+    stroke: WAVE_STROKE,
     birthFade: RING_BIRTH_FADE,
   };
 
-  // Arriving home, the eye has to survive the transition, so the front is
-  // held off the pupil and resting ring and waits for the wave to gain some
-  // depth first. Leaving for a content route it starts immediately and is
-  // allowed to consume everything: the iris goes first and the eye empties
-  // from its centre outwards, which is how it departs — rather than sitting
-  // there and fading out as a whole once the wave is over.
+  // Arriving home, the eye has to survive the transition, so the front is held
+  // off the pupil and resting ring and only wipes the wave. Leaving for a
+  // content route it is allowed to consume everything: the iris goes first and
+  // the eye empties from its centre outwards, which is how it departs — rather
+  // than sitting there and fading out as a whole once the wave is over.
   const protectCore = isHome;
-  const fadeStart = protectCore ? FADE_START : 0;
-  // The front has to overrun the outermost ring by the width of its own edge,
-  // or the wave ends with that ring still partly drawn and the count reset
-  // snaps it away. Overrunning by more than that is not free either: the set
-  // empties early and the tail of the wave plays to an empty screen. Sized
-  // against FADE_EDGE — at +4 with the narrow edge it finished 16% early.
-  const innerFade =
-    bloomT <= fadeStart
-      ? 0
-      : ((bloomT - fadeStart) / (1 - fadeStart)) * (BLOOM_RINGS + 2);
+  // Indices run 0 (pupil), 1 (resting ring), then the wave. The front has to
+  // overrun the outermost by the width of its own edge, or the wipe ends with
+  // that ring still partly drawn and clearing the rings snaps it away.
+  const innerFade = drainT * (waveRings + 2);
 
   // Pupil travel is bounded so it can never cross its ring. Constant now that
   // spacing and stroke no longer animate, but still derived rather than
@@ -252,6 +317,7 @@ export default function Scene({
     <div className="relative min-h-screen text-brand-dark dark:text-brand-white">
       {maintenanceBanner}
       <motion.div
+        ref={viewportRef}
         className="pointer-events-none fixed inset-0 z-0 flex items-center justify-center"
         style={{ opacity: presence }}
         inert={!isHome}
@@ -274,7 +340,8 @@ export default function Scene({
         >
           <Eye
             params={eyeParams}
-            size={320}
+            wave={waveParams}
+            size={EYE_VIEWBOX}
             pupilX={pupilX}
             pupilY={pupilY}
             ringX={ringX}
