@@ -67,14 +67,16 @@ interface EyeProps {
    */
   blink?: MotionValue<number>;
   /**
-   * Hold the pupil and the resting ring at full opacity, letting the front
-   * pass over only the transition rings. Set when the transition ends on the
-   * homepage, where the eye has to still be there afterwards; without it the
-   * count reset at the end of a wave would pop the resting eye back in.
+   * Hold the resting eye's rings at full opacity, letting the front pass over
+   * only the wave. Set when the transition ends on the homepage, where the eye
+   * has to still be there afterwards; without it, clearing the wave at the end
+   * would pop the resting ring back in.
    *
-   * Cleared when leaving for a content route, so the front consumes the iris
-   * first and the eye empties from its centre outwards rather than fading out
-   * as a whole at the end.
+   * Cleared when leaving for a content route, so the eye empties from its
+   * centre outwards rather than fading out as a whole at the end.
+   *
+   * Never applies to the pupil, which is exempt from the front either way —
+   * it leaves by closing. See `blink`.
    */
   protectCore?: boolean;
   className?: string;
@@ -133,8 +135,13 @@ export default function Eye({
   const cornerRadius = (pupil?.r ?? 0) * CORNER_ROUND;
 
   const opacityOf = (ring: (typeof core)[number]) => {
-    // The core is the resting eye — every ring the params set describes. The
-    // wave beyond it is always consumable.
+    // The pupil is exempt whichever way the transition is going: it leaves by
+    // closing, not by fading. The front reaches index 0 within a few ms of
+    // starting, so letting it cut the iris too would erase it before the lid
+    // had moved at all — the exit would be over before it was visible.
+    if (ring.k === 0) return ring.opacity;
+    // The rest of the resting eye survives only when the eye has to still be
+    // there afterwards. The wave beyond it is always consumable.
     if (protectCore && ring.k < core.length) return ring.opacity;
     // A front wider than one ring: a hard edge makes the iris blink rather
     // than dissolve, since it is a single element the front crosses in one step.
