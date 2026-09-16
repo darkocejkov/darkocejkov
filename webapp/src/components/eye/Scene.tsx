@@ -24,6 +24,13 @@ const BLOOM_DURATION = 2.2;
 const BLOOM_RINGS = 12;
 /** Fraction of the wave elapsed before the inner rings start fading out. */
 const FADE_START = 0.3;
+/** Seconds the eye takes to arrive or leave. */
+const PRESENCE_DURATION = 0.75;
+/**
+ * Decelerating. The eye arrives quickly and settles; easing in at both ends
+ * reads as sluggish over three quarters of a second.
+ */
+const PRESENCE_EASE = [0.22, 1, 0.36, 1] as const;
 
 export default function Scene({
   children,
@@ -79,26 +86,50 @@ export default function Scene({
   const [bloomT, setBloomT] = useState(0);
   useMotionValueEvent(bloom, "change", setBloomT);
 
-  // Derived, not separate state: the wave is running exactly when bloom is
-  // off its resting value, and bloomT is already mirrored into React for
-  // ringGeometry. A second useState here would duplicate that and have to be
-  // written from inside the effect.
-  const transitioning = bloomT > 0;
+  // The eye's own entrance and exit, separate from the ring wave. Previously
+  // the whole overlay just switched opacity, which took the pupil and resting
+  // ring with it — the eye blinked out the instant the wave finished instead
+  // of leaving. It is present on the homepage, and on a content route only
+  // for as long as a transition is playing.
+  const presence = useMotionValue(isHome ? 1 : 0);
 
+  // One effect owns the whole transition — the ring wave and the eye's own
+  // arrival and departure. Splitting them meant the eye's target was computed
+  // from `isHome`, which flips the instant the route changes, while the wave
+  // only registered a frame later; for those frames the eye was aiming at
+  // absent and visibly dipped before climbing back.
   useEffect(() => {
+    const home = pathname === "/";
+    const ease = PRESENCE_EASE;
+
     if (reduced) {
       bloom.set(0);
+      presence.set(home ? 1 : 0);
       return;
     }
-    const controls = animate(bloom, 1, {
+
+    // Arrive first, or hold if already here.
+    const enter = animate(presence, 1, { duration: PRESENCE_DURATION, ease });
+    let exit: ReturnType<typeof animate> | undefined;
+
+    const wave = animate(bloom, 1, {
       duration: BLOOM_DURATION,
       ease: "easeOut",
-      // Every ring past the resting one has already faded to nothing by the
-      // end of the wave, so resetting the count here is invisible.
-      onComplete: () => bloom.set(0),
+      onComplete: () => {
+        // Every ring past the resting one has already faded to nothing by the
+        // end of the wave, so resetting the count here is invisible.
+        bloom.set(0);
+        // The eye only leaves if this route is not its home.
+        if (!home) exit = animate(presence, 0, { duration: PRESENCE_DURATION, ease });
+      },
     });
-    return () => controls.stop();
-  }, [pathname, bloom, reduced]);
+
+    return () => {
+      enter.stop();
+      wave.stop();
+      exit?.stop();
+    };
+  }, [pathname, bloom, presence, reduced]);
 
   // The transition is a wave, not a bloom-and-retract. Rings are born just
   // outside the resting ring and march outward for the whole animation, while
@@ -138,6 +169,10 @@ export default function Scene({
   const ringX = useTransform(px, (v) => v * travel * 0.35);
   const ringY = useTransform(py, (v) => v * travel * 0.35);
 
+  // Scaling with the fade is what makes it read as arriving and receding
+  // rather than being switched on and off.
+  const eyeScale = useTransform(presence, [0, 1], [0.82, 1]);
+
   // The satellites counter-move against the pointer. Moving them *with* the
   // pupil, only further, made them read as welded to the iris; opposing it
   // puts them on their own plane in front of the eye, which is what separates
@@ -149,18 +184,16 @@ export default function Scene({
   return (
     <div className="relative min-h-screen text-brand-dark dark:text-brand-white">
       {maintenanceBanner}
-      <div
-        className={[
-          "pointer-events-none fixed inset-0 z-0 flex items-center justify-center",
-          "transition-opacity duration-500",
-          isHome || transitioning ? "opacity-100" : "opacity-0",
-        ].join(" ")}
+      <motion.div
+        className="pointer-events-none fixed inset-0 z-0 flex items-center justify-center"
+        style={{ opacity: presence }}
         inert={!isHome}
       >
-        <div
+        <motion.div
           ref={eyeContainerRef}
           className="pointer-events-auto relative"
           style={{
+            scale: eyeScale,
             width: "78vmin",
             height: "78vmin",
             // Only while the rotary is live. Dragging is touch-only but is
@@ -192,8 +225,8 @@ export default function Scene({
               />
             )}
           </motion.div>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
 
       {/* Sibling of the inert overlay, not inside it — otherwise it would be
           unreachable (hit-testing and Tab) on content routes. Single mount for
