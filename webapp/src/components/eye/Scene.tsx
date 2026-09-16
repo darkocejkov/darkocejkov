@@ -24,6 +24,11 @@ const BLOOM_DURATION = 2.2;
 const BLOOM_RINGS = 12;
 /** Fraction of the wave elapsed before the inner rings start fading out. */
 const FADE_START = 0.3;
+/**
+ * How much of a ring index an arriving ring takes to reach full opacity. Well
+ * under one, so rings snap in at their full weight rather than drifting up.
+ */
+const RING_BIRTH_FADE = 0.22;
 /** Seconds the eye takes to arrive or leave. */
 const PRESENCE_DURATION = 0.75;
 /** Radians the orbit sweeps through as the satellites arrive or leave. */
@@ -190,6 +195,7 @@ export default function Scene({
     spacing: HOME_EYE.spacing,
     count: HOME_EYE.count + bloomT * BLOOM_RINGS,
     stroke: HOME_EYE.stroke,
+    birthFade: RING_BIRTH_FADE,
   };
 
   // Arriving home, the eye has to survive the transition, so the front is

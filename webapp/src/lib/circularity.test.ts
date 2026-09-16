@@ -33,8 +33,23 @@ describe("ringGeometry", () => {
     expect(rings[0].opacity).toBe(1);
     expect(rings[1].opacity).toBe(1);
     expect(rings[2].opacity).toBeCloseTo(0.5);
-    // Stroke width scales with opacity so the ring thins in as it fades in.
-    expect(rings[2].strokeWidth).toBeCloseTo(base.stroke * 0.5);
+    // Width is independent of the fade: a ring arrives at its full weight and
+    // only its opacity comes up, so the stroke never appears to thin.
+    expect(rings[2].strokeWidth).toBeCloseTo(base.stroke);
+  });
+
+  it("brings a new ring to full opacity within birthFade of its arrival", () => {
+    // Default: the fade spans a whole ring index.
+    expect(ringGeometry({ ...base, count: 2.5 })[2].opacity).toBeCloseTo(0.5);
+
+    // A short birthFade reaches full opacity much sooner, without touching
+    // where the ring sits or how heavy it is.
+    const quick = ringGeometry({ ...base, count: 2.5, birthFade: 0.25 });
+    expect(quick[2].opacity).toBe(1);
+    expect(quick[2].strokeWidth).toBeCloseTo(base.stroke);
+
+    // Still ramps rather than popping: barely-arrived is still faint.
+    expect(ringGeometry({ ...base, count: 2.1, birthFade: 0.25 })[2].opacity).toBeCloseTo(0.4);
   });
 
   it("emits no path data under neutral parameters — circles, never paths", () => {
