@@ -28,7 +28,11 @@ const EYE_VIEWBOX = 320;
  * ring in onto the iris — see Eye's `wave` prop.
  */
 const WAVE_SPACING = 14;
-const WAVE_STROKE = 6;
+/**
+ * Half the spacing, so ring and gap carry equal weight. Going heavier than
+ * this inverts the wave — the gaps become the figure and the rings the ground.
+ */
+const WAVE_STROKE = 7;
 /**
  * Radius of the wave's innermost ring: clear of the resting ring's outer edge
  * by one of the wave's own gaps, so the two sets read as continuous.
@@ -65,6 +69,15 @@ const ORBIT_EXIT = 0.32;
  */
 const ORBIT_ENTER = 0.45;
 const ORBIT_ENTER_DELAY = FILL_DURATION;
+/**
+ * The iris leaves by closing. Quantising the tween's progress into this many
+ * held frames gives the same stop-motion feel as an idle blink, rather than a
+ * smooth sweep that would read as a different eye entirely — four steps lands
+ * on the 25/50/75/shut the blink already uses.
+ */
+const LID_STEPS = 4;
+const LID_DURATION = 0.22;
+const steppedLid = (t: number) => Math.ceil(t * LID_STEPS) / LID_STEPS;
 /**
  * Decelerating. The eye arrives quickly and settles; easing in at both ends
  * reads as sluggish even over this shorter run.
@@ -154,6 +167,12 @@ export default function Scene({
   const orbitPresence = useMotionValue(isHome ? 1 : 0);
   const orbitSpin = useMotionValue(isHome ? 0 : ORBIT_SPIN);
 
+  // The iris's exit: the eye closes rather than being cut away by the fade
+  // front. It rides the same lid as a blink, so the two combine by whichever
+  // is further shut — a blink landing mid-exit cannot reopen it.
+  const irisLid = useMotionValue(0);
+  const centreLid = useTransform([blink, irisLid], ([b, l]: number[]) => Math.max(b, l));
+
   // One effect owns the whole transition — the ring wave and the eye's own
   // arrival and departure. Splitting them meant the eye's target was computed
   // from `isHome`, which flips the instant the route changes, while the wave
@@ -166,6 +185,7 @@ export default function Scene({
     if (reduced) {
       fill.set(0);
       drain.set(0);
+      irisLid.set(0);
       presence.set(home ? 1 : 0);
       orbitPresence.set(home ? 1 : 0);
       orbitSpin.set(0);
@@ -179,6 +199,10 @@ export default function Scene({
     const interrupted = fill.get() > 0 || drain.get() > 0;
     fill.set(0);
     drain.set(0);
+    // Back open, ready to close again. Arriving home this is the eye that shut
+    // on the way out being reset, which is invisible: presence is still 0, so
+    // the eye is not on screen yet when it happens.
+    irisLid.set(0);
 
     // Coming in on top of an interrupted exit, the overlay is still up while
     // the reset above has just restored every ring it had faded. Drop it and
@@ -210,11 +234,20 @@ export default function Scene({
     // alongside it on a delay, so the wipe can never begin against a fill that
     // was cut short — the screen is always covered before anything leaves.
     let wipe: ReturnType<typeof animate> | null = null;
+    let close: ReturnType<typeof animate> | null = null;
 
     const wave = animate(fill, 1, {
       duration: FILL_DURATION,
       ease: "easeOut",
       onComplete: () => {
+        // Leaving, the eye shuts as the wipe starts — the two are one gesture,
+        // so this hangs off the same moment rather than a delay of its own.
+        // It stays open for the fill, where it is the source the wave radiates
+        // from; closing it there would lose the centre of the picture.
+        if (!home) {
+          close = animate(irisLid, 1, { duration: LID_DURATION, ease: steppedLid });
+        }
+
         wipe = animate(drain, 1, {
           duration: DRAIN_DURATION,
           // Linear: the front is a moving edge, and a constant ring-per-second
@@ -240,9 +273,10 @@ export default function Scene({
       enter.stop();
       wave.stop();
       wipe?.stop();
+      close?.stop();
       orbitAnims.forEach((a) => a.stop());
     };
-  }, [pathname, fill, drain, presence, orbitPresence, orbitSpin, reduced]);
+  }, [pathname, fill, drain, irisLid, presence, orbitPresence, orbitSpin, reduced]);
 
   // The eye itself is fixed — the resting pupil and its one ring, unchanged
   // through the whole transition. Everything that moves is the wave outside it.
@@ -348,7 +382,7 @@ export default function Scene({
             ringY={ringY}
             innerFade={innerFade}
             protectCore={protectCore}
-            blink={blink}
+            blink={centreLid}
             className="h-full w-full"
           />
           {/* motion.div, not div: reading a motion value with .get() inside a
