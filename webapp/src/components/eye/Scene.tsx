@@ -119,8 +119,10 @@ export default function Scene({
         // Every ring past the resting one has already faded to nothing by the
         // end of the wave, so resetting the count here is invisible.
         bloom.set(0);
-        // The eye only leaves if this route is not its home.
-        if (!home) exit = animate(presence, 0, { duration: PRESENCE_DURATION, ease });
+        // Leaving, the fade front has already consumed every ring including
+        // the iris, so there is nothing left to see — this just clears the
+        // empty overlay. Arriving home, the eye stays.
+        if (!home) exit = animate(presence, 0, { duration: 0.2, ease });
       },
     });
 
@@ -147,14 +149,18 @@ export default function Scene({
     stroke: HOME_EYE.stroke,
   };
 
-  // The fade front sets off once the wave has some depth to eat into, and is
-  // scaled so it reaches the outermost ring exactly as the wave ends. Running
-  // it faster empties the set well before the animation is over and leaves a
-  // stretch of nothing on screen.
+  // Arriving home, the eye has to survive the transition, so the front is
+  // held off the pupil and resting ring and waits for the wave to gain some
+  // depth first. Leaving for a content route it starts immediately and is
+  // allowed to consume everything: the iris goes first and the eye empties
+  // from its centre outwards, which is how it departs — rather than sitting
+  // there and fading out as a whole once the wave is over.
+  const protectCore = isHome;
+  const fadeStart = protectCore ? FADE_START : 0;
   const innerFade =
-    bloomT <= FADE_START
+    bloomT <= fadeStart
       ? 0
-      : ((bloomT - FADE_START) / (1 - FADE_START)) * (BLOOM_RINGS + 2);
+      : ((bloomT - fadeStart) / (1 - fadeStart)) * (BLOOM_RINGS + 2);
 
   // Pupil travel is bounded so it can never cross its ring. Constant now that
   // spacing and stroke no longer animate, but still derived rather than
@@ -212,6 +218,7 @@ export default function Scene({
             ringX={ringX}
             ringY={ringY}
             innerFade={innerFade}
+            protectCore={protectCore}
             className="h-full w-full"
           />
           {/* motion.div, not div: reading a motion value with .get() inside a

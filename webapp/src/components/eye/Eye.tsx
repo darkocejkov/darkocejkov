@@ -3,6 +3,9 @@
 import { motion, type MotionValue } from "motion/react";
 import { ringGeometry, type RingParams } from "@/lib/circularity";
 
+/** Width of the fade front, in ring indices. */
+const FADE_EDGE = 2.5;
+
 interface EyeProps {
   params: RingParams;
   /** viewBox edge length. The eye is centred within it. */
@@ -18,13 +21,22 @@ interface EyeProps {
   ringX?: MotionValue<number>;
   ringY?: MotionValue<number>;
   /**
-   * Index of the fade front during a transition. Rings at k below this have
-   * faded out, with a one-ring soft edge, so the set empties from the inside
-   * outwards. Rings 0 and 1 — the pupil and the resting ring — are never
-   * faded, which is what lets the transition end without the resting eye
-   * popping back into view.
+   * Position of the fade front during a transition, in ring indices. Rings
+   * behind it have faded out, so the set empties from the inside outwards.
+   * Starts at 0, where everything is still fully drawn.
    */
   innerFade?: number;
+  /**
+   * Hold the pupil and the resting ring at full opacity, letting the front
+   * pass over only the transition rings. Set when the transition ends on the
+   * homepage, where the eye has to still be there afterwards; without it the
+   * count reset at the end of a wave would pop the resting eye back in.
+   *
+   * Cleared when leaving for a content route, so the front consumes the iris
+   * first and the eye empties from its centre outwards rather than fading out
+   * as a whole at the end.
+   */
+  protectCore?: boolean;
   className?: string;
 }
 
@@ -43,6 +55,7 @@ export default function Eye({
   ringX,
   ringY,
   innerFade = 0,
+  protectCore = true,
   className,
 }: EyeProps) {
   const rings = ringGeometry(params);
@@ -50,8 +63,13 @@ export default function Eye({
   const pupil = rings.find((r) => r.k === 0);
   const outer = rings.filter((r) => r.k > 0);
 
-  const opacityOf = (ring: (typeof rings)[number]) =>
-    ring.k < 2 ? ring.opacity : ring.opacity * Math.min(1, Math.max(0, ring.k - innerFade));
+  const opacityOf = (ring: (typeof rings)[number]) => {
+    if (protectCore && ring.k < 2) return ring.opacity;
+    // A front wider than one ring: a hard edge makes the iris blink rather
+    // than dissolve, since it is a single element the front crosses in one step.
+    const edge = (ring.k - innerFade + FADE_EDGE) / FADE_EDGE;
+    return ring.opacity * Math.min(1, Math.max(0, edge));
+  };
 
   return (
     <svg
@@ -90,9 +108,9 @@ export default function Eye({
         {pupil && (
           <motion.g style={{ x: pupilX, y: pupilY }}>
             {pupil.d ? (
-              <path d={pupil.d} fill="currentColor" opacity={pupil.opacity} />
+              <path d={pupil.d} fill="currentColor" opacity={opacityOf(pupil)} />
             ) : (
-              <circle r={pupil.r} fill="currentColor" opacity={pupil.opacity} />
+              <circle r={pupil.r} fill="currentColor" opacity={opacityOf(pupil)} />
             )}
           </motion.g>
         )}
