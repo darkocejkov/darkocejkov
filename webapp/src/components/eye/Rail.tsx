@@ -42,7 +42,7 @@ export default function Rail({
 
       <nav
         aria-label="Sections"
-        className="flex flex-col items-center gap-4 [&>*:nth-child(2)]:translate-x-1.5 [&>*:nth-child(3)]:translate-x-2 [&>*:nth-child(4)]:translate-x-1.5 sm:[&>*]:translate-x-0"
+        className="flex flex-col items-center gap-4"
       >
         {NODES.map((node, i) => {
           const isActive = activeNode === i;
@@ -58,7 +58,7 @@ export default function Rail({
                 className={[
                   "block rounded-full bg-current transition-all duration-200",
                   isActive
-                    ? "h-4 w-4 ring-2 ring-brand-orange ring-offset-2"
+                    ? "h-4 w-4 ring-4 ring-brand-orange ring-offset-2"
                     : "h-2.5 w-2.5 opacity-40 group-hover:opacity-100",
                 ].join(" ")}
               />

@@ -48,6 +48,12 @@ export interface RingParams {
   twist?: number;
   /** Shape rotation, in degrees. */
   rotation?: number;
+  /**
+   * How much of a ring index a newly arrived ring takes to reach full
+   * opacity. 1 spreads the fade across the whole step; smaller values bring
+   * it up sooner, so rings arrive crisply instead of drifting in.
+   */
+  birthFade?: number;
   /** Points sampled per ring when a path is required. */
   samples?: number;
 }
@@ -57,9 +63,9 @@ export interface Ring {
   k: number;
   /** Inscribed radius. */
   r: number;
-  /** Stroke width, already scaled by a fractional ring's opacity. */
+  /** Stroke width. Independent of opacity, so an arriving ring is never thin. */
   strokeWidth: number;
-  /** 1 for whole rings; the fractional remainder for a partial outermost ring. */
+  /** 1 for a fully arrived ring; ramping up for one that has only partly arrived. */
   opacity: number;
   /** Origin-centred path data. Present only when the ring is morphed or wavy. */
   d?: string;
@@ -121,6 +127,7 @@ export function ringGeometry(p: RingParams): Ring[] {
     waveRamp = 1,
     twist = 0,
     rotation = 0,
+    birthFade = 1,
     samples = 240,
   } = p;
 
@@ -142,9 +149,12 @@ export function ringGeometry(p: RingParams): Ring[] {
       ? pupil + spacing * k
       : pupil + (spacing * (Math.pow(spacingGrowth, k) - 1)) / (spacingGrowth - 1);
 
+    // A fractional count means the outermost ring has only partly arrived.
+    // It comes up in opacity alone — width is left at full, so the stroke
+    // never appears to thin as the ring materialises.
     const remainder = count - k;
-    const opacity = remainder >= 1 ? 1 : Math.max(0, remainder);
-    const strokeWidth = stroke * Math.pow(taper, k) * opacity;
+    const opacity = Math.min(1, Math.max(0, remainder / birthFade));
+    const strokeWidth = stroke * Math.pow(taper, k);
 
     const u = Math.min(1, k / denom);
     const morph = Math.pow(u, morphCurve);

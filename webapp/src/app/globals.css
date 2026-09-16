@@ -32,16 +32,74 @@
   }
 }
 
-@keyframes marquee {
-  0% {
-    transform: translateX(0);
+
+/* ---------------------------------------------------------------- *
+ * Theme cross-fade
+ *
+ * Scoped to colour properties only. A blanket `transition: all` would
+ * also animate layout and the eye's ring geometry, which changes every
+ * frame during the bloom. The inline theme script in layout.tsx sets
+ * `.dark` before first paint, so nothing transitions on load.
+ * ---------------------------------------------------------------- */
+.theme-fade,
+.theme-fade * {
+  transition-property: background-color, border-color, color, fill, stroke, outline-color;
+  transition-duration: 420ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ---------------------------------------------------------------- *
+ * Film grain
+ *
+ * A ::after on body rather than a React node: no extra element to keep
+ * in the tree, and nothing for the scene to stack against. Sits above
+ * everything (the toggle is z-20, content z-10, eye z-0) and is inert
+ * to input. Dark mode carries slightly more because noise reads weaker
+ * against a dark ground.
+ * ---------------------------------------------------------------- */
+:root {
+  --grain-opacity: 0.075;
+}
+
+.dark {
+  --grain-opacity: 0.1;
+}
+
+.grain::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+  opacity: var(--grain-opacity);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+}
+
+@keyframes symbol-pulse {
+  0%, 100% {
+    opacity: 0.3;
+    transform: translateY(0);
   }
 
-  100% {
-    transform: translateX(-50%);
+  50% {
+    opacity: 1;
+    transform: translateY(-2px);
   }
 }
 
-.animate-marquee {
-  animation: marquee 20s linear infinite;
+.animate-symbol-pulse {
+  animation: symbol-pulse 1.8s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-fade,
+  .theme-fade * {
+    transition-duration: 0.01ms;
+  }
+
+  .animate-symbol-pulse {
+    animation: none;
+    opacity: 1;
+  }
 }
