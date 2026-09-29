@@ -39,8 +39,8 @@ export default function ThingsPage() {
                 </div>
                 {thing.type && <p className="text-xs text-gray-400">{thing.type}</p>}
                 {thing.body.trim() && (
-                  <div className="mt-1 text-xs text-gray-500">
-                    <Mdx source={thing.body} />
+                  <div className="mt-1">
+                    <Mdx source={thing.body} className="text-xs text-gray-500" />
                   </div>
                 )}
               </li>

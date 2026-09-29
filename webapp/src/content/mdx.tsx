@@ -68,11 +68,16 @@ const components = {
   Embed,
 };
 
-/** Render an MDX body with the site's component map and prose styling. */
-export async function Mdx({ source }: { source: string }) {
+/**
+ * Render an MDX body with the site's component map and prose styling.
+ * `className` is merged after the prose classes, as Markdown.tsx and
+ * RichText.tsx did, so a page can pass typography modifiers such as
+ * `prose-sm` or `prose-p:text-gray-500`.
+ */
+export async function Mdx({ source, className }: { source: string; className?: string }) {
   if (!source.trim()) return null;
   return (
-    <div className={PROSE_CLASS}>
+    <div className={[PROSE_CLASS, className].filter(Boolean).join(" ")}>
       <MDXRemote
         source={source}
         components={components}
