@@ -14,12 +14,15 @@
     "@strapi/blocks-react-renderer": "^1.0.2",
     "@tailwindcss/typography": "^0.5.19",
     "@tanstack/react-query": "^5.90.21",
+    "gray-matter": "^4.0.3",
     "motion": "^12.36.0",
     "next": "16.1.6",
+    "next-mdx-remote": "^6.0.0",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-markdown": "^10.1.0",
     "remark-gfm": "^4.0.1",
+    "zod": "^4.6.5",
     "zustand": "^5.0.11"
   },
   "devDependencies": {
