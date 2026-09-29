@@ -24,12 +24,12 @@ export { assetUrl, isExternalHref } from "./asset";
 export { ContentError } from "./load";
 
 /**
- * Content lives beside the Next app, not inside it. Next runs with the app
- * directory as its cwd during both build and dev, so one level up is the
- * repository root. CONTENT_DIR overrides it for tests.
+ * Content sits at the project root, alongside the app that reads it. Next runs
+ * with the project directory as its cwd during both build and dev.
+ * CONTENT_DIR overrides it for tests.
  */
 export function contentDir(): string {
-  return process.env.CONTENT_DIR ?? path.join(process.cwd(), "..", "content");
+  return process.env.CONTENT_DIR ?? path.join(process.cwd(), "content");
 }
 
 const isProduction = () => process.env.NODE_ENV === "production";

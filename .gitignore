@@ -116,3 +116,21 @@ build
 
 # Superpowers brainstorming companion
 .superpowers/
+
+############################
+# Next.js
+############################
+
+/.next/
+/out/
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+.vercel
+*.tsbuildinfo
+next-env.d.ts
+*.pem

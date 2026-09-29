@@ -74,7 +74,7 @@ content/                      # repo root
   about.mdx
   statement.mdx
 
-webapp/src/content/
+src/content/
   schema.ts     zod schemas — the single definition of every item shape
   load.ts       read + parse frontmatter + validate  (raw, unresolved)
   graph.ts      resolve references, invert relations, collect tags
@@ -317,35 +317,37 @@ but unrendered; this work makes the data available, and designing those pages is
 
 ## Deployment
 
-Content sits outside the Next application directory, so both the build *and the running
-server* must reach it. The tempting simplification — that content is read at build time only,
-which would make this a build configuration concern rather than a runtime bundling one — is
-wrong, and the implementation proved it. The root layout renders `MaintenanceBanner`, which
-fetches Strapi with `next: { revalidate: 60 }`, and that puts every route on ISR. Pages are
-prerendered, but they re-render on the server once their revalidation window lapses, and each
-of those re-renders reads `content/` off the filesystem again.
+The app sits at the repository root, so `content/` is inside the project directory and no
+build-configuration gymnastics are needed to reach it. That was not always true: content
+originally lived beside a `webapp/` subdirectory, which forced a tracing root, an
+out-of-project glob, and a manual Vercel setting. Moving the app to the root deleted all
+three.
 
-- Enable *"Include source files outside of the Root Directory in the Build Step"* on Vercel
-  (Project Settings → Build). On another host, build with the app directory as the working
-  directory, or set `CONTENT_DIR`. Building from the repository root is *not* an escape hatch
-  on its own: `contentDir()` resolves `path.join(process.cwd(), "..", "content")`, so a
-  repo-root cwd looks for content in the repository's parent and fails.
-- Set `outputFileTracingRoot` to the repository root in `next.config.ts`. This is independent
-  of `turbopack.root`, which must stay pinned to the app directory — a stray root lockfile
-  otherwise breaks module resolution.
-- Set `outputFileTracingIncludes` to carry `../content/**/*` into every route. This is
-  load-bearing, not belt-and-braces. `outputFileTracingRoot` only *permits* files under the
-  repository root to be traced; the tracer still has to observe them being read, and it cannot,
-  because `load.ts` reads a directory computed from `process.cwd()` at runtime and no static
-  analysis follows that. Without the explicit include, a traced deploy ships without `content/`
-  and 500s on the first render after a revalidation — not at build time, when it would be
-  noticed.
-- The empty-directory guard in `load.ts` turns a misconfiguration into a loud failure, and its
-  message names the Vercel setting rather than leaving the reader to find it here.
+One piece survives the move, because it was never about where content lives:
 
-**Known ergonomic cost:** Turbopack watches only inside the Next project, so editing a file in
-`content/` will not hot-reload. Because the graph re-reads per request in development, a manual
-browser refresh picks up the change.
+- `outputFileTracingIncludes` carries `./content/**/*` into every route. The tracer only
+  includes what it can observe statically, and `load.ts` reads a directory computed from
+  `process.cwd()` at runtime — no analysis follows that, at any path depth. Without the
+  explicit include a traced deploy ships without `content/`.
+
+  This matters because the tempting simplification — that content is read at build time only —
+  is wrong, and the implementation proved it. The root layout renders `MaintenanceBanner`,
+  which fetches Strapi with `next: { revalidate: 60 }`, putting every route on ISR. Pages are
+  prerendered, but they re-render on the server once their revalidation window lapses, and
+  each re-render reads `content/` off the filesystem again. A missing include therefore fails
+  *after* deploy, not at build time when it would be noticed — and it fails quietly, serving
+  stale prerendered content while the function logs fill with `content directory not found`.
+
+- `turbopack.root` stays pinned to the project directory. Next infers the workspace root by
+  walking up for lockfiles, and a stray one in any parent directory moves module resolution
+  somewhere without a `node_modules`.
+
+- The empty-directory guard in `load.ts` turns a misconfiguration into a loud failure rather
+  than an empty site.
+
+**Known ergonomic cost:** editing a file in `content/` does not hot-reload, because Turbopack
+watches the app's own source rather than arbitrary data files. The graph re-reads per request
+in development, so a manual browser refresh picks up the change.
 
 ## Verification
 

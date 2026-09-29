@@ -7,8 +7,8 @@ import { Mdx } from "@/content/mdx";
  * Prerender every article at build time. Not the end of it, though: the
  * maintenance banner puts every route on ISR, so a page re-renders on the
  * server after its revalidation window and reads content/ off disk again.
- * That is why next.config.ts needs outputFileTracingIncludes as well as
- * outputFileTracingRoot — see the comment there.
+ * That is why next.config.ts needs outputFileTracingIncludes — see the
+ * comment there.
  */
 export function generateStaticParams() {
   return getArticles().map((a) => ({ slug: a.slug }));
