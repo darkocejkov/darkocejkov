@@ -14,7 +14,17 @@ describe("the real content directory", () => {
     expect(graph.about.displayName.length).toBeGreaterThan(0);
   });
 
-  it("resolves identically with drafts included", () => {
-    expect(() => resolve(load(contentDir()), { includeDrafts: true })).not.toThrow();
+  // Development renders drafts, so a draft with a broken reference has to fail
+  // the check too — and the tree has to actually contain one, or this asserts
+  // nothing. The count comparison is what proves that.
+  it("resolves with drafts included, and they are the only difference", () => {
+    const published = resolve(load(contentDir()), { includeDrafts: false });
+    const withDrafts = resolve(load(contentDir()), { includeDrafts: true });
+
+    expect(withDrafts.articles.length).toBeGreaterThan(published.articles.length);
+    expect(withDrafts.articles.filter((a) => a.draft).length).toBe(
+      withDrafts.articles.length - published.articles.length
+    );
+    expect(published.articles.every((a) => !a.draft)).toBe(true);
   });
 });
