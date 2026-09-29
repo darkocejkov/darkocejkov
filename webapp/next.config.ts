@@ -8,10 +8,16 @@ import { fileURLToPath } from "node:url";
 // webpack fails outright with "Can't resolve 'tailwindcss'".
 const appDir = fileURLToPath(new URL(".", import.meta.url));
 
+// Content lives at the repository root, outside this app. Tracing has to start
+// there or the build will not carry those files. Distinct from turbopack.root,
+// which must stay pinned to appDir — see the comment above.
+const repoRoot = fileURLToPath(new URL("../", import.meta.url));
+
 const nextConfig: NextConfig = {
   turbopack: {
     root: appDir,
   },
+  outputFileTracingRoot: repoRoot,
   images: {
     remotePatterns: [
       {

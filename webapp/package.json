@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "content:check": "vitest run src/content/check.test.ts"
   },
   "dependencies": {
     "@strapi/blocks-react-renderer": "^1.0.2",
