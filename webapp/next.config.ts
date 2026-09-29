@@ -8,9 +8,17 @@ import { fileURLToPath } from "node:url";
 // webpack fails outright with "Can't resolve 'tailwindcss'".
 const appDir = fileURLToPath(new URL(".", import.meta.url));
 
-// Content lives at the repository root, outside this app. Tracing has to start
-// there or the build will not carry those files. Distinct from turbopack.root,
-// which must stay pinned to appDir — see the comment above.
+// Content lives at the repository root, outside this app, and both tracing
+// settings below are needed to ship it. outputFileTracingRoot only *permits*
+// files under the repo root to be traced; the tracer (@vercel/nft) still has
+// to see them being read, and it cannot — load.ts reads the directory at
+// runtime from a path computed off process.cwd(), which is invisible to static
+// analysis. outputFileTracingIncludes is what actually carries the files.
+// Without it a traced deploy (Vercel, `output: "standalone"`) fails at runtime
+// with "content directory not found", because pages are on ISR via the
+// MaintenanceBanner fetch and re-read the filesystem after revalidation.
+// Distinct from turbopack.root, which must stay pinned to appDir — see the
+// comment above.
 const repoRoot = fileURLToPath(new URL("../", import.meta.url));
 
 const nextConfig: NextConfig = {
@@ -18,6 +26,11 @@ const nextConfig: NextConfig = {
     root: appDir,
   },
   outputFileTracingRoot: repoRoot,
+  // Globs resolve from this app directory (Next runs them with cwd = project
+  // dir), so ../content is the repo-root folder. "/**" applies to every route.
+  outputFileTracingIncludes: {
+    "/**": ["../content/**/*"],
+  },
   images: {
     remotePatterns: [
       {
