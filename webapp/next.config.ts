@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { PHASE_PRODUCTION_BUILD } from "next/constants";
 import { fileURLToPath } from "node:url";
 
 // Pin the workspace root. Next infers it by walking up for lockfiles, so a
@@ -17,19 +18,11 @@ const appDir = fileURLToPath(new URL(".", import.meta.url));
 // Without it a traced deploy (Vercel, `output: "standalone"`) fails at runtime
 // with "content directory not found", because pages are on ISR via the
 // MaintenanceBanner fetch and re-read the filesystem after revalidation.
-// Distinct from turbopack.root, which must stay pinned to appDir — see the
-// comment above.
 const repoRoot = fileURLToPath(new URL("../", import.meta.url));
 
-const nextConfig: NextConfig = {
+const baseConfig: NextConfig = {
   turbopack: {
     root: appDir,
-  },
-  outputFileTracingRoot: repoRoot,
-  // Globs resolve from this app directory (Next runs them with cwd = project
-  // dir), so ../content is the repo-root folder. "/**" applies to every route.
-  outputFileTracingIncludes: {
-    "/**": ["../content/**/*"],
   },
   images: {
     remotePatterns: [
@@ -59,4 +52,39 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+/**
+ * The tracing settings are applied to the production build ONLY, and that is
+ * load-bearing rather than tidiness.
+ *
+ * `outputFileTracingRoot` does double duty in Next: it is the tracing root,
+ * and it is also the root webpack resolves modules from. `next dev` runs on
+ * webpack unless `--turbopack` is passed, so setting it globally makes dev
+ * resolve `node_modules` from the repository root — which has none — and
+ * `@import "tailwindcss"` dies with "Can't resolve 'tailwindcss'". Builds are
+ * unaffected because `turbopack.root` above pins Turbopack to this directory.
+ *
+ * It cannot simply be dropped either: with the project root left at this
+ * directory, `../content/**` is rejected outright — "glob is invalid, it has a
+ * prefix that navigates out of the project root".
+ *
+ * Phase is the axis that separates the two: tracing exists to produce build
+ * output, and dev never traces. Both needs are met by scoping it to the build.
+ *
+ * Moving this app to the repository root would dissolve the conflict entirely
+ * — `content/` would sit inside the project root, no tracing root would be
+ * needed, and the Vercel "Include source files outside of the Root Directory"
+ * setting could go too.
+ */
+export default function config(phase: string): NextConfig {
+  if (phase !== PHASE_PRODUCTION_BUILD) return baseConfig;
+
+  return {
+    ...baseConfig,
+    outputFileTracingRoot: repoRoot,
+    // Globs resolve from this app directory (Next runs them with cwd = project
+    // dir), so ../content is the repo-root folder. "/**" applies to every route.
+    outputFileTracingIncludes: {
+      "/**": ["../content/**/*"],
+    },
+  };
+}
