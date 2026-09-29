@@ -63,7 +63,17 @@ function parseFile<S extends z.ZodType>(
   issues: string[]
 ): Entry<z.infer<S>> | null {
   const raw = readFileSync(path.join(dir, file), "utf8");
-  const { data, content } = matter(raw);
+  let data: unknown;
+  let content: string;
+  try {
+    ({ data, content } = matter(raw));
+  } catch (e) {
+    // gray-matter rethrows js-yaml parse errors; naming the file keeps the
+    // author's whole failure list intact instead of aborting on this one.
+    const message = e instanceof Error ? e.message : String(e);
+    issues.push(`${file}: invalid frontmatter — ${message}`);
+    return null;
+  }
   const result = schema.safeParse(data);
   if (!result.success) {
     issues.push(...describeIssues(file, result.error));

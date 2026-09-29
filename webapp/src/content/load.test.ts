@@ -96,6 +96,23 @@ describe("load", () => {
     expect(issues.join("\n")).toMatch(/three\.mdx/);
   });
 
+  it("reports malformed YAML as an issue alongside schema failures in other files", () => {
+    const dir = makeContentDir({
+      ...REQUIRED,
+      "articles/broken.mdx": '---\ntitle: "unterminated\n---\n',
+      "articles/no-title.mdx": "---\nsummary: No title\npublishedAt: 2026-09-28\n---\n",
+    });
+    let issues: string[] = [];
+    try {
+      load(dir);
+    } catch (e) {
+      expect(e).toBeInstanceOf(ContentError);
+      issues = (e as ContentError).issues;
+    }
+    expect(issues.join("\n")).toMatch(/broken\.mdx: invalid frontmatter/);
+    expect(issues.join("\n")).toMatch(/no-title\.mdx/);
+  });
+
   it("parses an unquoted YAML date without failing validation", () => {
     const dir = makeContentDir({
       ...REQUIRED,
