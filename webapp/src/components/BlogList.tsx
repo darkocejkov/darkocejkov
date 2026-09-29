@@ -2,7 +2,22 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import type { Article } from "@/content";
+
+/**
+ * The slice of an article the list renders. The server page projects this
+ * from the full Article so the body, skills and graph edges never cross the
+ * client boundary. `cover` is resolved to a URL, and its alt is required, so
+ * the image never needs a fallback.
+ */
+export interface BlogListItem {
+  slug: string;
+  title: string;
+  summary: string;
+  publishedAt: string;
+  category?: string;
+  tags: string[];
+  cover: { url: string; alt: string } | null;
+}
 
 function formatDate(date: string) {
   return new Date(date).toLocaleDateString("en-US", {
@@ -17,7 +32,7 @@ export default function BlogList({
   articles,
   categories,
 }: {
-  articles: (Article & { coverUrl: string | null })[];
+  articles: BlogListItem[];
   categories: string[];
 }) {
   const searchParams = useSearchParams();
@@ -57,12 +72,12 @@ export default function BlogList({
           {visible.map((article) => (
             <li key={article.slug} className="py-6 first:pt-0 last:pb-0">
               <Link href={`/blog/${article.slug}`} className="group flex gap-4 items-start">
-                {article.coverUrl && (
+                {article.cover && (
                   <div className="shrink-0 w-20 h-20 rounded-md overflow-hidden bg-gray-100">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
-                      src={article.coverUrl}
-                      alt={article.cover?.alt ?? article.title}
+                      src={article.cover.url}
+                      alt={article.cover.alt}
                       width={80}
                       height={80}
                       className="w-full h-full object-cover"
