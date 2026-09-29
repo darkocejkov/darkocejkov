@@ -52,3 +52,33 @@ export function rotationForNode(index: number, total: number, selectorAngle = SE
 export function maxPupilOffset(spacing: number, stroke: number): number {
   return Math.max(0, spacing - stroke / 2);
 }
+
+export interface Point {
+  x: number;
+  y: number;
+}
+
+/**
+ * Which way an eye at `centre` should look to face `pointer`, as a vector
+ * whose length runs 0 at the centre to 1 at `saturation` pixels away.
+ *
+ * Multiply by `maxPupilOffset` to get the pupil's travel. Because the result
+ * is a bounded *direction* rather than two independently-clamped axes, the
+ * diagonal can never exceed full travel and push the pupil through its ring.
+ *
+ * `centre` is the eye's own position on screen, not the viewport's. The two
+ * coincide only for the home eye; the docked eye sits in the corner, and
+ * measuring its gaze from the middle of the screen made it stare off toward
+ * the centre no matter where the cursor actually was.
+ */
+export function gazeVector(pointer: Point, centre: Point, saturation: number): Point {
+  if (saturation <= 0) return { x: 0, y: 0 };
+
+  const dx = pointer.x - centre.x;
+  const dy = pointer.y - centre.y;
+  const distance = Math.hypot(dx, dy);
+  if (distance === 0) return { x: 0, y: 0 };
+
+  const reach = Math.min(distance / saturation, 1);
+  return { x: (dx / distance) * reach, y: (dy / distance) * reach };
+}

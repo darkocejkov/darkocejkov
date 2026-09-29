@@ -7,6 +7,7 @@ import Eye from "./Eye";
 import Orbit from "./Orbit";
 import Rail from "./Rail";
 import { useParallax, usePointer } from "./usePointer";
+import { useGaze } from "./useGaze";
 import { useRotary } from "./useRotary";
 import { useBlink } from "./useBlink";
 import { useMediaQuery } from "./useMediaQuery";
@@ -322,14 +323,21 @@ export default function Scene({
   // spacing and stroke no longer animate, but still derived rather than
   // hardcoded so retuning HOME_EYE cannot silently break containment.
   const travel = maxPupilOffset(eyeParams.spacing, eyeParams.stroke);
-  const pupilX = useTransform(px, (v) => v * travel);
-  const pupilY = useTransform(py, (v) => v * travel);
+
+  // Gaze, not parallax. `px`/`py` say where the cursor is relative to the
+  // middle of the viewport; the pupil needs to know where it is relative to
+  // this eye. They agree while the eye is centred on the homepage and stop
+  // agreeing the moment it is not — and a direction vector also keeps the
+  // diagonal inside `travel`, which two independently-clamped axes did not.
+  const { gx, gy } = useGaze(eyeContainerRef);
+  const pupilX = useTransform(gx, (v) => v * travel);
+  const pupilY = useTransform(gy, (v) => v * travel);
 
   // The rings drift with the pointer too, but less than the pupil, so the
   // pupil leads and they trail. Without this the rings are nailed down and
   // only the pupil moves, which reads as a flat sticker rather than depth.
-  const ringX = useTransform(px, (v) => v * travel * 0.35);
-  const ringY = useTransform(py, (v) => v * travel * 0.35);
+  const ringX = useTransform(gx, (v) => v * travel * 0.35);
+  const ringY = useTransform(gy, (v) => v * travel * 0.35);
 
   // Scaling with the fade is what makes it read as arriving and receding
   // rather than being switched on and off.
@@ -412,7 +420,7 @@ export default function Scene({
       {!isHome && (
         <div className="relative z-10 flex min-h-screen">
           <aside className="sticky top-0 h-screen flex-none border-r border-brand-dark/10 dark:border-brand-white/10">
-            <Rail px={px} py={py} blink={blink} onBlinkTrigger={triggerBlink} />
+            <Rail blink={blink} onBlinkTrigger={triggerBlink} />
           </aside>
           <main className="min-w-0 flex-1 px-8 py-12">{children}</main>
         </div>

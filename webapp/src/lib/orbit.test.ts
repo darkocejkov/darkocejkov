@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  gazeVector,
   SELECTOR_ANGLE,
   maxPupilOffset,
   nearestNodeIndex,
@@ -58,5 +59,64 @@ describe("maxPupilOffset", () => {
 
   it("never returns a negative travel", () => {
     expect(maxPupilOffset(5, 40)).toBe(0);
+  });
+});
+
+describe("gazeVector", () => {
+  const centre = { x: 100, y: 100 };
+
+  it("looks nowhere when the pointer is on the eye", () => {
+    expect(gazeVector(centre, centre, 200)).toEqual({ x: 0, y: 0 });
+  });
+
+  it("looks right when the pointer is right of the eye", () => {
+    const { x, y } = gazeVector({ x: 300, y: 100 }, centre, 200);
+    expect(x).toBeCloseTo(1);
+    expect(y).toBeCloseTo(0);
+  });
+
+  it("looks left when the pointer is left of the eye", () => {
+    const { x } = gazeVector({ x: -100, y: 100 }, centre, 200);
+    expect(x).toBeCloseTo(-1);
+  });
+
+  it("deflects proportionally within the saturation distance", () => {
+    const { x, y } = gazeVector({ x: 200, y: 100 }, centre, 200);
+    expect(x).toBeCloseTo(0.5);
+    expect(y).toBeCloseTo(0);
+  });
+
+  it("saturates rather than growing past full travel", () => {
+    const near = gazeVector({ x: 300, y: 100 }, centre, 200);
+    const far = gazeVector({ x: 9000, y: 100 }, centre, 200);
+    expect(far).toEqual(near);
+  });
+
+  /**
+   * The bug this replaces: viewport-normalised x and y were each clamped to
+   * 1 independently, so a corner pointer produced a diagonal of magnitude
+   * sqrt(2) and pushed the pupil through its own ring. A direction vector
+   * cannot exceed 1 in any direction.
+   */
+  it("never exceeds unit length on the diagonal", () => {
+    const { x, y } = gazeVector({ x: 9000, y: 9000 }, centre, 200);
+    expect(Math.hypot(x, y)).toBeCloseTo(1);
+    expect(x).toBeCloseTo(Math.SQRT1_2);
+    expect(y).toBeCloseTo(Math.SQRT1_2);
+  });
+
+  it("points at the pointer regardless of where the eye sits", () => {
+    // The docked eye lives at the top-left of the viewport. A pointer below
+    // and right of it must read as down-right, even though that pointer is
+    // still left of the viewport's centre — which is what the old
+    // viewport-relative maths got wrong.
+    const railEye = { x: 40, y: 60 };
+    const { x, y } = gazeVector({ x: 140, y: 160 }, railEye, 200);
+    expect(x).toBeGreaterThan(0);
+    expect(y).toBeGreaterThan(0);
+  });
+
+  it("stays still rather than dividing by zero at zero saturation", () => {
+    expect(gazeVector({ x: 300, y: 300 }, centre, 0)).toEqual({ x: 0, y: 0 });
   });
 });
