@@ -2,7 +2,7 @@ import { getLinks } from "@/content";
 
 function formatDate(date: string | undefined) {
   if (!date) return null;
-  return new Date(date).toLocaleDateString("en-US", { month: "short", year: "numeric" });
+  return new Date(date).toLocaleDateString("en-US", { month: "short", year: "numeric", timeZone: "UTC" });
 }
 
 function hostname(url: string) {
