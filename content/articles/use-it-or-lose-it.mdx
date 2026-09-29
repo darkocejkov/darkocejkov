@@ -1,0 +1,37 @@
+---
+title: Use It or Lose It
+summary: Noticing my own skills decay while the AI does the coding, and trying to write down rules that keep understanding from going with them.
+publishedAt: 2026-09-09
+category: notes
+tags: [ai, learning, code-review]
+skills: [claude-code, code-review]
+related: [knowing-code-you-didnt-write, ides-or-terminals]
+---
+
+- is the "use it or lose it" as bad as i make it out to be?
+  - it's quite true for me that the longer i don't use something, the more i forget how to it
+  - without any specific sources, it seems correct to say that's a universal experience, and no matter what, it happens for everything
+  - take for example, having worked on a project repo. a long time ago, it's probably so far out of your memory you only remember the high-level, or very important technical details
+  - i think it just *feels* bad to actively lose skills by almost doing it, but not yourself. i rarely remember anymore how to specifically make a react component, or the specific eslint rules
+  - an additional downside is that i'm expected to do a human review and understand and poke holes in the logic, but i am removed from the logic, that i can't do it as effectively anymore
+  - it's overwhelming being presented so many changes, fixes, gotchas, details that docs are too difficult to read
+    - so you stash all that detail in docs and have another LLM read it for you
+  - is there a cap on how much you can reasonably understand?
+
+- i actually think that i am experiencing the loss of skill right now, as for the past few weeks, i've been doing less coding AND less real reviews
+  - it's all been going to the AI
+- this subject has loads of nuance, but i think it would be helpful to establish truths or rules about AI usage and preventing overreach
+  - 💡do not trust the AI's contributions
+    - if you can't trust the AI's contributions, can you trust your own?
+      - 🔴 the point is not that you think your own contributions are perfect, no one's are, and certainly not your own
+      - it's that you know that even though the AI didn't spot some sort of logic error, it can often not spot it, because it simply did a replace and not a pass.
+  - 💡stop overwhelming yourself by making yourself review thousands of lines of changes
+    - instead of asking the AI to implement this whole feature and arrive at 50+ files changed, 3k+-, it might be more effective to create a plan and then use windows of implementation to nail a specific feature and have it reviewed before moving on
+- if understanding is implicit in the process of coding, and we are no longer coding how do we gain understanding?
+  - it is not how can we speed up understanding? or how can we create reports of explanations?
+  - it's about how can we create meaningful understanding.
+    - isn't this now pedagogical??
+  - like i can very easily have the AI generate a 20 page report on the details of the changes, what why how when where why how, and then some, but will i read it? if i read it, will i absorb it?
+  - 💡do quizzes help?
+  - whenever i studied, i would always try to reframe the problem and solution in ways i could explain to others - a solo lesson. i would anticipate the types of questions that could be asked about this:
+    - "if this knowledge appeared on a test, what would the question be like? multiple choice? answer?"

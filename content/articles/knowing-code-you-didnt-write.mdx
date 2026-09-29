@@ -1,0 +1,70 @@
+---
+title: Knowing Code You Didn't Write
+summary: Four workflows for letting AI write the code, and the open question underneath all of them — whether you can know code you did not write as well as code you did.
+publishedAt: 2026-09-09
+category: notes
+tags: [ai, code-review, workflow]
+skills: [claude-code, code-review]
+related: [use-it-or-lose-it, ides-or-terminals]
+---
+
+- workflow:
+  - slow - do all changes yourself
+    - cost: time
+    - benefit: you made all the changes
+  - medium, heavy guidance
+    - a trade-off between time and review
+    - you don't need to make the changes yourself, but you must review ALL the changes
+  - fast, swarm + subagents
+    - have AI do all the steps of planning and implementation
+    - at every step, you pass along the outcome to another AI to verify the logic
+  - parallel workflow
+    - works towards "multiple discovery"
+      - where independent people find similar solutions to the same thing (ie. calculus)
+    - instead of relying on AI to plan, model, execute, review and you make many small decisions along the way:
+    - spawn an agent to do the discovery and planning without checking on it
+      - gotchas, possible bugs, limitations, blockers
+    - you do your own planning and then compare to the AI
+      - did it come to a similar conclusion?
+      - did it find something you didn't? did you think about something it didn't?
+    - this not only makes you do the thinking yourself, you get a 2nd opinion, and often uncover hidden context you didn't remember to mention
+
+- how can i visualize the code changes to know exactly what is changing?
+- how can i have a constant reference handy for the agreed plan?
+
+- i don't think i can code review just by the PR itself, maybe for code style, but not logic. it just doesn't work for me?
+- i *see* what changes, i can rationalize why, but i don't intuitively understand them in context
+- how can i see Claude's edits much clearer?
+  - make it use Edit tool instead of bash commands
+- instead of a having to be quizzed on very specific information as it's coded by someone else - ie. follow-along, a better REVIEW skill goes through the code with you, explains it, then quizzes you?
+  - auto mode, but have to approve edits?
+
+- i need to force myself to do a comprehensive code-review, and no submission until i understand the code as much as possible
+  - use claude to explain changes line-by-line?
+- use artifacts for PRs
+- with how much work is pumped out, how can i slow down without blocking people?
+
+- use AI to fully implement a ticket
+- AI then creates a PR
+- humans then review the PR
+- the human is the bottleneck, because a GOOD review takes time, and there are more PRs than humans
+- the whole point is not to eliminate ourselves, but use the tools when necessary
+
+- part of the solution is slowing down work, so we can release work slower, and have time between PRs to work more deeply than other PRs
+  - but how do we know when a PR is ready?
+  - how many reviews do agents need to complete?
+- we work slower, then we have time to review work AND get familiar with the code
+- part of the problem is that our work is now very strange, because we have tickets without strong AC
+
+- is it really possible for me to have work done *for me* then be able to know it as if *i have done it?*
+  - is it more effort?
+  - **is it a different skill?** am i just not good at this yet?
+
+- now that we have AI that can show us problems in the code - we need to VERIFY all the information
+  - take the billing endpoint problem, it was identified that it's a problem in amplify, but not local - and THEORIZED that it would be a problem in ECS
+- what's the goal of writing code, reviewing code?
+  - is it mimicking the way we know our code as if we wrote it ourselves?
+    - how much can we *not know?*
+  - is the end goal rather about how much work we put into front-loading the process, rather than knowing the code as well?
+    - like, does it matter if i know the way the code changes - if i can release the changes to green reviews?
+    - so instead of having to write the code myself, that time and effort goes into planning, testing, review the generated code much more?

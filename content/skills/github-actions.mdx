@@ -1,0 +1,13 @@
+---
+name: "GitHub Actions & CI"
+proficiency: fluent
+lastUsed: 2026-09
+iconKey: githubactions
+---
+
+Three years maintaining the pipeline, and the owner of its worst
+recurring failure. When the runners started dying out of memory and raising the
+heap was no longer an option, I debugged it with Chrome heap snapshots and
+found Jest workers holding every MUI icon import several times over. Import
+config plus workerIdleMemoryLimit made the failure structurally impossible and
+cut the test pipeline from 22 minutes to 10.
