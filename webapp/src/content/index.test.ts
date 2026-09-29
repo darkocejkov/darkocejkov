@@ -1,23 +1,29 @@
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { REQUIRED, makeContentDir } from "./test-helpers";
 
 const original = process.env.CONTENT_DIR;
 afterEach(() => {
   if (original === undefined) delete process.env.CONTENT_DIR;
   else process.env.CONTENT_DIR = original;
+  // NODE_ENV is typed readonly by Next, so it is stubbed via vi.stubEnv
+  // rather than assigned; this puts back whatever value it had before.
+  vi.unstubAllEnvs();
 });
 
 /**
  * index.ts memoizes, so each test needs a fresh module instance, hence the
- * cache-busting query. Two Vite quirks shape how it is written: the bust
- * value must not contain a dot (Vite reads the transform language from
- * /\.\w+$/ on the raw id, so `0.123` would parse as a numeric extension),
- * and the specifier is built outside the import() call so Vite's
- * dynamic-import-vars plugin does not try to expand it as a glob.
+ * cache-busting query. The bust value is a module-level counter: unique per
+ * test, deterministic, and free of the `.` character. That last point is a
+ * Vite quirk — it reads the transform language from /\.\w+$/ on the raw id,
+ * so a value such as `0.123` would parse as a numeric extension and index.ts
+ * would be transpiled as plain JS. The specifier is also built outside the
+ * import() call so Vite's dynamic-import-vars plugin does not try to expand
+ * it as a glob.
  */
+let n = 0;
 async function freshApi(files: Record<string, string>) {
   process.env.CONTENT_DIR = makeContentDir({ ...REQUIRED, ...files });
-  const specifier = `./index?cachebust=${Math.random().toString(36).slice(2)}`;
+  const specifier = `./index?cachebust=${n++}`;
   return import(specifier) as Promise<typeof import("./index")>;
 }
 
@@ -68,5 +74,25 @@ describe("content API", () => {
     });
     // Vitest runs with NODE_ENV=test, so drafts are visible.
     expect(api.getArticles()).toHaveLength(2);
+  });
+
+  it("excludes drafts in production", async () => {
+    vi.stubEnv("NODE_ENV", "production");
+    const api = await freshApi({
+      "articles/one.mdx": article("One"),
+      "articles/wip.mdx": article("WIP", "draft: true\n"),
+    });
+    expect(api.getArticles().map((a) => a.slug)).toEqual(["one"]);
+  });
+
+  it("memoizes the graph in production", async () => {
+    vi.stubEnv("NODE_ENV", "production");
+    const api = await freshApi({ "articles/one.mdx": article("One") });
+    expect(api.getGraph()).toBe(api.getGraph());
+  });
+
+  it("rebuilds the graph on every call outside production", async () => {
+    const api = await freshApi({ "articles/one.mdx": article("One") });
+    expect(api.getGraph()).not.toBe(api.getGraph());
   });
 });
