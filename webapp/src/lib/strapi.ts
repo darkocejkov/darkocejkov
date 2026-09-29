@@ -281,6 +281,15 @@ export interface About {
   metaDescription: string | null;
 }
 
+/**
+ * The half of the Strapi `about` record that stays in the CMS: state that must
+ * change without a deploy. Identity and prose now live in content/about.mdx.
+ */
+export interface SiteStatus {
+  lookingForWork: boolean;
+  currently: string | null;
+}
+
 /** Site chrome state only - the banner and its notifications. */
 export interface SiteMeta {
   id: number;

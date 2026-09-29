@@ -1,35 +1,25 @@
-import RichText from "@/components/RichText";
 import SocialIcon from "@/components/SocialIcon";
+import { assetUrl, getAbout, getLinks, getStatement } from "@/content";
+import { Mdx } from "@/content/mdx";
 import {
   mediaUrl,
   strapiGet,
-  type About,
   type Download,
-  type SiteLink,
+  type SiteStatus,
   type StrapiList,
   type StrapiSingle,
 } from "@/lib/strapi";
 
-async function getAbout(): Promise<About | null> {
+/** Availability is the one thing here that must change without a deploy. */
+async function getStatus(): Promise<SiteStatus> {
   try {
-    const res = await strapiGet<StrapiSingle<About>>("/about", { populate: "portrait" });
-    return res.data;
-  } catch {
-    return null;
-  }
-}
-
-/** My own accounts. Bookmarks live on /bookmarks. */
-async function getSocialLinks(): Promise<SiteLink[]> {
-  try {
-    const res = await strapiGet<StrapiList<SiteLink>>("/links", {
-      sort: "order:asc",
-      "pagination[pageSize]": "100",
-      "filters[type][$eq]": "social",
+    const res = await strapiGet<StrapiSingle<SiteStatus>>("/about", {
+      "fields[0]": "lookingForWork",
+      "fields[1]": "currently",
     });
     return res.data;
   } catch {
-    return [];
+    return { lookingForWork: false, currently: null };
   }
 }
 
@@ -45,11 +35,11 @@ async function getDownloads(): Promise<Download[]> {
   }
 }
 
-export async function generateMetadata() {
-  const about = await getAbout();
+export function generateMetadata() {
+  const about = getAbout();
   return {
-    title: about?.displayName ? `About — ${about.displayName}` : "About",
-    description: about?.metaDescription ?? undefined,
+    title: `About — ${about.displayName}`,
+    description: about.metaDescription,
   };
 }
 
@@ -64,11 +54,13 @@ function Fact({ label, value }: { label: string; value: string | null | undefine
 }
 
 export default async function AboutPage() {
-  const [about, links, downloads] = await Promise.all([getAbout(), getSocialLinks(), getDownloads()]);
-  if (!about) return <div className="max-w-2xl">Nothing here yet.</div>;
+  const about = getAbout();
+  const statement = getStatement();
+  // My own accounts. Bookmarks live on /bookmarks.
+  const links = getLinks("social");
+  const [status, downloads] = await Promise.all([getStatus(), getDownloads()]);
 
-  const portrait = mediaUrl(about.portrait);
-  const hasStatement = Array.isArray(about.statement) && about.statement.length > 0;
+  const portrait = about.portrait;
 
   return (
     <div className="max-w-2xl">
@@ -76,8 +68,8 @@ export default async function AboutPage() {
         {portrait && (
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            src={portrait}
-            alt={about.portrait?.alternativeText ?? about.displayName}
+            src={assetUrl(portrait.src)}
+            alt={portrait.alt}
             width={96}
             height={96}
             className="rounded-lg object-cover"
@@ -86,7 +78,7 @@ export default async function AboutPage() {
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-3">
             <h1 className="font-funnel text-5xl font-bold leading-tight">{about.displayName}</h1>
-            {about.lookingForWork && (
+            {status.lookingForWork && (
               <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700">
                 Open to work
               </span>
@@ -100,20 +92,20 @@ export default async function AboutPage() {
       {about.shortBio && <p className="mt-8 text-gray-600 dark:text-gray-400">{about.shortBio}</p>}
 
       <div className="mt-6">
-        <RichText content={about.bio} />
+        <Mdx source={about.body} />
       </div>
 
       <dl className="mt-8 flex flex-wrap gap-x-10 gap-y-4 border-y border-gray-100 py-4 dark:border-gray-800">
         <Fact label="Location" value={about.location} />
-        <Fact label="Currently" value={about.currently} />
+        <Fact label="Currently" value={status.currently} />
       </dl>
 
-      {hasStatement && (
+      {statement.body.trim() && (
         <section className="mt-10">
           <h2 className="font-funnel mb-3 text-sm font-semibold uppercase tracking-wide text-gray-400">
-            Statement
+            {statement.title}
           </h2>
-          <RichText content={about.statement} />
+          <Mdx source={statement.body} />
         </section>
       )}
 
@@ -125,14 +117,14 @@ export default async function AboutPage() {
           <div className="flex flex-wrap items-center gap-4">
             {links.map((link) => (
               <a
-                key={link.id}
+                key={link.slug}
                 href={link.url}
                 target="_blank"
                 rel="noopener noreferrer"
                 title={link.title}
                 className="text-gray-500 transition-colors hover:text-brand-dark dark:hover:text-brand-white"
               >
-                <SocialIcon url={link.url} title={link.title} iconKey={link.iconKey} />
+                <SocialIcon url={link.url} title={link.title} iconKey={link.iconKey ?? null} />
                 <span className="sr-only">{link.title}</span>
               </a>
             ))}
