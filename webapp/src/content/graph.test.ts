@@ -56,6 +56,26 @@ describe("related and backlinks", () => {
     expect(two.related).toEqual([]);
   });
 
+  // Two referrers, not one: with a single referrer, replacing the accumulating
+  // push in graph.ts with an assignment passes. Backlinks are the reason the
+  // whole corpus is loaded eagerly, so this assertion has to pin accumulation.
+  // Order follows the articles' publishedAt-desc sort, so the dates are
+  // distinct and the expectation is exact.
+  it("accumulates a backlink from every article that relates to the target", () => {
+    const dated = (title: string, publishedAt: string, extra = "") =>
+      `---\ntitle: ${title}\nsummary: ${title} summary\npublishedAt: ${publishedAt}\n${extra}---\n\nBody.\n`;
+
+    const graph = build({
+      "articles/older.mdx": dated("Older", "2026-01-01", "related: [target]\n"),
+      "articles/newer.mdx": dated("Newer", "2026-03-01", "related: [target]\n"),
+      "articles/target.mdx": dated("Target", "2026-02-01"),
+    });
+
+    const target = graph.articles.find((a) => a.slug === "target")!;
+    expect(target.backlinks.map((b) => b.slug)).toEqual(["newer", "older"]);
+    expect(target.backlinks.map((b) => b.title)).toEqual(["Newer", "Older"]);
+  });
+
   it("errors on a related slug that matches no article", () => {
     expect(() => build({ "articles/one.mdx": article("One", "related: [ghost]\n") })).toThrow(
       /one\.mdx[\s\S]*ghost/

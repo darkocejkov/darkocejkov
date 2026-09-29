@@ -16,6 +16,23 @@ const slugRef = z
   .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "must be a lowercase kebab-case slug");
 
 /**
+ * A slug or tag repeated in a YAML list is an authoring slip, never a request
+ * for the item to appear twice. Deduping here — at the one boundary every
+ * reference list passes through — means nothing downstream has to defend
+ * against it: no duplicate React keys under "Linked from", no
+ * "TypeScript, TypeScript" in a tools row, no inflated tag counts.
+ *
+ * The default runs first, so an omitted field still yields `[]`. Asset lists
+ * (`gallery`, `media`) deliberately do not use this: repeating an image is a
+ * legitimate editorial choice.
+ */
+const uniqueList = (item: z.ZodType<string, string>) =>
+  z
+    .array(item)
+    .default([])
+    .transform((values) => [...new Set(values)]);
+
+/**
  * zod moved its string-format helpers between v3 (`z.string().url()`) and v4
  * (`z.url()`). Validating by hand keeps this file working on either major.
  */
@@ -68,7 +85,7 @@ export const ExperienceFrontmatter = z.object({
   type: EmploymentType.optional(),
   startDate: dateString,
   endDate: dateString.optional(),
-  skills: z.array(slugRef).default([]),
+  skills: uniqueList(slugRef),
 });
 export type ExperienceFrontmatter = z.infer<typeof ExperienceFrontmatter>;
 
@@ -103,8 +120,8 @@ export const ProjectFrontmatter = z.object({
   endDate: dateString.optional(),
   repoUrl: urlString.optional(),
   liveUrl: urlString.optional(),
-  tags: z.array(z.string()).default([]),
-  skills: z.array(slugRef).default([]),
+  tags: uniqueList(z.string()),
+  skills: uniqueList(slugRef),
   gallery: z.array(Asset).default([]),
 });
 export type ProjectFrontmatter = z.infer<typeof ProjectFrontmatter>;
@@ -116,9 +133,9 @@ export const ArticleFrontmatter = z.object({
   draft: z.boolean().default(false),
   cover: Asset.optional(),
   category: z.string().optional(),
-  tags: z.array(z.string()).default([]),
-  skills: z.array(slugRef).default([]),
-  related: z.array(slugRef).default([]),
+  tags: uniqueList(z.string()),
+  skills: uniqueList(slugRef),
+  related: uniqueList(slugRef),
   project: slugRef.optional(),
 });
 export type ArticleFrontmatter = z.infer<typeof ArticleFrontmatter>;
@@ -128,7 +145,7 @@ export const ThingFrontmatter = z.object({
   type: ThingType.optional(),
   isSelf: z.boolean().default(false),
   media: z.array(Asset).default([]),
-  tags: z.array(z.string()).default([]),
+  tags: uniqueList(z.string()),
 });
 export type ThingFrontmatter = z.infer<typeof ThingFrontmatter>;
 
@@ -140,7 +157,7 @@ export const LinkFrontmatter = z.object({
   order: z.number().int().default(0),
   savedAt: dateString.optional(),
   type: LinkType,
-  tags: z.array(z.string()).default([]),
+  tags: uniqueList(z.string()),
 });
 export type LinkFrontmatter = z.infer<typeof LinkFrontmatter>;
 

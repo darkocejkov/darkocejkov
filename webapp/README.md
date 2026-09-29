@@ -20,6 +20,10 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## Deployment
+
+Authored content lives in `content/` at the repository root, outside this app, so the build has to be able to reach it. On Vercel that means enabling **"Include source files outside of the Root Directory in the Build Step"** under Project Settings → Build; without it `load()` throws `content directory not found` and the build fails rather than deploying an empty site. On any other host, either build with this directory as the working directory, or point `CONTENT_DIR` at the content tree directly — `contentDir()` otherwise resolves `../content` relative to the process cwd. Run `npm run content:check` before committing: it validates and resolves the real content tree in a couple of seconds and exits nonzero on any schema or reference error, which is the pre-commit substitute for a CMS admin refusing to publish something broken.
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:

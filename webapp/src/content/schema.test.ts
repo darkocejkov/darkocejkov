@@ -95,6 +95,16 @@ describe("ExperienceFrontmatter", () => {
     });
     expect(result.success).toBe(false);
   });
+
+  it("dedupes a repeated skill slug", () => {
+    const result = ExperienceFrontmatter.parse({
+      title: "Software Engineer",
+      company: "Moz",
+      startDate: "2024-06-01",
+      skills: ["typescript", "react", "typescript"],
+    });
+    expect(result.skills).toEqual(["typescript", "react"]);
+  });
 });
 
 describe("ArticleFrontmatter", () => {
@@ -116,6 +126,28 @@ describe("ArticleFrontmatter", () => {
     expect(result.related).toEqual([]);
     expect(result.tags).toEqual([]);
   });
+
+  // A copy-pasted slug in a YAML list is an ordinary authoring mistake; left
+  // alone it shows the same article twice under "Linked from".
+  it("dedupes a repeated related slug, keeping first-seen order", () => {
+    const result = ArticleFrontmatter.parse({
+      title: "On circles",
+      summary: "A post",
+      publishedAt: "2026-09-28",
+      related: ["on-rings", "on-circles-again", "on-rings"],
+    });
+    expect(result.related).toEqual(["on-rings", "on-circles-again"]);
+  });
+
+  it("dedupes a repeated tag", () => {
+    const result = ArticleFrontmatter.parse({
+      title: "On circles",
+      summary: "A post",
+      publishedAt: "2026-09-28",
+      tags: ["design", "svg", "design"],
+    });
+    expect(result.tags).toEqual(["design", "svg"]);
+  });
 });
 
 describe("ProjectFrontmatter", () => {
@@ -132,6 +164,31 @@ describe("ProjectFrontmatter", () => {
       gallery: [{ src: "/uploads/a.png", alt: "A", caption: "First" }],
     });
     expect(result.gallery[0].caption).toBe("First");
+  });
+
+  it("dedupes repeated tags and skills", () => {
+    const result = ProjectFrontmatter.parse({
+      title: "Orbit Rail",
+      summary: "A thing",
+      tags: ["svg", "svg", "animation"],
+      skills: ["typescript", "typescript"],
+    });
+    expect(result.tags).toEqual(["svg", "animation"]);
+    expect(result.skills).toEqual(["typescript"]);
+  });
+
+  // Two prints of the same image in a gallery is an editorial choice, not a
+  // slip — asset lists are deliberately left alone.
+  it("keeps a repeated gallery image", () => {
+    const result = ProjectFrontmatter.parse({
+      title: "Orbit Rail",
+      summary: "A thing",
+      gallery: [
+        { src: "/uploads/a.png", alt: "A" },
+        { src: "/uploads/a.png", alt: "A" },
+      ],
+    });
+    expect(result.gallery).toHaveLength(2);
   });
 });
 

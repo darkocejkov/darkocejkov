@@ -138,7 +138,7 @@ function loadSingleton<S extends z.ZodType>(
 export function load(dir: string): LoadedContent {
   if (!existsSync(dir) || !statSync(dir).isDirectory()) {
     throw new ContentError([
-      `content directory not found at ${dir} — check the build is running from the webapp directory, or set CONTENT_DIR`,
+      `content directory not found at ${dir} — on Vercel, enable "Include source files outside of the Root Directory in the Build Step" (Project Settings → Build); otherwise check the build is running from the webapp directory, or set CONTENT_DIR`,
     ]);
   }
 

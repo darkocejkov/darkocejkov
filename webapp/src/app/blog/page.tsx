@@ -13,7 +13,12 @@ export default function Blog() {
   // Article would ship every body, skill description and graph edge for a
   // view that shows none of them. Media URLs are resolved here so the client
   // component stays free of env config.
-  const items: BlogListItem[] = articles.map((a) => ({
+  //
+  // The annotation sits on the callback's return type, not on `items`. An
+  // object literal inside a `.map` is inferred and then assignability-checked,
+  // which lets a stray extra property through; annotating the return position
+  // makes it a fresh literal check, so adding `body: a.body` is a TS2353.
+  const items = articles.map((a): BlogListItem => ({
     slug: a.slug,
     title: a.title,
     summary: a.summary,
