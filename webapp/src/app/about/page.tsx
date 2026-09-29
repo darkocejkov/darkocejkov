@@ -1,3 +1,4 @@
+import Link from "next/link";
 import SocialIcon from "@/components/SocialIcon";
 import { assetUrl, getAbout, getLinks, getStatement } from "@/content";
 import { Mdx } from "@/content/mdx";
@@ -108,6 +109,22 @@ export default async function AboutPage() {
           <Mdx source={statement.body} />
         </section>
       )}
+
+      {/* The CV lives on its own routes rather than in the orbit: the scene is
+          built around five satellites, and a seventh would read as a menu. */}
+      <section className="mt-10">
+        <h2 className="font-funnel mb-3 text-sm font-semibold uppercase tracking-wide text-gray-400">
+          Background
+        </h2>
+        <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm">
+          <Link href="/experience" className="underline underline-offset-2">
+            Experience
+          </Link>
+          <Link href="/education" className="underline underline-offset-2">
+            Education
+          </Link>
+        </div>
+      </section>
 
       {links.length > 0 && (
         <section className="mt-10">
