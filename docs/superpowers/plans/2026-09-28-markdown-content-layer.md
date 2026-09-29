@@ -3279,6 +3279,8 @@ git commit -m "Shrink the Strapi client to uploads, downloads, and status"
 This is a hosting-configuration step, not a code change, and must happen before the first deploy from this branch:
 
 - **Vercel:** enable *"Include source files outside of the Root Directory in the Build Step"* in Project Settings → Build.
-- **Any other host:** run the build from the repository root so `content/` is present.
+- **Any other host:** run the build with `webapp/` as the working directory, or set `CONTENT_DIR` to the content tree. Building from the repository root does *not* work on its own — `contentDir()` resolves `path.join(process.cwd(), "..", "content")`, so a repo-root cwd looks one level above the repository.
 
 If it is missed, `load()` throws `content directory not found` and the build fails loudly rather than deploying an empty site.
+
+It can also fail *after* a successful build. `MaintenanceBanner` fetches Strapi with `next: { revalidate: 60 }`, which puts every route on ISR, so pages re-read `content/` from disk whenever they revalidate — content is not read at build time only. `outputFileTracingIncludes` in `next.config.ts` is what carries the tree into a traced deploy; `outputFileTracingRoot` alone does not, because the tracer never sees the runtime read. Removing the include breaks the site on the first cold render rather than at build time.

@@ -4,7 +4,7 @@ import remarkGfm from "remark-gfm";
 import { assetUrl, isExternalHref } from "./asset";
 import type { Asset } from "./schema";
 
-/** Shared prose styling, previously duplicated in Markdown.tsx and RichText.tsx. */
+/** Shared prose styling for every rendered body, MDX and page template alike. */
 export const PROSE_CLASS = [
   "prose prose-neutral dark:prose-invert max-w-none",
   "prose-headings:font-funnel prose-headings:font-semibold",
@@ -70,9 +70,8 @@ const components = {
 
 /**
  * Render an MDX body with the site's component map and prose styling.
- * `className` is merged after the prose classes, as Markdown.tsx and
- * RichText.tsx did, so a page can pass typography modifiers such as
- * `prose-sm` or `prose-p:text-gray-500`.
+ * `className` is merged after the prose classes, so a page can pass
+ * typography modifiers such as `prose-sm` or `prose-p:text-gray-500`.
  */
 export async function Mdx({ source, className }: { source: string; className?: string }) {
   if (!source.trim()) return null;

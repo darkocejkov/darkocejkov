@@ -4,8 +4,11 @@ import { assetUrl, getArticle, getArticles, type ArticleRef } from "@/content";
 import { Mdx } from "@/content/mdx";
 
 /**
- * Prerender every article at build time. The content graph is read during the
- * build, so no filesystem access happens on a visitor's request.
+ * Prerender every article at build time. Not the end of it, though: the
+ * maintenance banner puts every route on ISR, so a page re-renders on the
+ * server after its revalidation window and reads content/ off disk again.
+ * That is why next.config.ts needs outputFileTracingIncludes as well as
+ * outputFileTracingRoot — see the comment there.
  */
 export function generateStaticParams() {
   return getArticles().map((a) => ({ slug: a.slug }));

@@ -2,7 +2,11 @@ import { assetUrl } from "@/content/asset";
 
 const CMS_URL = process.env.NEXT_PUBLIC_CMS_URL ?? "http://localhost:1337";
 
-/** Strapi returns relative media paths (/uploads/...), so they need the CMS origin. */
+/**
+ * Null-guard adapter from a Strapi media record to a renderable URL. The
+ * origin work belongs to `assetUrl`; this only unwraps the record and turns
+ * a missing one into null rather than a broken src.
+ */
 export function mediaUrl(media: StrapiMedia | null | undefined): string | null {
   if (!media?.url) return null;
   return assetUrl(media.url);

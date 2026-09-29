@@ -46,7 +46,7 @@ shape; the app simply stops reading the fields that moved.
 | Unknown slug references | Build error | The safety a database relation gave for free must be handed back deliberately. |
 | Content location | `content/` at repo root | Keeps content out of the application directory. Requires build configuration — see Deployment. |
 | Dev caching | Memoize in production only | A module singleton would need a server restart per edit. Re-reading per request costs single-digit milliseconds at this corpus size. |
-| Rendering | Content pages fully static | `generateStaticParams` over the graph. Faster than today, where every render hits the CMS. |
+| Rendering | Prerendered, then revalidated | `generateStaticParams` over the graph. Faster than today, where every render hits the CMS — but the maintenance banner puts every route on ISR, so pages re-read `content/` after revalidation. See Deployment. |
 
 ### Why one eager graph rather than per-type loaders
 
@@ -317,16 +317,31 @@ but unrendered; this work makes the data available, and designing those pages is
 
 ## Deployment
 
-Content sits outside the Next application directory, so the build must reach it. Content is
-read at build time only — pages are statically generated — which makes this a build
-configuration concern rather than a runtime bundling one.
+Content sits outside the Next application directory, so both the build *and the running
+server* must reach it. The tempting simplification — that content is read at build time only,
+which would make this a build configuration concern rather than a runtime bundling one — is
+wrong, and the implementation proved it. The root layout renders `MaintenanceBanner`, which
+fetches Strapi with `next: { revalidate: 60 }`, and that puts every route on ISR. Pages are
+prerendered, but they re-render on the server once their revalidation window lapses, and each
+of those re-renders reads `content/` off the filesystem again.
 
-- Enable *"Include source files outside of the Root Directory"* on Vercel (or build from the
-  repository root on any other host).
+- Enable *"Include source files outside of the Root Directory in the Build Step"* on Vercel
+  (Project Settings → Build). On another host, build with the app directory as the working
+  directory, or set `CONTENT_DIR`. Building from the repository root is *not* an escape hatch
+  on its own: `contentDir()` resolves `path.join(process.cwd(), "..", "content")`, so a
+  repo-root cwd looks for content in the repository's parent and fails.
 - Set `outputFileTracingRoot` to the repository root in `next.config.ts`. This is independent
   of `turbopack.root`, which must stay pinned to the app directory — a stray root lockfile
   otherwise breaks module resolution.
-- The empty-directory guard in `load.ts` turns a misconfiguration into a failed build.
+- Set `outputFileTracingIncludes` to carry `../content/**/*` into every route. This is
+  load-bearing, not belt-and-braces. `outputFileTracingRoot` only *permits* files under the
+  repository root to be traced; the tracer still has to observe them being read, and it cannot,
+  because `load.ts` reads a directory computed from `process.cwd()` at runtime and no static
+  analysis follows that. Without the explicit include, a traced deploy ships without `content/`
+  and 500s on the first render after a revalidation — not at build time, when it would be
+  noticed.
+- The empty-directory guard in `load.ts` turns a misconfiguration into a loud failure, and its
+  message names the Vercel setting rather than leaving the reader to find it here.
 
 **Known ergonomic cost:** Turbopack watches only inside the Next project, so editing a file in
 `content/` will not hot-reload. Because the graph re-reads per request in development, a manual
