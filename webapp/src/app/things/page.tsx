@@ -1,26 +1,10 @@
-import { mediaUrl, strapiGet, type StrapiList, type Thing } from "@/lib/strapi";
+import { assetUrl, getThings } from "@/content";
+import { Mdx } from "@/content/mdx";
 
 export const metadata = { title: "Things" };
 
-async function getThings(): Promise<Thing[]> {
-  try {
-    const res = await strapiGet<StrapiList<Thing>>("/things", {
-      sort: "name:asc",
-      "pagination[pageSize]": "100",
-      "populate[media][fields][0]": "url",
-      "populate[media][fields][1]": "alternativeText",
-      "populate[tags][fields][0]": "name",
-      "populate[tags][fields][1]": "slug",
-    });
-    return res.data;
-  } catch {
-    // The collection may not exist yet — degrade to an empty state.
-    return [];
-  }
-}
-
-export default async function ThingsPage() {
-  const things = await getThings();
+export default function ThingsPage() {
+  const things = getThings();
 
   return (
     <div className="max-w-4xl">
@@ -32,14 +16,14 @@ export default async function ThingsPage() {
       ) : (
         <ul className="mt-10 grid grid-cols-2 gap-8 sm:grid-cols-3">
           {things.map((thing) => {
-            const cover = mediaUrl(thing.media?.[0]);
+            const cover = thing.media[0];
             return (
-              <li key={thing.id}>
+              <li key={thing.slug}>
                 {cover ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
-                    src={cover}
-                    alt={thing.media?.[0]?.alternativeText ?? thing.name}
+                    src={assetUrl(cover.src)}
+                    alt={cover.alt}
                     className="aspect-square w-full rounded-lg object-cover"
                   />
                 ) : (
@@ -54,7 +38,11 @@ export default async function ThingsPage() {
                   )}
                 </div>
                 {thing.type && <p className="text-xs text-gray-400">{thing.type}</p>}
-                {thing.notes && <p className="mt-1 text-xs text-gray-500">{thing.notes}</p>}
+                {thing.body.trim() && (
+                  <div className="mt-1 text-xs text-gray-500">
+                    <Mdx source={thing.body} />
+                  </div>
+                )}
               </li>
             );
           })}

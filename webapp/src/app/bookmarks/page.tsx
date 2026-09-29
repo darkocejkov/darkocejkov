@@ -1,22 +1,6 @@
-import { strapiGet, type StrapiList, type SiteLink } from "@/lib/strapi";
+import { getLinks } from "@/content";
 
-async function getBookmarks(): Promise<SiteLink[]> {
-  try {
-    const res = await strapiGet<StrapiList<SiteLink>>("/links", {
-      // Social links are my own accounts and render in the footer instead.
-      "filters[type][$eq]": "bookmark",
-      sort: "order:asc",
-      "pagination[pageSize]": "100",
-      "populate[tags][fields][0]": "name",
-      "populate[tags][fields][1]": "slug",
-    });
-    return res.data;
-  } catch {
-    return [];
-  }
-}
-
-function formatDate(date: string | null) {
+function formatDate(date: string | undefined) {
   if (!date) return null;
   return new Date(date).toLocaleDateString("en-US", { month: "short", year: "numeric" });
 }
@@ -29,8 +13,9 @@ function hostname(url: string) {
   }
 }
 
-export default async function Bookmarks() {
-  const bookmarks = await getBookmarks();
+export default function Bookmarks() {
+  // Social links are my own accounts and render in the footer instead.
+  const bookmarks = getLinks("bookmark");
 
   return (
     <div>
@@ -44,7 +29,7 @@ export default async function Bookmarks() {
           {bookmarks.map((link) => {
             const saved = formatDate(link.savedAt);
             return (
-              <li key={link.id} className="py-4 first:pt-0">
+              <li key={link.slug} className="py-4 first:pt-0">
                 <a href={link.url} target="_blank" rel="noopener noreferrer" className="group block">
                   <span className="text-sm font-medium group-hover:underline">{link.title}</span>
                   {link.description && (
@@ -53,9 +38,7 @@ export default async function Bookmarks() {
                   <span className="mt-1.5 flex flex-wrap items-center gap-x-3 text-xs text-gray-400">
                     <span>{hostname(link.url)}</span>
                     {saved && <span>{saved}</span>}
-                    {link.tags?.length > 0 && (
-                      <span>{link.tags.map((t) => t.name).join(", ")}</span>
-                    )}
+                    {link.tags.length > 0 && <span>{link.tags.join(", ")}</span>}
                   </span>
                 </a>
               </li>
