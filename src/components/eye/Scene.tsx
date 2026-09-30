@@ -110,12 +110,12 @@ export default function Scene({
   const rotaryBind = rotaryLive ? bind : {};
 
   // The eye container scales with the viewport (78vmin, uncapped), so the
-  // orbit radius/dot size must be measured proportions of its rendered size
+  // orbit radius/icon size must be measured proportions of its rendered size
   // rather than fixed pixels — otherwise satellites drift off the rings as
   // the eye grows or shrinks.
   const { ref: eyeContainerRef, width: containerWidth } = useElementSize<HTMLDivElement>();
   const orbitRadius = (containerWidth ?? 0) * 0.404;
-  const orbitDot = (containerWidth ?? 0) * (isNarrow ? 0.0586 : 0.0423);
+  const orbitIconSize = (containerWidth ?? 0) * (isNarrow ? 0.0586 : 0.0423);
 
   // The overlay is fixed inset-0, so measuring it measures the viewport. The
   // wave has to reach the far corners for "filled" to be true, and how far
@@ -360,7 +360,7 @@ export default function Scene({
       {maintenanceBanner}
       <motion.div
         ref={viewportRef}
-        className="pointer-events-none fixed inset-0 z-0 flex items-center justify-center"
+        className="pointer-events-none fixed inset-0 z-[60] flex items-center justify-center"
         style={{ opacity: presence }}
         inert={!isHome}
       >
@@ -400,7 +400,7 @@ export default function Scene({
             style={{ x: orbitLayer.x, y: orbitLayer.y, opacity: orbitPresence }}
           >
             {containerWidth !== null && (
-              <Orbit radius={orbitRadius} dotSize={orbitDot} rotation={orbitAngle} />
+              <Orbit radius={orbitRadius} iconSize={orbitIconSize} rotation={orbitAngle} />
             )}
           </motion.div>
         </motion.div>

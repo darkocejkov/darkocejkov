@@ -74,12 +74,14 @@ export default function Rail({
               <span
                 aria-hidden="true"
                 className={[
-                  "block rounded-full bg-current transition-all duration-200",
+                  "flex h-6 w-6 items-center justify-center rounded-full font-sans text-xl leading-none transition-all duration-200",
                   isActive
-                    ? "h-4 w-4 ring-4 ring-brand-orange ring-offset-2"
-                    : "h-2.5 w-2.5 opacity-40 group-hover:opacity-100",
+                    ? "scale-110 ring-2 ring-brand-orange ring-offset-2"
+                    : "opacity-40 group-hover:opacity-100",
                 ].join(" ")}
-              />
+              >
+                {node.icon}
+              </span>
               {/* Visual-only: revealed on hover/focus. The sr-only twin below
                   carries the accessible name so screen readers hear it once. */}
               <span

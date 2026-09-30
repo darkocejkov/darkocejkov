@@ -1,13 +1,25 @@
 import path from "node:path";
 import { load } from "./load";
 import { resolve, type ContentGraph } from "./graph";
-import type { Article, Education, Experience, Project, Skill, SiteLink, Thing } from "./graph";
-import type { LinkType } from "./schema";
+import type {
+  Article,
+  ArticlesPage,
+  Artwork,
+  Education,
+  Experience,
+  Project,
+  Skill,
+  SiteLink,
+  Thing,
+} from "./graph";
+import type { LinkType, MetadataFrontmatter } from "./schema";
 
 export type {
   About,
   Article,
+  ArticlesPage,
   ArticleRef,
+  Artwork,
   ContentGraph,
   Education,
   Experience,
@@ -19,7 +31,17 @@ export type {
   TagCount,
   Thing,
 } from "./graph";
-export type { Asset, EmploymentType, LinkType, Proficiency, ProjectStage, ThingType } from "./schema";
+export type {
+  Asset,
+  EmploymentType,
+  LinkType,
+  MetadataFrontmatter,
+  Proficiency,
+  ProjectStage,
+  ResumeDownload,
+  SiteNotification,
+  ThingType,
+} from "./schema";
 export { assetUrl, isExternalHref } from "./asset";
 export { ContentError } from "./load";
 
@@ -54,6 +76,10 @@ export function getExperience(): Experience[] {
 
 export function getEducation(): Education[] {
   return getGraph().education;
+}
+
+export function getArtworks(): Artwork[] {
+  return getGraph().artworks;
 }
 
 export function getSkills(): Skill[] {
@@ -99,4 +125,12 @@ export function getAbout() {
 
 export function getStatement() {
   return getGraph().statement;
+}
+
+export function getArticlesPage(): ArticlesPage {
+  return getGraph().articlesPage;
+}
+
+export function getMetadata(): MetadataFrontmatter {
+  return getGraph().metadata;
 }

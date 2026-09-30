@@ -19,15 +19,13 @@ export default function ThingsPage() {
             const cover = thing.media[0];
             return (
               <li key={thing.slug}>
-                {cover ? (
+                {cover && (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={assetUrl(cover.src)}
                     alt={cover.alt}
                     className="aspect-square w-full rounded-lg object-cover"
                   />
-                ) : (
-                  <div className="aspect-square w-full rounded-lg bg-gray-100 dark:bg-gray-800" />
                 )}
                 <div className="mt-2 flex items-baseline justify-between gap-2">
                   <h2 className="text-sm font-medium">{thing.name}</h2>

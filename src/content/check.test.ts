@@ -5,8 +5,8 @@ import { resolve } from "./graph";
 
 /**
  * Validates the real content tree, not a fixture. This is what
- * `npm run content:check` runs — the pre-commit substitute for a CMS admin
- * refusing to publish something broken.
+ * `npm run content:check` runs — the pre-commit check for schema or reference
+ * errors in authored content.
  */
 describe("the real content directory", () => {
   it("loads and resolves with no schema or reference errors", () => {

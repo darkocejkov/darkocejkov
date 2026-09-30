@@ -1,0 +1,1 @@
+export { default, generateStaticParams } from "../../blog/[slug]/page";

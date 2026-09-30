@@ -1,21 +1,5 @@
-import React from "react";
-import {
-  strapiGet,
-  isNotificationActive,
-  type StrapiSingle,
-  type SiteMeta,
-} from "@/lib/strapi";
-
-async function getMeta(): Promise<SiteMeta | null> {
-  try {
-    const res = await strapiGet<StrapiSingle<SiteMeta>>("/meta", {
-      populate: "notifications",
-    });
-    return res.data ?? null;
-  } catch {
-    return null;
-  }
-}
+import { getMetadata } from "@/content";
+import { isNotificationActive } from "@/content/metadata";
 
 const SYMBOLS = ["◖", "▨", "×", "◉", "↖"];
 
@@ -40,14 +24,13 @@ function Symbols({ reverse = false }: { reverse?: boolean }) {
   );
 }
 
-export default async function MaintenanceBanner() {
-  const meta = await getMeta();
-  if (!meta) return null;
-
+export default function MaintenanceBanner() {
+  const meta = getMetadata();
   // Dated notifications win over the standing construction flag, so a banner
   // can expire on its own instead of needing to be switched off by hand.
-  const active = (meta.notifications ?? []).filter((n) => isNotificationActive(n));
-  const message = active[0]?.message ?? (meta.underConstruction ? "under active redesign" : null);
+  const active = meta.notifications.filter((n) => isNotificationActive(n));
+  const notification = active[0];
+  const message = notification?.message ?? (meta.underConstruction ? "under active redesign" : null);
   if (!message) return null;
 
   // Centred rather than a marquee: a scrolling strip makes the reader wait
@@ -57,7 +40,13 @@ export default async function MaintenanceBanner() {
     <div className="sticky top-0 z-30 bg-brand-orange py-2 font-funnel text-sm font-medium text-brand-dark">
       <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 px-4 text-center">
         <Symbols />
-        <span>{message}</span>
+        {notification?.url ? (
+          <a href={notification.url} className="underline underline-offset-2">
+            {message}
+          </a>
+        ) : (
+          <span>{message}</span>
+        )}
         <Symbols reverse />
       </div>
     </div>

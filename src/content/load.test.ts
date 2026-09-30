@@ -28,6 +28,23 @@ describe("load", () => {
     expect(loaded.statement.body.trim()).toBe("Statement body.");
   });
 
+  it("loads the articles landing page singleton", () => {
+    const loaded = load(makeContentDir(REQUIRED));
+    expect(loaded.articlesPage.data).toEqual({ title: "Articles", subtitle: "A subtitle" });
+    expect(loaded.articlesPage.body.trim()).toBe("Articles description.");
+  });
+
+  it("loads site metadata and its defaulted collections", () => {
+    const loaded = load(makeContentDir(REQUIRED));
+    expect(loaded.metadata.data).toEqual({
+      lookingForWork: false,
+      currently: null,
+      underConstruction: false,
+      notifications: [],
+      downloads: [],
+    });
+  });
+
   it("returns an empty array for a collection with no directory", () => {
     const loaded = load(makeContentDir(REQUIRED));
     expect(loaded.things).toEqual([]);

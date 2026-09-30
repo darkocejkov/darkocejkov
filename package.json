@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "new": "plop",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
@@ -31,6 +32,8 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
+    "node-plop": "^0.32.3",
+    "plop": "^4.0.5",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vite": "^8.3.0",

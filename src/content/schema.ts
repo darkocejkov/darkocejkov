@@ -50,14 +50,13 @@ const emailString = z
   .refine((v) => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v), "must be an email address");
 
 /**
- * Assets live in the CMS media library and are referenced by relative path.
- * An absolute URL would bake the CMS origin into content and break on any
- * move; `assetUrl` resolves these at render time instead.
+ * Uploaded media lives in the R2 bucket. Store its bucket-relative path so
+ * content stays independent of the public asset hostname.
  */
 export const Asset = z.object({
   src: z
     .string()
-    .regex(/^\/uploads\//, "must be a CMS path beginning with /uploads/"),
+    .regex(/^\/(art|assets)\//, "must begin with /art/ or /assets/"),
   alt: z.string(),
   caption: z.string().optional(),
 });
@@ -69,7 +68,7 @@ export type EmploymentType = z.infer<typeof EmploymentType>;
 export const Proficiency = z.enum(["novice", "working", "fluent", "deep"]);
 export type Proficiency = z.infer<typeof Proficiency>;
 
-export const ThingType = z.enum(["book", "record", "tool", "gear", "furniture", "other"]);
+export const ThingType = z.enum(["book", "record", "tool", "video", "gear", "furniture", "other"]);
 export type ThingType = z.infer<typeof ThingType>;
 
 export const ProjectStage = z.enum(["concept", "in-progress", "shipped", "archived"]);
@@ -126,6 +125,25 @@ export const ProjectFrontmatter = z.object({
 });
 export type ProjectFrontmatter = z.infer<typeof ProjectFrontmatter>;
 
+export const ArtworkImage = Asset.extend({
+  width: z.number().int().positive(),
+  height: z.number().int().positive(),
+});
+
+export const ArtworkFrontmatter = z.object({
+  name: z.string().min(1),
+  image: ArtworkImage,
+  description: z.string().optional(),
+  medium: z.string().optional(),
+  materials: z.string().optional(),
+  year: z.string().optional(),
+  dimensions: z.string().optional(),
+  series: z.string().optional(),
+  order: z.number().int().default(0),
+  tags: uniqueList(z.string()),
+});
+export type ArtworkFrontmatter = z.infer<typeof ArtworkFrontmatter>;
+
 export const ArticleFrontmatter = z.object({
   title: z.string().min(1),
   summary: z.string().min(1),
@@ -177,3 +195,40 @@ export const StatementFrontmatter = z.object({
   title: z.string().min(1),
 });
 export type StatementFrontmatter = z.infer<typeof StatementFrontmatter>;
+
+export const ArticlesPageFrontmatter = z.object({
+  title: z.string().min(1),
+  subtitle: z.string().min(1),
+});
+export type ArticlesPageFrontmatter = z.infer<typeof ArticlesPageFrontmatter>;
+
+const notificationDateTime = z.preprocess(
+  (value) => (value instanceof Date ? value.toISOString() : value),
+  z.string().refine((value) => !Number.isNaN(Date.parse(value)), "must be a valid date/time")
+);
+
+export const SiteNotification = z.object({
+  message: z.string().min(1),
+  level: z.enum(["info", "success", "warning"]).default("info"),
+  url: z.string().min(1).optional(),
+  startsAt: notificationDateTime.optional(),
+  endsAt: notificationDateTime.optional(),
+});
+export type SiteNotification = z.infer<typeof SiteNotification>;
+
+export const ResumeDownload = z.object({
+  title: z.string().min(1),
+  file: z.string().regex(/^\/resume\/.+/, "must be an R2 path beginning with /resume/"),
+  description: z.string().optional(),
+  version: z.string().optional(),
+});
+export type ResumeDownload = z.infer<typeof ResumeDownload>;
+
+export const MetadataFrontmatter = z.object({
+  lookingForWork: z.boolean().default(false),
+  currently: z.string().nullable().default(null),
+  underConstruction: z.boolean().default(false),
+  notifications: z.array(SiteNotification).default([]),
+  downloads: z.array(ResumeDownload).default([]),
+});
+export type MetadataFrontmatter = z.infer<typeof MetadataFrontmatter>;

@@ -4,10 +4,13 @@ import matter from "gray-matter";
 import type { z } from "zod";
 import {
   AboutFrontmatter,
+  ArtworkFrontmatter,
+  ArticlesPageFrontmatter,
   ArticleFrontmatter,
   EducationFrontmatter,
   ExperienceFrontmatter,
   LinkFrontmatter,
+  MetadataFrontmatter,
   ProjectFrontmatter,
   SkillFrontmatter,
   StatementFrontmatter,
@@ -37,6 +40,7 @@ export interface Entry<T> {
 
 export interface LoadedContent {
   experience: Entry<z.infer<typeof ExperienceFrontmatter>>[];
+  artworks: Entry<z.infer<typeof ArtworkFrontmatter>>[];
   education: Entry<z.infer<typeof EducationFrontmatter>>[];
   skills: Entry<z.infer<typeof SkillFrontmatter>>[];
   projects: Entry<z.infer<typeof ProjectFrontmatter>>[];
@@ -45,6 +49,8 @@ export interface LoadedContent {
   links: Entry<z.infer<typeof LinkFrontmatter>>[];
   about: Entry<z.infer<typeof AboutFrontmatter>>;
   statement: Entry<z.infer<typeof StatementFrontmatter>>;
+  articlesPage: Entry<z.infer<typeof ArticlesPageFrontmatter>>;
+  metadata: Entry<z.infer<typeof MetadataFrontmatter>>;
 }
 
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
@@ -145,6 +151,7 @@ export function load(dir: string): LoadedContent {
   const issues: string[] = [];
 
   const experience = loadCollection(dir, "experience", ExperienceFrontmatter, issues);
+  const artworks = loadCollection(dir, "art", ArtworkFrontmatter, issues);
   const education = loadCollection(dir, "education", EducationFrontmatter, issues);
   const skills = loadCollection(dir, "skills", SkillFrontmatter, issues);
   const projects = loadCollection(dir, "projects", ProjectFrontmatter, issues);
@@ -153,8 +160,25 @@ export function load(dir: string): LoadedContent {
   const links = loadCollection(dir, "links", LinkFrontmatter, issues);
   const about = loadSingleton(dir, "about.mdx", AboutFrontmatter, issues);
   const statement = loadSingleton(dir, "statement.mdx", StatementFrontmatter, issues);
+  const articlesPage = loadSingleton(dir, "articles.mdx", ArticlesPageFrontmatter, issues);
+  const metadata = loadSingleton(dir, "metadata.mdx", MetadataFrontmatter, issues);
 
-  if (issues.length > 0 || !about || !statement) throw new ContentError(issues);
+  if (issues.length > 0 || !about || !statement || !articlesPage || !metadata) {
+    throw new ContentError(issues);
+  }
 
-  return { experience, education, skills, projects, articles, things, links, about, statement };
+  return {
+    experience,
+    artworks,
+    education,
+    skills,
+    projects,
+    articles,
+    things,
+    links,
+    about,
+    statement,
+    articlesPage,
+    metadata,
+  };
 }

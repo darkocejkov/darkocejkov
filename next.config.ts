@@ -12,41 +12,30 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: appDir,
   },
-  // `content/` lives inside the project root, but the tracer still cannot see
-  // it: load.ts reads the directory at runtime from a path computed off
-  // process.cwd(), and @vercel/nft only includes what it can find statically.
-  // Without this a traced deploy (Vercel, `output: "standalone"`) fails at
-  // runtime with "content directory not found", because the maintenance
-  // banner's fetch puts every route on ISR and pages re-read the filesystem
-  // after revalidation.
+  // Dynamic article and project routes can render slugs that were not
+  // prerendered. Include the content tree for those traced server functions.
   outputFileTracingIncludes: {
     "/**": ["./content/**/*"],
   },
   images: {
     remotePatterns: [
       {
-        protocol: "http",
-        hostname: "localhost",
-        port: "1337",
-        pathname: "/uploads/**",
+        protocol: "https",
+        hostname: "assets.darkocejkov.ca",
+        pathname: "/art/**",
       },
       {
         protocol: "https",
-        hostname: "cms.darkocejkov.ca",
-        pathname: "/uploads/**",
+        hostname: "assets.darkocejkov.ca",
+        pathname: "/assets/**",
       },
     ],
   },
   async redirects() {
     return [
       { source: "/links", destination: "/bookmarks", permanent: true },
-      { source: "/brain", destination: "/", permanent: true },
+      { source: "/blog/:path*", destination: "/brain/:path*", permanent: true },
     ];
-  },
-  logging: {
-    fetches: {
-      fullUrl: true,
-    },
   },
 };
 

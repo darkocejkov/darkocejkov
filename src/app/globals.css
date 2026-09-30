@@ -32,6 +32,32 @@
   }
 }
 
+body {
+  cursor: url("/cursor-northwest.svg") 2 2, auto;
+}
+
+body a,
+body button,
+body [role="button"] {
+  cursor: url("/cursor-northwest.svg") 2 2, pointer;
+}
+
+body input,
+body textarea,
+body select,
+body [contenteditable="true"] {
+  cursor: text;
+}
+
+@media (pointer: coarse) {
+  body,
+  body a,
+  body button,
+  body [role="button"] {
+    cursor: auto;
+  }
+}
+
 
 /* ---------------------------------------------------------------- *
  * Theme cross-fade

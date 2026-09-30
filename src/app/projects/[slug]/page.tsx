@@ -45,7 +45,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
           href="/projects"
           className="mb-8 inline-block text-sm text-gray-400 transition-colors hover:text-gray-700"
         >
-          ← Back to Work
+          ← Back to Projects
         </Link>
 
         <h1 className="font-funnel text-4xl font-bold leading-tight">{project.title}</h1>
@@ -116,7 +116,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
             <ul className="mt-3 flex flex-col gap-2">
               {project.articles.map((article) => (
                 <li key={article.slug}>
-                  <Link href={`/blog/${article.slug}`} className="group block">
+                  <Link href={`/brain/${article.slug}`} className="group block">
                     <span className="text-sm font-medium group-hover:underline">{article.title}</span>
                     <span className="block text-xs text-gray-500 line-clamp-1">{article.summary}</span>
                   </Link>

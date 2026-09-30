@@ -1,33 +1,20 @@
-import { afterEach, describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 import { assetUrl, isExternalHref } from "./asset";
 
-const original = process.env.NEXT_PUBLIC_CMS_URL;
-afterEach(() => {
-  if (original === undefined) delete process.env.NEXT_PUBLIC_CMS_URL;
-  else process.env.NEXT_PUBLIC_CMS_URL = original;
-});
-
 describe("assetUrl", () => {
-  it("prefixes an upload path with the configured CMS origin", () => {
-    process.env.NEXT_PUBLIC_CMS_URL = "https://cms.darkocejkov.ca";
-    expect(assetUrl("/uploads/a.png")).toBe("https://cms.darkocejkov.ca/uploads/a.png");
+  it("resolves art paths against the R2 public domain", () => {
+    expect(assetUrl("/art/portrait.png")).toBe("https://assets.darkocejkov.ca/art/portrait.png");
   });
 
-  it("falls back to localhost when no CMS origin is configured", () => {
-    delete process.env.NEXT_PUBLIC_CMS_URL;
-    expect(assetUrl("/uploads/a.png")).toBe("http://localhost:1337/uploads/a.png");
+  it("resolves assets and resume paths against the same bucket", () => {
+    expect(assetUrl("/assets/object.png")).toBe("https://assets.darkocejkov.ca/assets/object.png");
+    expect(assetUrl("/resume/cv.pdf")).toBe("https://assets.darkocejkov.ca/resume/cv.pdf");
   });
 
   it("leaves an absolute URL untouched", () => {
     expect(assetUrl("https://example.com/a.png")).toBe("https://example.com/a.png");
   });
 
-  it("reads the origin per call, so a changed env var takes effect", () => {
-    process.env.NEXT_PUBLIC_CMS_URL = "https://one.example";
-    expect(assetUrl("/uploads/a.png")).toBe("https://one.example/uploads/a.png");
-    process.env.NEXT_PUBLIC_CMS_URL = "https://two.example";
-    expect(assetUrl("/uploads/a.png")).toBe("https://two.example/uploads/a.png");
-  });
 });
 
 describe("isExternalHref", () => {

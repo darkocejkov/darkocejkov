@@ -1,8 +1,10 @@
 import { Suspense } from "react";
 import BlogList, { type BlogListItem } from "@/components/BlogList";
-import { assetUrl, getArticles } from "@/content";
+import { assetUrl, getArticles, getArticlesPage } from "@/content";
+import { Mdx } from "@/content/mdx";
 
 export default function Blog() {
+  const page = getArticlesPage();
   const articles = getArticles();
 
   // Categories are implicit — the set actually in use, alphabetised.
@@ -23,6 +25,7 @@ export default function Blog() {
     title: a.title,
     summary: a.summary,
     publishedAt: a.publishedAt,
+    draft: a.draft,
     category: a.category,
     tags: a.tags,
     cover: a.cover ? { url: assetUrl(a.cover.src), alt: a.cover.alt } : null,
@@ -30,7 +33,11 @@ export default function Blog() {
 
   return (
     <div>
-      <h1 className="font-funnel mb-6 text-4xl font-bold">Blog</h1>
+      <header className="mb-8">
+        <h1 className="font-funnel text-4xl font-bold">{page.title}</h1>
+        <p className="mt-2 text-gray-500">{page.subtitle}</p>
+        <Mdx source={page.description} className="mt-3 prose-sm text-gray-500" />
+      </header>
       <Suspense fallback={<p className="text-sm text-gray-400">Loading…</p>}>
         <BlogList articles={items} categories={categories} />
       </Suspense>

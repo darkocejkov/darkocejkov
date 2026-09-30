@@ -9,20 +9,17 @@ import { useSceneStore } from "@/stores/scene";
 interface OrbitProps {
   /** Orbit radius in pixels. */
   radius: number;
-  /** Diameter of an unselected satellite dot. */
-  dotSize: number;
+  /** Size of the satellite icon box in pixels. */
+  iconSize: number;
   /** Live orbit rotation in radians. Omit for a static orbit. */
   rotation?: MotionValue<number>;
-  /** Render text labels beside the dots. */
-  showLabels?: boolean;
 }
 
 function Satellite({
   index,
   radius,
-  dotSize,
+  iconSize,
   rotation,
-  showLabels,
 }: OrbitProps & { index: number }) {
   const node = NODES[index];
   const activeNode = useSceneStore((s) => s.activeNode);
@@ -41,18 +38,26 @@ function Satellite({
     <motion.div className="absolute left-1/2 top-1/2" style={{ x, y }}>
       <Link
         href={node.href}
+        aria-label={node.label}
         aria-current={isActive ? "page" : undefined}
-        className="group flex -translate-x-1/2 -translate-y-1/2 items-center gap-2 rounded-full outline-none focus-visible:ring-2 focus-visible:ring-brand-orange focus-visible:ring-offset-2"
+        className="group relative flex -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full outline-none focus-visible:ring-2 focus-visible:ring-brand-orange focus-visible:ring-offset-2"
       >
         <span
           aria-hidden="true"
           className={[
-            "block rounded-full bg-current transition-transform duration-200",
+            "flex shrink-0 items-center justify-center rounded-full font-sans leading-none transition-transform duration-200",
             isActive ? "scale-125 ring-4 ring-brand-orange ring-offset-2" : "group-hover:scale-110",
           ].join(" ")}
-          style={{ width: dotSize, height: dotSize }}
-        />
-        <span className={showLabels ? "text-sm" : "sr-only"}>{node.label}</span>
+          style={{ width: iconSize, height: iconSize, fontSize: iconSize }}
+        >
+          {node.icon}
+        </span>
+        <span
+          aria-hidden="true"
+          className="invisible absolute bottom-full left-1/2 z-10 mb-2 -translate-x-1/2 whitespace-nowrap rounded-sm bg-brand-dark px-2 py-1 text-xs text-brand-white opacity-0 shadow-sm transition-[opacity,visibility] duration-150 group-hover:visible group-hover:opacity-100 group-focus-visible:visible group-focus-visible:opacity-100 dark:bg-brand-white dark:text-brand-dark"
+        >
+          {node.label}
+        </span>
       </Link>
     </motion.div>
   );

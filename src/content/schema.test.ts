@@ -4,25 +4,52 @@ import {
   Asset,
   ExperienceFrontmatter,
   LinkFrontmatter,
+  MetadataFrontmatter,
   ProjectFrontmatter,
+  ResumeDownload,
 } from "./schema";
 
 describe("Asset", () => {
-  it("accepts a CMS upload path", () => {
-    const result = Asset.parse({ src: "/uploads/portrait.png", alt: "Me" });
-    expect(result.src).toBe("/uploads/portrait.png");
+  it("accepts high-quality art and general asset paths", () => {
+    expect(Asset.parse({ src: "/art/portrait.png", alt: "Me" }).src).toBe("/art/portrait.png");
+    expect(Asset.parse({ src: "/assets/object.png", alt: "Object" }).src).toBe("/assets/object.png");
   });
 
-  it("rejects an absolute CMS URL, which would break when the CMS moves", () => {
+  it("rejects absolute URLs and unsupported bucket folders", () => {
     const result = Asset.safeParse({
-      src: "http://localhost:1337/uploads/portrait.png",
+      src: "https://assets.darkocejkov.ca/art/portrait.png",
       alt: "Me",
     });
     expect(result.success).toBe(false);
+    expect(Asset.safeParse({ src: "/resume/cv.pdf", alt: "CV" }).success).toBe(false);
   });
 
   it("requires alt text so images cannot ship without it", () => {
-    expect(Asset.safeParse({ src: "/uploads/a.png" }).success).toBe(false);
+    expect(Asset.safeParse({ src: "/art/a.png" }).success).toBe(false);
+  });
+});
+
+describe("metadata frontmatter", () => {
+  it("defaults availability, notifications, and downloads", () => {
+    expect(MetadataFrontmatter.parse({})).toEqual({
+      lookingForWork: false,
+      currently: null,
+      underConstruction: false,
+      notifications: [],
+      downloads: [],
+    });
+  });
+
+  it("normalizes YAML notification dates and validates resume file paths", () => {
+    const result = MetadataFrontmatter.parse({
+      notifications: [{ message: "Notice", startsAt: new Date("2026-10-01T00:00:00Z") }],
+    });
+    expect(result.notifications[0].startsAt).toBe("2026-10-01T00:00:00.000Z");
+  });
+
+  it("accepts resume downloads only from the resume folder", () => {
+    expect(ResumeDownload.safeParse({ title: "CV", file: "/resume/cv.pdf" }).success).toBe(true);
+    expect(ResumeDownload.safeParse({ title: "CV", file: "/assets/cv.pdf" }).success).toBe(false);
   });
 });
 
@@ -161,7 +188,7 @@ describe("ProjectFrontmatter", () => {
     const result = ProjectFrontmatter.parse({
       title: "Orbit Rail",
       summary: "A thing",
-      gallery: [{ src: "/uploads/a.png", alt: "A", caption: "First" }],
+      gallery: [{ src: "/art/a.png", alt: "A", caption: "First" }],
     });
     expect(result.gallery[0].caption).toBe("First");
   });
@@ -184,8 +211,8 @@ describe("ProjectFrontmatter", () => {
       title: "Orbit Rail",
       summary: "A thing",
       gallery: [
-        { src: "/uploads/a.png", alt: "A" },
-        { src: "/uploads/a.png", alt: "A" },
+        { src: "/art/a.png", alt: "A" },
+        { src: "/art/a.png", alt: "A" },
       ],
     });
     expect(result.gallery).toHaveLength(2);

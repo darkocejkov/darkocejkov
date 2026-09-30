@@ -1,7 +1,7 @@
 interface Props {
   url: string;
   title: string;
-  /** Explicit key from the CMS; falls back to sniffing the URL when absent. */
+  /** Explicit key from content; falls back to sniffing the URL when absent. */
   iconKey?: string | null;
 }
 

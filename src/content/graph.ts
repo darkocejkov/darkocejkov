@@ -2,8 +2,10 @@ import { ContentError, type Entry, type LoadedContent } from "./load";
 import { readingTime } from "./text";
 import type {
   Asset,
+  ArtworkFrontmatter,
   EmploymentType,
   LinkType,
+  MetadataFrontmatter,
   Proficiency,
   ProjectStage,
   ThingType,
@@ -92,6 +94,10 @@ export interface Education {
   body: string;
 }
 
+export interface Artwork extends ArtworkFrontmatter {
+  slug: string;
+}
+
 export interface Thing {
   slug: string;
   name: string;
@@ -131,6 +137,12 @@ export interface Statement {
   body: string;
 }
 
+export interface ArticlesPage {
+  title: string;
+  subtitle: string;
+  description: string;
+}
+
 export interface TagCount {
   tag: string;
   count: number;
@@ -139,6 +151,7 @@ export interface TagCount {
 export interface ContentGraph {
   experience: Experience[];
   education: Education[];
+  artworks: Artwork[];
   skills: Skill[];
   projects: Project[];
   articles: Article[];
@@ -146,6 +159,8 @@ export interface ContentGraph {
   links: SiteLink[];
   about: About;
   statement: Statement;
+  articlesPage: ArticlesPage;
+  metadata: MetadataFrontmatter;
   tags: TagCount[];
 }
 
@@ -316,6 +331,10 @@ export function resolve(
     }))
     .sort((a, b) => byDateDesc(a.startDate, b.startDate));
 
+  const artworks: Artwork[] = loaded.artworks
+    .map((entry) => ({ ...entry.data, slug: entry.slug }))
+    .sort((a, b) => a.order - b.order || a.name.localeCompare(b.name));
+
   const things: Thing[] = loaded.things
     .map((e) => ({
       slug: e.slug,
@@ -360,6 +379,7 @@ export function resolve(
   return {
     experience,
     education,
+    artworks,
     skills,
     projects,
     articles,
@@ -367,6 +387,11 @@ export function resolve(
     links,
     about: { ...loaded.about.data, body: loaded.about.body },
     statement: { title: loaded.statement.data.title, body: loaded.statement.body },
+    articlesPage: {
+      ...loaded.articlesPage.data,
+      description: loaded.articlesPage.body,
+    },
+    metadata: loaded.metadata.data,
     tags,
   };
 }

@@ -6,6 +6,9 @@ import path from "node:path";
 export const REQUIRED: Record<string, string> = {
   "about.mdx": "---\ndisplayName: Test Person\n---\n\nBio body.\n",
   "statement.mdx": "---\ntitle: Statement\n---\n\nStatement body.\n",
+  "articles.mdx": "---\ntitle: Articles\nsubtitle: A subtitle\n---\n\nArticles description.\n",
+  "metadata.mdx":
+    "---\nlookingForWork: false\ncurrently: null\nunderConstruction: false\nnotifications: []\ndownloads: []\n---\n",
 };
 
 /** Build a throwaway content directory from a path-to-contents map. */

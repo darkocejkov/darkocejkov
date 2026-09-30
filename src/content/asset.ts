@@ -1,14 +1,12 @@
-const DEFAULT_CMS_URL = "http://localhost:1337";
+const R2_URL = "https://assets.darkocejkov.ca";
 
 /**
- * Resolve a relative CMS upload path against the CMS origin. Read per call
- * rather than at module load so tests and multi-environment builds see the
- * value that is current when the URL is actually needed.
+ * Resolve a bucket-relative path against the public R2 domain. Absolute URLs
+ * remain available for externally hosted assets.
  */
 export function assetUrl(src: string): string {
   if (/^https?:\/\//.test(src)) return src;
-  const base = process.env.NEXT_PUBLIC_CMS_URL ?? DEFAULT_CMS_URL;
-  return `${base}${src}`;
+  return new URL(src, `${R2_URL}/`).toString();
 }
 
 /** Anything that is not site-relative or an in-page anchor leaves the site. */

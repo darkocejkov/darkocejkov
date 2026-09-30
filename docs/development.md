@@ -10,9 +10,9 @@ src/       the app. src/content/ is the loader that turns those files
 docs/      this, plus the design specs under docs/superpowers/
 ```
 
-Strapi still runs behind it, but only for the things a file cannot do: the media
-library, downloadable files, and the state that has to change without a deploy —
-the maintenance banner and the availability flags.
+R2 serves uploaded media and downloadable files from `assets.darkocejkov.ca`.
+Availability, notifications, and resume links are versioned in
+`content/metadata.mdx`.
 
 ## Running it
 
@@ -21,28 +21,39 @@ npm install
 npm run dev
 ```
 
-The CMS runs separately on `localhost:1337`. It does not need to be up: every
-call into it is wrapped, so the site builds and renders without it — you lose
-the maintenance banner, the "open to work" badge, and the downloads list, and
-nothing else.
-
 | Command | What it does |
 |---|---|
 | `npm run dev` | Development server |
+| `npm run new` | Interactively scaffold a content entry with Plop |
 | `npm run build` | Production build |
 | `npm test` | Unit tests |
 | `npm run content:check` | Validates and resolves the real content tree |
 | `npm run lint` | ESLint |
 
 Run `content:check` before committing content. It takes a couple of seconds and
-exits nonzero on any schema or unresolved-reference error — the pre-commit
-substitute for a CMS admin refusing to publish something broken.
+exits nonzero on any schema or unresolved-reference error.
 
 ## Writing content
 
 Every item is one MDX file whose **filename is its slug**. Frontmatter is
 validated by `src/content/schema.ts`, which is the contract: if a field is not
 in there, it does not exist.
+
+Run `npm run new` to scaffold an article, project, artwork, experience,
+education entry, skill, thing, or link. The generator asks for the required
+fields, suggests a kebab-case filename, and writes schema-compatible MDX under
+`content/`.
+Templates live in `plop-templates/`; their prompts and output paths are defined
+in `plopfile.cjs`.
+
+`content/articles.mdx` is the articles landing page, not an article in the
+`content/articles/` collection. Its `title` and `subtitle` frontmatter and MDX
+body provide the heading, subheading, and description shown at `/brain`.
+
+`content/metadata.mdx` holds the open-to-work flag, current status, construction
+flag, dated notifications, and downloadable files. Resume files use paths under
+`/resume/`; each download has a title, file path, and optional description or
+version.
 
 **Relations are declared once and inverted.** An article names `related`, and
 the backlinks on the other end are derived. An article names its `project`, and
@@ -55,9 +66,10 @@ exception: a published article may reference a draft, and that reference is
 dropped silently rather than erroring — the draft legitimately exists, and
 forbidding the link until it ships would be worse.
 
-**Images go to the CMS**, and are referenced by relative `/uploads/...` path,
-never an absolute URL. `assetUrl()` resolves them at render, so moving the CMS
-does not break every image in every file.
+**Media goes to R2** and is referenced by bucket-relative paths: high-quality
+images under `/art/`, other images and files under `/assets/`, and resumes under
+`/resume/`. `assetUrl()` resolves these against
+`https://assets.darkocejkov.ca`.
 
 **`draft: true`** keeps an article out of production builds while leaving it
 visible in development.
@@ -79,11 +91,9 @@ project; it is not. `load.ts` reads the directory at runtime from a path
 computed off `process.cwd()`, and the tracer only includes what it can find by
 static analysis, at any path depth.
 
-Without it, a traced deploy ships without `content/` and fails *after* deploy
-rather than at build time — quietly, serving stale prerendered pages while the
-function logs fill with `content directory not found`. Every route is on ISR
-because the root layout fetches the maintenance banner, so pages do re-read the
-filesystem long after the build.
+Without it, a traced deployment can omit `content/`. Unprerendered article and
+project routes can render on demand, so those routes need the content directory
+at runtime.
 
 See `docs/superpowers/specs/2026-09-28-markdown-content-layer-design.md` for why
 the content layer is shaped the way it is.

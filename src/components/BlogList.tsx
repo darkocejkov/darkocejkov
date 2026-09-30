@@ -14,6 +14,7 @@ export interface BlogListItem {
   title: string;
   summary: string;
   publishedAt: string;
+  draft: boolean;
   category?: string;
   tags: string[];
   cover: { url: string; alt: string } | null;
@@ -38,8 +39,20 @@ export default function BlogList({
   const searchParams = useSearchParams();
   const raw = searchParams.get("category") ?? undefined;
   const active = raw && categories.includes(raw) ? raw : undefined;
+  const draftsFirst = searchParams.get("sort") === "drafts";
 
-  const visible = active ? articles.filter((a) => a.category === active) : articles;
+  const filtered = active ? articles.filter((a) => a.category === active) : articles;
+  const visible = draftsFirst
+    ? [...filtered].sort((a, b) => Number(b.draft) - Number(a.draft))
+    : filtered;
+
+  const listHref = (category?: string, sortDrafts = false) => {
+    const params = new URLSearchParams();
+    if (category) params.set("category", category);
+    if (sortDrafts) params.set("sort", "drafts");
+    const query = params.toString();
+    return query ? `/brain?${query}` : "/brain";
+  };
 
   const chip = (isActive: boolean) =>
     `rounded-full px-3 py-1 text-sm transition-colors ${
@@ -50,19 +63,28 @@ export default function BlogList({
 
   return (
     <>
-      <div className="mb-10 flex flex-wrap gap-2">
-        <Link href="/blog" className={chip(!active)}>
-          All
-        </Link>
-        {categories.map((cat) => (
-          <Link
-            key={cat}
-            href={`/blog?category=${encodeURIComponent(cat)}`}
-            className={chip(active === cat)}
-          >
-            {cat}
+      <div className="mb-10 flex flex-wrap items-center justify-between gap-4">
+        <div className="flex flex-wrap gap-2">
+          <Link href={listHref(undefined, draftsFirst)} className={chip(!active)}>
+            All
           </Link>
-        ))}
+          {categories.map((cat) => (
+            <Link key={cat} href={listHref(cat, draftsFirst)} className={chip(active === cat)}>
+              {cat}
+            </Link>
+          ))}
+        </div>
+        {articles.some((article) => article.draft) && (
+          <div className="flex items-center gap-2 text-sm">
+            <span className="text-gray-400">Sort:</span>
+            <Link href={listHref(active)} className={chip(!draftsFirst)} aria-current={!draftsFirst ? "page" : undefined}>
+              Newest
+            </Link>
+            <Link href={listHref(active, true)} className={chip(draftsFirst)} aria-current={draftsFirst ? "page" : undefined}>
+              Drafts first
+            </Link>
+          </div>
+        )}
       </div>
 
       {visible.length === 0 ? (
@@ -71,7 +93,7 @@ export default function BlogList({
         <ol className="flex flex-col divide-y divide-gray-100 dark:divide-gray-800">
           {visible.map((article) => (
             <li key={article.slug} className="py-6 first:pt-0 last:pb-0">
-              <Link href={`/blog/${article.slug}`} className="group flex gap-4 items-start">
+              <Link href={`/brain/${article.slug}`} className="group flex gap-4 items-start">
                 {article.cover && (
                   <div className="shrink-0 w-20 h-20 rounded-md overflow-hidden bg-gray-100">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -85,11 +107,18 @@ export default function BlogList({
                   </div>
                 )}
                 <div className="min-w-0">
-                  {article.category && (
-                    <div className="mb-1">
+                  {(article.category || article.draft) && (
+                    <div className="mb-1 flex flex-wrap items-center gap-2">
+                      {article.category && (
                       <span className="rounded-full bg-gray-100 dark:bg-gray-800 px-2 py-0.5 text-xs text-gray-500">
                         {article.category}
                       </span>
+                      )}
+                      {article.draft && (
+                        <span className="rounded-full border border-brand-orange/50 px-2 py-0.5 text-xs font-medium text-brand-orange">
+                          Draft
+                        </span>
+                      )}
                     </div>
                   )}
                   <h2 className="font-funnel text-xl font-semibold group-hover:underline">

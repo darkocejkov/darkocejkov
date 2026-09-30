@@ -47,8 +47,8 @@ export function Embed({ url, title }: { url: string; title: string }) {
 }
 
 const components = {
-  // Content references uploads by relative path; resolve to the CMS origin here
-  // so nothing in content/ knows where the CMS lives.
+  // Content references R2 objects by bucket-relative path; resolve the public
+  // origin here so content stays independent of the storage hostname.
   img: ({ src, alt }: { src?: string; alt?: string }) =>
     src ? (
       // eslint-disable-next-line @next/next/no-img-element

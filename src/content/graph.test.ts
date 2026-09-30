@@ -36,6 +36,32 @@ describe("skill resolution", () => {
   });
 });
 
+describe("artworks", () => {
+  it("loads named artwork with an R2 image and optional details", () => {
+    const graph = build({
+      "art/brushstrokes-1.mdx":
+        '---\nname: "Brushstrokes 1"\nimage:\n  src: "/art/brushstrokes 1.png"\n  alt: "Abstract brushstrokes"\n  width: 2910\n  height: 3906\ndescription: "Layered color and movement."\nmaterials: acrylic\nmedium: painting\nyear: "2024"\n---\n',
+    });
+
+    expect(graph.artworks).toEqual([
+      expect.objectContaining({
+        slug: "brushstrokes-1",
+        name: "Brushstrokes 1",
+        image: {
+          src: "/art/brushstrokes 1.png",
+          alt: "Abstract brushstrokes",
+          width: 2910,
+          height: 3906,
+        },
+        description: "Layered color and movement.",
+        materials: "acrylic",
+        medium: "painting",
+        year: "2024",
+      }),
+    ]);
+  });
+});
+
 describe("related and backlinks", () => {
   it("resolves related into article references", () => {
     const graph = build({
@@ -221,6 +247,18 @@ describe("sorting and derived fields", () => {
     expect(graph.about.displayName).toBe("Test Person");
     expect(graph.about.body.trim()).toBe("Bio body.");
     expect(graph.statement.body.trim()).toBe("Statement body.");
+    expect(graph.articlesPage).toEqual({
+      title: "Articles",
+      subtitle: "A subtitle",
+      description: "\nArticles description.\n",
+    });
+    expect(graph.metadata).toEqual({
+      lookingForWork: false,
+      currently: null,
+      underConstruction: false,
+      notifications: [],
+      downloads: [],
+    });
   });
 });
 

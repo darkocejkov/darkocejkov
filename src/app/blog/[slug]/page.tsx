@@ -42,7 +42,7 @@ function ArticleLinkList({
       <ul className="mt-3 flex flex-col gap-2">
         {items.map((item) => (
           <li key={item.slug}>
-            <Link href={`/blog/${item.slug}`} className="group block">
+            <Link href={`/brain/${item.slug}`} className="group block">
               <span className="text-sm font-medium group-hover:underline">{item.title}</span>
               <span className="block text-xs text-gray-500 line-clamp-1">{item.summary}</span>
             </Link>
@@ -68,17 +68,24 @@ export default async function BlogPostPage({
     <div>
       <div className="max-w-2xl mx-auto">
         <Link
-          href="/blog"
+          href="/brain"
           className="text-sm text-gray-400 hover:text-gray-700 transition-colors mb-8 inline-block"
         >
-          ← Back to Blog
+          ← Back to brain words
         </Link>
 
-        {article.category && (
+        {(article.category || article.draft) && (
           <div className="flex flex-wrap items-center gap-2 mb-3">
+            {article.category && (
             <span className="rounded-full bg-gray-100 dark:bg-gray-800 px-2 py-0.5 text-xs text-gray-500">
               {article.category}
             </span>
+            )}
+            {article.draft && (
+              <span className="rounded-full border border-brand-orange/50 px-2 py-0.5 text-xs font-medium text-brand-orange">
+                Draft
+              </span>
+            )}
           </div>
         )}
 
