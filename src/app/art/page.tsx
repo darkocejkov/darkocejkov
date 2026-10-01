@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { FlowTitle } from "@/components/flow/Flow";
 import { assetUrl, getArtworks } from "@/content";
 
 export const metadata = { title: "Art" };
@@ -8,15 +9,15 @@ export default function ArtPage() {
 
   return (
     <div>
-      <h1 className="font-funnel mb-2 text-4xl font-bold">Art</h1>
+      <FlowTitle className="mb-4">Art</FlowTitle>
       <p className="mb-10 max-w-prose text-gray-500">Artwork and visual studies.</p>
 
       {artworks.length === 0 ? (
         <p className="text-sm text-gray-400">No artwork yet.</p>
       ) : (
-        <ul className="grid grid-cols-1 gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
+        <ul className="columns-1 gap-8 sm:columns-2 lg:columns-3">
           {artworks.map((artwork) => (
-            <li key={artwork.slug}>
+            <li key={artwork.slug} className="mb-8 break-inside-avoid">
               <Image
                 src={assetUrl(artwork.image.src)}
                 alt={artwork.image.alt}
@@ -25,9 +26,8 @@ export default function ArtPage() {
                 sizes="(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 100vw"
                 className="h-auto w-full rounded-sm object-contain"
               />
-              <h2 className="font-funnel mt-3 text-lg font-semibold">{artwork.name}</h2>
               {artwork.description && (
-                <p className="mt-1 text-sm text-gray-500">{artwork.description}</p>
+                <p className="mt-3 text-sm text-gray-500">{artwork.description}</p>
               )}
               {(artwork.medium || artwork.materials || artwork.year || artwork.dimensions || artwork.series) && (
                 <dl className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-400">

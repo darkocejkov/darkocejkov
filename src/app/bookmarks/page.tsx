@@ -1,4 +1,5 @@
 import { getLinks } from "@/content";
+import { FlowTitle } from "@/components/flow/Flow";
 
 function formatDate(date: string | undefined) {
   if (!date) return null;
@@ -19,7 +20,7 @@ export default function Bookmarks() {
 
   return (
     <div>
-      <h1 className="font-funnel mb-2 text-4xl font-bold">Bookmarks</h1>
+      <FlowTitle className="mb-4">Bookmarks</FlowTitle>
       <p className="mb-10 max-w-prose text-gray-500">Things worth coming back to.</p>
 
       {bookmarks.length === 0 ? (

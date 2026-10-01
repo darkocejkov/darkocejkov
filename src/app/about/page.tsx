@@ -1,4 +1,5 @@
 import SocialIcon from "@/components/SocialIcon";
+import { FlowTitle } from "@/components/flow/Flow";
 import { assetUrl, getAbout, getLinks, getMetadata, getStatement } from "@/content";
 import { Mdx } from "@/content/mdx";
 
@@ -45,7 +46,7 @@ export default function AboutPage() {
         )}
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-3">
-            <h1 className="font-funnel text-5xl font-bold leading-tight">{about.displayName}</h1>
+            <FlowTitle>{about.displayName}</FlowTitle>
             {metadata.lookingForWork && (
               <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700">
                 Open to work

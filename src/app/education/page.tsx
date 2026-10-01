@@ -1,4 +1,5 @@
 import { getEducation } from "@/content";
+import { FlowTitle } from "@/components/flow/Flow";
 import { Mdx } from "@/content/mdx";
 import { formatRange } from "@/lib/dates";
 
@@ -9,7 +10,7 @@ export default function EducationPage() {
 
   return (
     <div className="max-w-3xl">
-      <h1 className="font-funnel mb-2 text-4xl font-bold">Education</h1>
+      <FlowTitle className="mb-4">Education</FlowTitle>
       <p className="mb-10 max-w-prose text-gray-500">What I studied, and where.</p>
 
       {qualifications.length === 0 ? (

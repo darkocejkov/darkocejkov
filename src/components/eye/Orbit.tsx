@@ -1,48 +1,51 @@
 "use client";
 
 import Link from "next/link";
-import { motion, useMotionValue, useTransform, type MotionValue } from "motion/react";
-import { NODES } from "@/config/nodes";
+import { motion, useTransform, type MotionValue } from "motion/react";
+import ScrambleGlyph from "./ScrambleGlyph";
+import type { SceneNode } from "@/config/nodes";
 import { orbitPosition } from "@/lib/orbit";
 import { useSceneStore } from "@/stores/scene";
 
 interface OrbitProps {
-  /** Orbit radius in pixels. */
-  radius: number;
+  id: string;
+  items: ReadonlyArray<SceneNode>;
+  /** Orbit radius in pixels; 0 tucks every satellite into the centre. */
+  radius: MotionValue<number>;
   /** Size of the satellite icon box in pixels. */
-  iconSize: number;
-  /** Live orbit rotation in radians. Omit for a static orbit. */
-  rotation?: MotionValue<number>;
+  iconSize: MotionValue<number>;
+  /** Live orbit rotation in radians. */
+  rotation: MotionValue<number>;
+  /** Closed satellites are hidden from pointer, keyboard, and screen readers. */
+  open: boolean;
+  onNavigate: () => void;
 }
 
 function Satellite({
   index,
+  items,
   radius,
   iconSize,
   rotation,
-}: OrbitProps & { index: number }) {
-  const node = NODES[index];
-  const activeNode = useSceneStore((s) => s.activeNode);
-  const isActive = activeNode === index;
+  onNavigate,
+}: Omit<OrbitProps, "id" | "open"> & { index: number }) {
+  const node = items[index];
+  const total = items.length;
+  const isActive = useSceneStore((s) => s.activeNode === index);
 
-  // A stable zero value for the static (desktop) case, so the transforms below
-  // are always given a real MotionValue — hooks cannot be called conditionally.
-  const staticRotation = useMotionValue(0);
-  const turn = rotation ?? staticRotation;
-
-  // Recompute position as the orbit turns, without re-rendering React.
-  const x = useTransform(turn, (r) => orbitPosition(index, NODES.length, radius, r).x);
-  const y = useTransform(turn, (r) => orbitPosition(index, NODES.length, radius, r).y);
+  const x = useTransform([rotation, radius], ([r, rad]: number[]) => orbitPosition(index, total, rad, r).x);
+  const y = useTransform([rotation, radius], ([r, rad]: number[]) => orbitPosition(index, total, rad, r).y);
 
   return (
     <motion.div className="absolute left-1/2 top-1/2" style={{ x, y }}>
       <Link
         href={node.href}
+        onClick={onNavigate}
         aria-label={node.label}
         aria-current={isActive ? "page" : undefined}
         className="group relative flex -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full outline-none focus-visible:ring-2 focus-visible:ring-brand-orange focus-visible:ring-offset-2"
       >
-        <span
+        <motion.span
           aria-hidden="true"
           className={[
             "flex shrink-0 items-center justify-center rounded-full font-sans leading-none transition-transform duration-200",
@@ -50,8 +53,8 @@ function Satellite({
           ].join(" ")}
           style={{ width: iconSize, height: iconSize, fontSize: iconSize }}
         >
-          {node.icon}
-        </span>
+          <ScrambleGlyph glyph={node.icon} />
+        </motion.span>
         <span
           aria-hidden="true"
           className="invisible absolute bottom-full left-1/2 z-10 mb-2 -translate-x-1/2 whitespace-nowrap rounded-sm bg-brand-dark px-2 py-1 text-xs text-brand-white opacity-0 shadow-sm transition-[opacity,visibility] duration-150 group-hover:visible group-hover:opacity-100 group-focus-visible:visible group-focus-visible:opacity-100 dark:bg-brand-white dark:text-brand-dark"
@@ -63,14 +66,17 @@ function Satellite({
   );
 }
 
-export default function Orbit(props: OrbitProps) {
+export default function Orbit({ id, open, ...props }: OrbitProps) {
   return (
-    <nav aria-label="Sections" className="pointer-events-none absolute inset-0">
-      <div className="pointer-events-auto contents">
-        {NODES.map((node, i) => (
-          <Satellite key={node.slug} {...props} index={i} />
-        ))}
-      </div>
+    <nav
+      id={id}
+      aria-label="Sections"
+      inert={!open}
+      className={open ? "pointer-events-auto absolute inset-0" : "pointer-events-none absolute inset-0"}
+    >
+      {props.items.map((node, i) => (
+        <Satellite key={node.slug} {...props} index={i} />
+      ))}
     </nav>
   );
 }

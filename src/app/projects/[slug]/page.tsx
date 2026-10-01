@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { FlowTitle } from "@/components/flow/Flow";
 import { assetUrl, getProject, getProjects } from "@/content";
 import { Embed, Gallery, Mdx } from "@/content/mdx";
 
@@ -48,7 +49,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
           ← Back to Projects
         </Link>
 
-        <h1 className="font-funnel text-4xl font-bold leading-tight">{project.title}</h1>
+        <FlowTitle>{project.title}</FlowTitle>
         <p className="mt-2 text-gray-500">{project.summary}</p>
 
         <dl className="mt-6 flex flex-wrap gap-x-10 gap-y-4 border-y border-gray-100 dark:border-gray-800 py-4">

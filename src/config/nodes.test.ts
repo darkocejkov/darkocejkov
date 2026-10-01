@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { NODES, nodeIndexForPath } from "./nodes";
+import { HOME_NODE, NODES, nodeIndexForPath } from "./nodes";
 
 describe("scene nodes", () => {
   it("includes all nine navigation sections with icons from the chosen ranges", () => {
@@ -15,7 +15,7 @@ describe("scene nodes", () => {
       "/art",
     ]);
 
-    for (const node of NODES) {
+    for (const node of [...NODES, HOME_NODE]) {
       const codePoint = node.icon.codePointAt(0)!;
       expect(codePoint >= 0x25c9 && codePoint <= 0x25d7 || codePoint >= 0x25ef && codePoint <= 0x25f7).toBe(true);
     }

@@ -1,19 +1,19 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { animate, motion, useMotionValue, useMotionValueEvent, useTransform } from "motion/react";
 import Eye from "./Eye";
 import Orbit from "./Orbit";
-import Rail from "./Rail";
 import { useParallax, usePointer } from "./usePointer";
 import { useGaze } from "./useGaze";
 import { useRotary } from "./useRotary";
 import { useBlink } from "./useBlink";
 import { useMediaQuery } from "./useMediaQuery";
 import { useElementSize } from "./useElementSize";
+import { setIrisObstacle } from "./irisObstacle";
 import ThemeToggle from "@/components/ThemeToggle";
-import { NODES, nodeIndexForPath } from "@/config/nodes";
+import { HOME_NODE, NODES, nodeIndexForPath } from "@/config/nodes";
 import { maxPupilOffset, nearestNodeIndex } from "@/lib/orbit";
 import { useSceneStore } from "@/stores/scene";
 
@@ -23,67 +23,46 @@ const HOME_EYE = { pupil: 46, spacing: 40, count: 2, stroke: 26 };
 /** viewBox edge the eye is drawn in. The wave is sized in these units. */
 const EYE_VIEWBOX = 320;
 
+/** Outer edge of the resting ring, in viewBox units. */
+const CORE_OUTER = HOME_EYE.pupil + HOME_EYE.spacing + HOME_EYE.stroke / 2;
+
 /**
- * The wave's own spacing and stroke, far finer than the resting eye's. Kept
- * separate rather than shared so tightening the wave cannot drag the resting
- * ring in onto the iris — see Eye's `wave` prop.
+ * The wave's own spacing and stroke at full eye size, far finer than the
+ * resting eye's. Half-spacing stroke keeps ring and gap equal weight.
  */
 const WAVE_SPACING = 14;
-/**
- * Half the spacing, so ring and gap carry equal weight. Going heavier than
- * this inverts the wave — the gaps become the figure and the rings the ground.
- */
 const WAVE_STROKE = 7;
-/**
- * Radius of the wave's innermost ring: clear of the resting ring's outer edge
- * by one of the wave's own gaps, so the two sets read as continuous.
- */
-const WAVE_START = HOME_EYE.pupil + HOME_EYE.spacing + HOME_EYE.stroke / 2 + WAVE_SPACING;
 /** Floor for the ring count, used until the viewport has been measured. */
 const MIN_WAVE_RINGS = 12;
 
 /**
- * The transition is two phases, not one. The wave first fills the screen
- * outright, and only once it has covered everything does the fade front start
- * from the centre and wipe it away. They used to overlap, which meant the
- * rings were already thinning at the middle while the outside was still
- * arriving and the screen was never actually full.
+ * The transition is two phases: the wave fills the screen outright, then the
+ * fade front wipes it away from the centre.
  */
 const FILL_DURATION = 0.7;
 const DRAIN_DURATION = 0.45;
-/**
- * How much of a ring index an arriving ring takes to reach full opacity. Small
- * enough that a ring is essentially on the moment it exists, rather than
- * drifting up behind the wave front.
- */
+/** How much of a ring index an arriving ring takes to reach full opacity. */
 const RING_BIRTH_FADE = 0.07;
-/** Seconds the eye takes to arrive or leave. */
-const PRESENCE_DURATION = 0.4;
+
 /** Radians the orbit sweeps through as the satellites arrive or leave. */
 const ORBIT_SPIN = Math.PI / 3;
-/** Seconds the satellites take to sweep out, starting immediately. */
 const ORBIT_EXIT = 0.32;
-/**
- * Seconds the satellites take to sweep in, and how long they hold off. They
- * wait out the fill and arrive on the wipe — coming in any earlier puts them
- * on top of the densest part of the wave, where they just read as clutter.
- */
 const ORBIT_ENTER = 0.45;
-const ORBIT_ENTER_DELAY = FILL_DURATION;
-/**
- * The iris leaves by closing. Quantising the tween's progress into this many
- * held frames gives the same stop-motion feel as an idle blink, rather than a
- * smooth sweep that would read as a different eye entirely — four steps lands
- * on the 25/50/75/shut the blink already uses.
- */
-const LID_STEPS = 4;
-const LID_DURATION = 0.22;
-const steppedLid = (t: number) => Math.ceil(t * LID_STEPS) / LID_STEPS;
-/**
- * Decelerating. The eye arrives quickly and settles; easing in at both ends
- * reads as sluggish even over this shorter run.
- */
-const PRESENCE_EASE = [0.22, 1, 0.36, 1] as const;
+
+/** Docked iris on content routes: centred on desktop, bottom-centre on mobile. */
+const DOCK_DURATION = 0.6;
+const DOCK_SIZE = 112;
+const DOCK_SIZE_NARROW = 80;
+const DOCK_RADIUS = 84;
+const DOCK_RADIUS_NARROW = 76;
+const DOCK_ICON = 22;
+const DOCK_ICON_NARROW = 24;
+const DOCK_MARGIN = 24;
+
+/** Decelerating: arrives quickly and settles. */
+const EASE = [0.22, 1, 0.36, 1] as const;
+
+const mix = (a: number, b: number, t: number) => a + (b - a) * t;
 
 export default function Scene({
   children,
@@ -96,58 +75,58 @@ export default function Scene({
   const { px, py, reduced } = usePointer();
   const setPhase = useSceneStore((s) => s.setPhase);
   const setActiveNode = useSceneStore((s) => s.setActiveNode);
+  const orbitId = useId();
 
   const isNarrow = useMediaQuery("(max-width: 639px)");
   const isHome = pathname === "/";
   const { rotation, engaged, bind } = useRotary(NODES.length);
   const { blink, trigger: triggerBlink } = useBlink();
 
-  // The rotary runs on every width, but only on the homepage. That is what
-  // makes it safe on desktop: "/" renders no page content, so there is no
-  // document scroll for the wheel handler to hijack. On content routes it
-  // stays off at every width, where hijacking the scroll would be real.
-  const rotaryLive = isHome;
+  // The satellites default to open on the homepage and tucked away elsewhere.
+  // Storing only "which path was toggled" means navigating resets the default
+  // without an effect having to write state.
+  const [toggledOn, setToggledOn] = useState<string | null>(null);
+  const open = isHome !== (toggledOn === pathname);
+  const toggle = useCallback(
+    () => setToggledOn((prev) => (prev === pathname ? null : pathname)),
+    [pathname],
+  );
+  const resetToggle = useCallback(() => setToggledOn(null), []);
+
+  // The rotary only runs on "/" with the orbit out: there is no page scroll
+  // there for the wheel handler to hijack.
+  const rotaryLive = isHome && open;
   const rotaryBind = rotaryLive ? bind : {};
 
-  // The eye container scales with the viewport (78vmin, uncapped), so the
-  // orbit radius/icon size must be measured proportions of its rendered size
-  // rather than fixed pixels — otherwise satellites drift off the rings as
-  // the eye grows or shrinks.
   const { ref: eyeContainerRef, width: containerWidth } = useElementSize<HTMLDivElement>();
-  const orbitRadius = (containerWidth ?? 0) * 0.404;
-  const orbitIconSize = (containerWidth ?? 0) * (isNarrow ? 0.0586 : 0.0423);
 
-  // The overlay is fixed inset-0, so measuring it measures the viewport. The
-  // wave has to reach the far corners for "filled" to be true, and how far
-  // that is depends on the aspect ratio — a fixed ring count covers 16:9 and
-  // falls short of an ultrawide.
+  // The overlay is fixed inset-0, so measuring it measures the viewport.
   const {
     ref: viewportRef,
     width: viewportWidth,
     height: viewportHeight,
   } = useElementSize<HTMLDivElement>();
 
+  // Home sizes are derived from the viewport rather than the eye box, which
+  // itself shrinks while docking.
+  const homeSize =
+    viewportWidth && viewportHeight ? 0.78 * Math.min(viewportWidth, viewportHeight) : null;
+  const dockSize = isNarrow ? DOCK_SIZE_NARROW : DOCK_SIZE;
+  const homeRadius = (homeSize ?? 0) * 0.404;
+  const dockRadius = isNarrow ? DOCK_RADIUS_NARROW : DOCK_RADIUS;
+  const homeIcon = (homeSize ?? 0) * (isNarrow ? 0.0586 : 0.0423);
+  const dockIcon = isNarrow ? DOCK_ICON_NARROW : DOCK_ICON;
+
   useEffect(() => {
-    const home = pathname === "/";
-    setPhase(home ? "home" : "docked");
-    // The sole owner of activeNode. The write is total — every branch writes,
-    // none skip — so nothing is ever left stale. On "/" the rotary is only
-    // live (and thus only meaningful) when narrow; otherwise nothing is
-    // selected. Off "/" the node is derived from the route. Depending on
-    // isNarrow means crossing the breakpoint on a content route re-derives
-    // too, instead of leaving a stale desktop-rotary value in place.
+    setPhase(isHome ? "home" : "docked");
     setActiveNode(
-      home
+      isHome
         ? (engaged ? nearestNodeIndex(rotation.get(), NODES.length) : -1)
         : nodeIndexForPath(pathname),
     );
-  }, [pathname, setPhase, setActiveNode, engaged, rotation]);
+  }, [isHome, pathname, setPhase, setActiveNode, engaged, rotation]);
 
-  // The two phases of the wave, each 0 -> 1 and run back to back: `fill` adds
-  // rings outwards until the screen is covered, then `drain` sweeps the fade
-  // front through them from the centre. Held in motion values so the tweens
-  // are frame-driven; mirrored into state only because ringGeometry runs at
-  // render time.
+  // Mirrored into state only because ringGeometry runs at render time.
   const fill = useMotionValue(0);
   const drain = useMotionValue(0);
   const [fillT, setFillT] = useState(0);
@@ -155,114 +134,40 @@ export default function Scene({
   useMotionValueEvent(fill, "change", setFillT);
   useMotionValueEvent(drain, "change", setDrainT);
 
-  // The eye's own entrance and exit, separate from the ring wave. Previously
-  // the whole overlay just switched opacity, which took the pupil and resting
-  // ring with it — the eye blinked out the instant the wave finished instead
-  // of leaving. It is present on the homepage, and on a content route only
-  // for as long as a transition is playing.
-  const presence = useMotionValue(isHome ? 1 : 0);
+  // 0 = full-size home eye, 1 = docked.
+  const dock = useMotionValue(isHome ? 0 : 1);
+  // 0 = satellites tucked into the iris, 1 = fanned out on the orbit.
+  const spread = useMotionValue(open ? 1 : 0);
+  const orbitSpin = useMotionValue(open ? 0 : ORBIT_SPIN);
 
-  // The satellites get their own arrival and departure, sweeping the orbit
-  // round as they go. Riding the overlay's opacity alone meant they vanished
-  // with it in one step at the very end — the same abruptness the eye had.
-  const orbitPresence = useMotionValue(isHome ? 1 : 0);
-  const orbitSpin = useMotionValue(isHome ? 0 : ORBIT_SPIN);
-
-  // The iris's exit: the eye closes rather than being cut away by the fade
-  // front. It rides the same lid as a blink, so the two combine by whichever
-  // is further shut — a blink landing mid-exit cannot reopen it.
-  const irisLid = useMotionValue(0);
-  const centreLid = useTransform([blink, irisLid], ([b, l]: number[]) => Math.max(b, l));
-
-  // One effect owns the whole transition — the ring wave and the eye's own
-  // arrival and departure. Splitting them meant the eye's target was computed
-  // from `isHome`, which flips the instant the route changes, while the wave
-  // only registered a frame later; for those frames the eye was aiming at
-  // absent and visibly dipped before climbing back.
   useEffect(() => {
     const home = pathname === "/";
-    const ease = PRESENCE_EASE;
 
     if (reduced) {
       fill.set(0);
       drain.set(0);
-      irisLid.set(0);
-      presence.set(home ? 1 : 0);
-      orbitPresence.set(home ? 1 : 0);
-      orbitSpin.set(0);
+      dock.set(home ? 0 : 1);
       return;
     }
 
-    // Restart the wave from the beginning. Stopping an animation leaves its
-    // value where it stood, so navigating again mid-wave used to resume from
-    // there — `animate(fill, 1)` from 0.8 is nearly a no-op, which is why a
-    // quick second navigation appeared to play no animation at all.
-    const interrupted = fill.get() > 0 || drain.get() > 0;
+    // Restart from zero: a stopped animation keeps its value, and resuming
+    // from mid-wave made a quick second navigation look like no animation.
     fill.set(0);
     drain.set(0);
-    // Back open, ready to close again. Arriving home this is the eye that shut
-    // on the way out being reset, which is invisible: presence is still 0, so
-    // the eye is not on screen yet when it happens.
-    irisLid.set(0);
 
-    // Coming in on top of an interrupted exit, the overlay is still up while
-    // the reset above has just restored every ring it had faded. Drop it and
-    // fade back in rather than letting that restoration show.
-    if (interrupted && !home) presence.set(0);
+    const docking = animate(dock, home ? 0 : 1, { duration: DOCK_DURATION, ease: EASE });
 
-    // Arrive first, or hold if already here.
-    const enter = animate(presence, 1, { duration: PRESENCE_DURATION, ease });
-
-    // The satellites sweep in behind the eye, or sweep out immediately — out
-    // early so they leave alongside the iris rather than after the wave, in
-    // late so they settle as it does.
-    //
-    // The sweep goes out and comes back rather than carrying on round: it is
-    // an offset on top of the dial, not a turn of it, so returning it to zero
-    // is what leaves the rotary's own position exactly where the reader left
-    // it. Measured at -18deg before leaving and -18deg on return.
-    const orbitAnims = home
-      ? [
-          animate(orbitPresence, 1, { duration: ORBIT_ENTER, ease, delay: ORBIT_ENTER_DELAY }),
-          animate(orbitSpin, 0, { duration: ORBIT_ENTER, ease, delay: ORBIT_ENTER_DELAY }),
-        ]
-      : [
-          animate(orbitPresence, 0, { duration: ORBIT_EXIT, ease: "easeIn" }),
-          animate(orbitSpin, ORBIT_SPIN, { duration: ORBIT_EXIT, ease: "easeIn" }),
-        ];
-
-    // Phase two is started from phase one's completion rather than run
-    // alongside it on a delay, so the wipe can never begin against a fill that
-    // was cut short — the screen is always covered before anything leaves.
     let wipe: ReturnType<typeof animate> | null = null;
-    let close: ReturnType<typeof animate> | null = null;
-
     const wave = animate(fill, 1, {
       duration: FILL_DURATION,
       ease: "easeOut",
       onComplete: () => {
-        // Leaving, the eye shuts as the wipe starts — the two are one gesture,
-        // so this hangs off the same moment rather than a delay of its own.
-        // It stays open for the fill, where it is the source the wave radiates
-        // from; closing it there would lose the centre of the picture.
-        if (!home) {
-          close = animate(irisLid, 1, { duration: LID_DURATION, ease: steppedLid });
-        }
-
         wipe = animate(drain, 1, {
           duration: DRAIN_DURATION,
-          // Linear: the front is a moving edge, and a constant ring-per-second
-          // sweep is what reads as one. Easing it makes the edge visibly
-          // hesitate at the centre or stall at the rim.
           ease: "linear",
+          // Rings must go before the front that emptied them, or restoring
+          // their opacity shows as a flash.
           onComplete: () => {
-            // Order matters. Clearing `fill` drops every ring at once, and
-            // clearing `drain` restores the opacity of any the front had
-            // consumed — so leaving, the overlay has to be down first, and
-            // the rings have to go before the front that emptied them, or
-            // that restoration shows as a flash. Nothing is lost by cutting
-            // instantly: the screen is already empty by this point.
-            if (!home) presence.set(0);
             fill.set(0);
             drain.set(0);
           },
@@ -271,110 +176,142 @@ export default function Scene({
     });
 
     return () => {
-      enter.stop();
+      docking.stop();
       wave.stop();
       wipe?.stop();
-      close?.stop();
-      orbitAnims.forEach((a) => a.stop());
     };
-  }, [pathname, fill, drain, irisLid, presence, orbitPresence, orbitSpin, reduced]);
+  }, [pathname, fill, drain, dock, reduced]);
 
-  // The eye itself is fixed — the resting pupil and its one ring, unchanged
-  // through the whole transition. Everything that moves is the wave outside it.
+  // Satellites arriving via navigation wait out the wave's fill; a click on
+  // the iris brings them out immediately.
+  const lastPath = useRef(pathname);
+  useEffect(() => {
+    const navigated = lastPath.current !== pathname;
+    lastPath.current = pathname;
+
+    if (reduced) {
+      spread.set(open ? 1 : 0);
+      orbitSpin.set(0);
+      return;
+    }
+
+    const options = open
+      ? { duration: ORBIT_ENTER, ease: EASE, delay: navigated ? FILL_DURATION : 0 }
+      : { duration: ORBIT_EXIT, ease: "easeIn" as const };
+    const anims = [
+      animate(spread, open ? 1 : 0, options),
+      animate(orbitSpin, open ? 0 : ORBIT_SPIN, options),
+    ];
+    return () => anims.forEach((a) => a.stop());
+  }, [open, pathname, spread, orbitSpin, reduced]);
+
+  useEffect(() => {
+    if (!open) return;
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") toggle();
+    }
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [open, toggle]);
+
+  // Before measurement (server render, first paint) fall back to CSS sizes so
+  // a docked route never flashes a full-size eye over its content.
+  const eyeSize = useTransform(dock, (d) =>
+    homeSize === null ? (d >= 0.5 ? `${dockSize}px` : "78vmin") : `${mix(homeSize, dockSize, d)}px`,
+  );
+
+  // On mobile the docked iris sits at the bottom, lifting when open so the
+  // whole ring stays on screen.
+  const dockY = useTransform([dock, spread], ([d, s]: number[]) => {
+    if (!isNarrow || viewportHeight === null) return 0;
+    const clearance = mix(dockSize / 2, dockRadius + dockIcon, s);
+    return d * (viewportHeight / 2 - DOCK_MARGIN - clearance);
+  });
+
+  const orbitRadius = useTransform([dock, spread], ([d, s]: number[]) => mix(homeRadius, dockRadius, d) * s);
+  const orbitIconSize = useTransform(dock, (d) => mix(homeIcon, dockIcon, d));
+
+  // Publish the iris's footprint so page text can flow around it.
+  useEffect(() => {
+    if (isHome || viewportWidth === null || viewportHeight === null) {
+      setIrisObstacle(null);
+      return;
+    }
+    const publish = () => {
+      const d = dock.get();
+      const size = homeSize === null ? dockSize : mix(homeSize, dockSize, d);
+      const eye = (size * CORE_OUTER) / EYE_VIEWBOX;
+      const ring = (mix(homeRadius, dockRadius, d) + mix(homeIcon, dockIcon, d) / 2) * spread.get();
+      setIrisObstacle({ x: viewportWidth / 2, y: viewportHeight / 2 + dockY.get(), r: Math.max(eye, ring) });
+    };
+    publish();
+    const unsubscribes = [dock, spread, dockY].map((value) => value.on("change", publish));
+    return () => unsubscribes.forEach((unsubscribe) => unsubscribe());
+  }, [isHome, viewportWidth, viewportHeight, homeSize, dockSize, homeRadius, dockRadius, homeIcon, dockIcon, dock, spread, dockY]);
+
   const eyeParams = HOME_EYE;
 
-  // How many rings it takes to clear the furthest corner. The container is
-  // sized in vmin but drawn in a fixed viewBox, so pixels convert to user
-  // units through its measured width — which means this comes out the same on
-  // any monitor of a given shape, and only grows for wider ones.
+  // The eye shrinks while the wave plays, so the wave is scaled up in viewBox
+  // units to keep the same on-screen spacing at any eye size.
   const unitsPerPx = containerWidth ? EYE_VIEWBOX / containerWidth : 0;
-  const reach =
+  const pxScale = homeSize && containerWidth ? homeSize / containerWidth : 1;
+  const waveSpacing = WAVE_SPACING * pxScale;
+  const waveStart = CORE_OUTER + waveSpacing;
+  const reachPx =
     viewportWidth && viewportHeight
-      ? 0.5 * Math.hypot(viewportWidth, viewportHeight) * unitsPerPx
+      ? isNarrow && !isHome
+        ? Math.hypot(viewportWidth / 2, viewportHeight)
+        : 0.5 * Math.hypot(viewportWidth, viewportHeight)
       : 0;
   const waveRings = Math.max(
     MIN_WAVE_RINGS,
-    Math.ceil((reach - WAVE_START) / WAVE_SPACING) + 1,
+    Math.ceil((reachPx * unitsPerPx - waveStart) / waveSpacing) + 1,
   );
 
-  // Rings march outward for the whole fill, at constant spacing and stroke so
-  // they keep a uniform weight and an even gap. The SVG is overflow:visible,
-  // so the wave spills past its box rather than being clipped at it.
   const waveParams = {
-    pupil: WAVE_START,
-    spacing: WAVE_SPACING,
+    pupil: waveStart,
+    spacing: waveSpacing,
     count: fillT * waveRings,
-    stroke: WAVE_STROKE,
+    stroke: WAVE_STROKE * pxScale,
     birthFade: RING_BIRTH_FADE,
   };
 
-  // Arriving home, the eye has to survive the transition, so the front is held
-  // off the pupil and resting ring and only wipes the wave. Leaving for a
-  // content route it is allowed to consume everything: the iris goes first and
-  // the eye empties from its centre outwards, which is how it departs — rather
-  // than sitting there and fading out as a whole once the wave is over.
-  const protectCore = isHome;
-  // Indices run 0 (pupil), 1 (resting ring), then the wave. The front has to
-  // overrun the outermost by the width of its own edge, or the wipe ends with
-  // that ring still partly drawn and clearing the rings snaps it away.
+  // The front has to overrun the outermost ring by its own edge width, or the
+  // wipe ends with that ring still partly drawn.
   const innerFade = drainT * (waveRings + 2);
 
-  // Pupil travel is bounded so it can never cross its ring. Constant now that
-  // spacing and stroke no longer animate, but still derived rather than
-  // hardcoded so retuning HOME_EYE cannot silently break containment.
   const travel = maxPupilOffset(eyeParams.spacing, eyeParams.stroke);
 
-  // Gaze, not parallax. `px`/`py` say where the cursor is relative to the
-  // middle of the viewport; the pupil needs to know where it is relative to
-  // this eye. They agree while the eye is centred on the homepage and stop
-  // agreeing the moment it is not — and a direction vector also keeps the
-  // diagonal inside `travel`, which two independently-clamped axes did not.
-  const { gx, gy } = useGaze(eyeContainerRef);
+  const { gx, gy } = useGaze(eyeContainerRef, dockY);
   const pupilX = useTransform(gx, (v) => v * travel);
   const pupilY = useTransform(gy, (v) => v * travel);
-
-  // The rings drift with the pointer too, but less than the pupil, so the
-  // pupil leads and they trail. Without this the rings are nailed down and
-  // only the pupil moves, which reads as a flat sticker rather than depth.
   const ringX = useTransform(gx, (v) => v * travel * 0.35);
   const ringY = useTransform(gy, (v) => v * travel * 0.35);
 
-  // Scaling with the fade is what makes it read as arriving and receding
-  // rather than being switched on and off.
-  const eyeScale = useTransform(presence, [0, 1], [0.82, 1]);
-
-  // The satellites counter-move against the pointer. Moving them *with* the
-  // pupil, only further, made them read as welded to the iris; opposing it
-  // puts them on their own plane in front of the eye, which is what separates
-  // the two. Disabled on touch: there is no hovering cursor to cue depth
-  // from, and on mobile the rotary drag is the only pointer motion — feeding
-  // it here displaces the snapped dot off the selector by several pixels.
+  // Satellites counter-move against the pointer to sit on their own plane.
+  // Off on touch, and faded out as the eye docks.
   const orbitLayer = useParallax(px, py, isNarrow ? 0 : -travel * 0.8);
+  const orbitX = useTransform([orbitLayer.x, dock], ([x, d]: number[]) => x * (1 - d));
+  const orbitY = useTransform([orbitLayer.y, dock], ([y, d]: number[]) => y * (1 - d));
 
-  // What the orbit is actually rotated by: the dial's own position plus the
-  // sweep it makes on the way in or out.
   const orbitAngle = useTransform([rotation, orbitSpin], ([r, spin]: number[]) => r + spin);
+
+  const items = isHome ? NODES : [...NODES, HOME_NODE];
 
   return (
     <div className="relative min-h-screen text-brand-dark dark:text-brand-white">
       {maintenanceBanner}
-      <motion.div
+      <div
         ref={viewportRef}
         className="pointer-events-none fixed inset-0 z-[60] flex items-center justify-center"
-        style={{ opacity: presence }}
-        inert={!isHome}
       >
         <motion.div
           ref={eyeContainerRef}
           className="pointer-events-auto relative"
           style={{
-            scale: eyeScale,
-            width: "78vmin",
-            height: "78vmin",
-            // Only while the rotary is live. Dragging is touch-only but is
-            // not width-gated (a tablet in landscape still drags), and on a
-            // content route this would otherwise be a dead scroll zone
-            // sitting over the article.
+            width: eyeSize,
+            height: eyeSize,
+            y: dockY,
             touchAction: rotaryLive ? "none" : undefined,
           }}
           {...rotaryBind}
@@ -389,43 +326,47 @@ export default function Scene({
             ringX={ringX}
             ringY={ringY}
             innerFade={innerFade}
-            protectCore={protectCore}
-            blink={centreLid}
+            blink={blink}
             className="h-full w-full"
           />
-          {/* motion.div, not div: reading a motion value with .get() inside a
-              style object would sample it once at render and never update. */}
+          <button
+            type="button"
+            onClick={toggle}
+            aria-expanded={open}
+            aria-controls={orbitId}
+            aria-label={open ? "Hide sections" : "Show sections"}
+            className="absolute left-1/2 top-1/2 h-[62%] w-[62%] -translate-x-1/2 -translate-y-1/2 rounded-full outline-none focus-visible:ring-2 focus-visible:ring-brand-orange focus-visible:ring-offset-2"
+          />
           <motion.div
-            className="absolute inset-0"
-            style={{ x: orbitLayer.x, y: orbitLayer.y, opacity: orbitPresence }}
+            className="pointer-events-none absolute inset-0"
+            style={{ x: orbitX, y: orbitY, opacity: spread }}
           >
-            {containerWidth !== null && (
-              <Orbit radius={orbitRadius} iconSize={orbitIconSize} rotation={orbitAngle} />
+            {homeSize !== null && (
+              <Orbit
+                id={orbitId}
+                items={items}
+                radius={orbitRadius}
+                iconSize={orbitIconSize}
+                rotation={orbitAngle}
+                open={open}
+                onNavigate={resetToggle}
+              />
             )}
           </motion.div>
         </motion.div>
-      </motion.div>
+      </div>
 
-      {/* Sibling of the inert overlay, not inside it — otherwise it would be
-          unreachable (hit-testing and Tab) on content routes. Single mount for
-          every route: the original site's footer rendered it everywhere.
-          z-20: the content wrapper below is also stacked (z-10) and, on
-          content routes, comes later in DOM order — without a higher
-          z-index its <main> would win the paint order and swallow clicks
-          here even though this sits at a fixed, on-screen position. */}
       <div className="fixed bottom-6 right-6 z-20">
         <ThemeToggle />
       </div>
 
-      {!isHome && (
-        <div className="relative z-10 flex min-h-screen">
-          <aside className="sticky top-0 h-screen flex-none border-r border-brand-dark/10 dark:border-brand-white/10">
-            <Rail blink={blink} onBlinkTrigger={triggerBlink} />
-          </aside>
-          <main className="min-w-0 flex-1 px-8 py-12">{children}</main>
-        </div>
+      {isHome ? (
+        children
+      ) : (
+        <main className="relative z-10 mx-auto min-h-screen w-full max-w-5xl px-6 pb-40 pt-16 sm:px-10 sm:pb-24">
+          {children}
+        </main>
       )}
-      {isHome && children}
     </div>
   );
 }

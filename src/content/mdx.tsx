@@ -3,11 +3,12 @@ import { MDXRemote } from "next-mdx-remote/rsc";
 import remarkGfm from "remark-gfm";
 import { assetUrl, isExternalHref } from "./asset";
 import type { Asset } from "./schema";
+import { FlowListItem, FlowParagraph } from "@/components/flow/Flow";
 
 /** Shared prose styling for every rendered body, MDX and page template alike. */
 export const PROSE_CLASS = [
   "prose prose-neutral dark:prose-invert max-w-none",
-  "prose-headings:font-funnel prose-headings:font-semibold",
+  "prose-headings:font-funnel prose-headings:font-extrabold prose-headings:tracking-tight",
   "prose-a:underline-offset-2",
   "prose-code:rounded prose-code:bg-neutral-100 prose-code:px-1 prose-code:py-0.5 prose-code:text-sm prose-code:font-normal prose-code:before:content-none prose-code:after:content-none",
   "prose-pre:rounded-lg prose-pre:bg-neutral-100",
@@ -66,6 +67,8 @@ const components = {
   },
   Gallery,
   Embed,
+  p: FlowParagraph,
+  li: FlowListItem,
 };
 
 /**

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { FlowTitle } from "@/components/flow/Flow";
 import { assetUrl, getProjects } from "@/content";
 
 const stageLabel: Record<string, string> = {
@@ -14,7 +15,7 @@ export default function Projects() {
 
   return (
     <div>
-      <h1 className="font-funnel mb-2 text-4xl font-bold">Projects</h1>
+      <FlowTitle className="mb-4">Projects</FlowTitle>
       <p className="mb-10 max-w-prose text-gray-500">
         Software, objects, and things that fall between.
       </p>

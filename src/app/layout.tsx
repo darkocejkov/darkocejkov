@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { Rubik, Funnel_Display } from "next/font/google";
 import Scene from "@/components/eye/Scene";
+import LookingForWork from "@/components/LookingForWork";
 import MaintenanceBanner from "@/components/MaintenanceBanner";
+import { getMetadata } from "@/content";
 import "./globals.css";
 
 const rubik = Rubik({
@@ -31,6 +33,7 @@ export default function RootLayout({
       </head>
       <body className={`${rubik.variable} ${funnelDisplay.variable} theme-fade grain flex min-h-screen flex-col font-sans bg-brand-white text-brand-dark dark:bg-brand-dark dark:text-brand-white`}>
         <Scene maintenanceBanner={<MaintenanceBanner />}>{children}</Scene>
+        {getMetadata().lookingForWork && <LookingForWork />}
       </body>
     </html>
   );

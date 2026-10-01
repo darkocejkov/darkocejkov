@@ -1,4 +1,5 @@
 import SocialIcon from "@/components/SocialIcon";
+import { FlowTitle } from "@/components/flow/Flow";
 import { getLinks } from "@/content";
 
 export const metadata = { title: "Connect" };
@@ -8,7 +9,7 @@ export default function ConnectPage() {
 
   return (
     <div className="max-w-2xl">
-      <h1 className="font-funnel mb-2 text-4xl font-bold">Connect</h1>
+      <FlowTitle className="mb-4">Connect</FlowTitle>
       <p className="mb-10 max-w-prose text-gray-500">Find me elsewhere.</p>
 
       {socials.length === 0 ? (

@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import BlogList, { type BlogListItem } from "@/components/BlogList";
+import { FlowTitle } from "@/components/flow/Flow";
 import { assetUrl, getArticles, getArticlesPage } from "@/content";
 import { Mdx } from "@/content/mdx";
 
@@ -34,7 +35,7 @@ export default function Blog() {
   return (
     <div>
       <header className="mb-8">
-        <h1 className="font-funnel text-4xl font-bold">{page.title}</h1>
+        <FlowTitle>{page.title}</FlowTitle>
         <p className="mt-2 text-gray-500">{page.subtitle}</p>
         <Mdx source={page.description} className="mt-3 prose-sm text-gray-500" />
       </header>

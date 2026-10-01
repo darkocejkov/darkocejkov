@@ -13,6 +13,7 @@
     "content:check": "vitest run src/content/check.test.ts"
   },
   "dependencies": {
+    "@chenglou/pretext": "^0.0.9",
     "@tailwindcss/typography": "^0.5.19",
     "@tanstack/react-query": "^5.90.21",
     "gray-matter": "^4.0.3",

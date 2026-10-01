@@ -1,6 +1,6 @@
 /**
- * Orbit and rail navigation nodes. Positions derive from index and array
- * length, so adding a section is one entry here and nothing else.
+ * Orbit navigation nodes. Positions derive from index and array length, so
+ * adding a section is one entry here and nothing else.
  */
 export interface SceneNode {
   slug: string;
@@ -20,6 +20,9 @@ export const NODES: ReadonlyArray<SceneNode> = [
   { slug: "connect", href: "/connect", label: "Connect", icon: "\u25D1" },
   { slug: "art", href: "/art", label: "Art", icon: "\u25F1" },
 ];
+
+/** Appended to the orbit on content routes, where it is the way back to "/". */
+export const HOME_NODE: SceneNode = { slug: "home", href: "/", label: "Home", icon: "\u25CE" };
 
 /** Index of the node owning a pathname, or -1 on the homepage / an unknown route. */
 export function nodeIndexForPath(pathname: string): number {

@@ -1,4 +1,5 @@
 import { getExperience } from "@/content";
+import { FlowTitle } from "@/components/flow/Flow";
 import { Mdx } from "@/content/mdx";
 import { formatRange } from "@/lib/dates";
 
@@ -16,7 +17,7 @@ export default function ExperiencePage() {
 
   return (
     <div className="max-w-3xl">
-      <h1 className="font-funnel mb-2 text-4xl font-bold">Experience</h1>
+      <FlowTitle className="mb-4">Experience</FlowTitle>
       <p className="mb-10 max-w-prose text-gray-500">Where I&apos;ve worked, and what I did there.</p>
 
       {roles.length === 0 ? (

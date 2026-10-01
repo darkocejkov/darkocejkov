@@ -1,4 +1,5 @@
 import { assetUrl, getThings } from "@/content";
+import { FlowTitle } from "@/components/flow/Flow";
 import { Mdx } from "@/content/mdx";
 
 export const metadata = { title: "Things" };
@@ -8,7 +9,7 @@ export default function ThingsPage() {
 
   return (
     <div className="max-w-4xl">
-      <h1 className="font-funnel text-4xl font-bold">Things</h1>
+      <FlowTitle>Things</FlowTitle>
       <p className="mt-2 text-gray-500">Objects I own, collected, or made.</p>
 
       {things.length === 0 ? (

@@ -3,7 +3,7 @@ import { create } from "zustand";
 export type ScenePhase = "home" | "docked";
 
 interface SceneState {
-  /** "home" centres the eye full-bleed; "docked" pins it to the rail. */
+  /** "home" shows the full-size eye; "docked" shrinks it on content routes. */
   phase: ScenePhase;
   /** Index into NODES, or -1 when nothing is selected. */
   activeNode: number;

@@ -115,9 +115,8 @@ export default function Eye({
     : [];
   const outer = [...core.filter((r) => r.k > 0), ...waveRings];
 
-  // Masks are referenced by id, and this component renders more than once on a
-  // content route — the centre eye and the rail's. Sharing an id would point
-  // both at whichever mounted last.
+  // Masks are referenced by id; a unique one per instance keeps two eyes on
+  // one page from sharing a mask.
   const maskId = `blink-${useId()}`;
 
   // The lid is just another circle, subtracted from the iris. Slightly larger

@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { FlowTitle } from "@/components/flow/Flow";
 import { assetUrl, getArticle, getArticles, type ArticleRef } from "@/content";
 import { Mdx } from "@/content/mdx";
 
@@ -89,7 +90,7 @@ export default async function BlogPostPage({
           </div>
         )}
 
-        <h1 className="font-funnel text-4xl font-bold leading-tight mb-3">{article.title}</h1>
+        <FlowTitle className="mb-6">{article.title}</FlowTitle>
 
         <div className="flex items-center gap-3 text-xs text-gray-400 mb-8">
           <span>{formatDate(article.publishedAt)}</span>
