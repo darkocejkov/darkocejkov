@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import { animate, motion, useMotionValue, useMotionValueEvent, useTransform } from "motion/react";
 import Eye from "./Eye";
 import Orbit from "./Orbit";
@@ -58,6 +58,13 @@ const DOCK_RADIUS_NARROW = 76;
 const DOCK_ICON = 22;
 const DOCK_ICON_NARROW = 24;
 const DOCK_MARGIN = 24;
+
+/** Routes whose content needs the viewport centre; the docked iris moves aside. */
+const ASIDE_PATHS = new Set(["/connect"]);
+/** How far left of centre the aside iris sits on desktop, as a fraction of viewport width. */
+const ASIDE_SHIFT = 0.3;
+/** Routes built around the iris; on mobile it stays centred instead of dropping to the bottom. */
+const CENTRED_PATHS = new Set(["/bookmarks"]);
 
 /** Decelerating: arrives quickly and settles. */
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -136,17 +143,25 @@ export default function Scene({
 
   // 0 = full-size home eye, 1 = docked.
   const dock = useMotionValue(isHome ? 0 : 1);
+  // 0 = docked in the middle, 1 = moved aside.
+  const aside = useMotionValue(ASIDE_PATHS.has(pathname) ? 1 : 0);
+  // 0 = mobile dock at the bottom, 1 = kept centred.
+  const centred = useMotionValue(CENTRED_PATHS.has(pathname) ? 1 : 0);
   // 0 = satellites tucked into the iris, 1 = fanned out on the orbit.
   const spread = useMotionValue(open ? 1 : 0);
   const orbitSpin = useMotionValue(open ? 0 : ORBIT_SPIN);
 
   useEffect(() => {
     const home = pathname === "/";
+    const asideTarget = ASIDE_PATHS.has(pathname) ? 1 : 0;
+    const centredTarget = CENTRED_PATHS.has(pathname) ? 1 : 0;
 
     if (reduced) {
       fill.set(0);
       drain.set(0);
       dock.set(home ? 0 : 1);
+      aside.set(asideTarget);
+      centred.set(centredTarget);
       return;
     }
 
@@ -156,6 +171,8 @@ export default function Scene({
     drain.set(0);
 
     const docking = animate(dock, home ? 0 : 1, { duration: DOCK_DURATION, ease: EASE });
+    const shifting = animate(aside, asideTarget, { duration: DOCK_DURATION, ease: EASE });
+    const centring = animate(centred, centredTarget, { duration: DOCK_DURATION, ease: EASE });
 
     let wipe: ReturnType<typeof animate> | null = null;
     const wave = animate(fill, 1, {
@@ -177,10 +194,12 @@ export default function Scene({
 
     return () => {
       docking.stop();
+      shifting.stop();
+      centring.stop();
       wave.stop();
       wipe?.stop();
     };
-  }, [pathname, fill, drain, dock, reduced]);
+  }, [pathname, fill, drain, dock, aside, centred, reduced]);
 
   // Satellites arriving via navigation wait out the wave's fill; a click on
   // the iris brings them out immediately.
@@ -222,11 +241,19 @@ export default function Scene({
 
   // On mobile the docked iris sits at the bottom, lifting when open so the
   // whole ring stays on screen.
-  const dockY = useTransform([dock, spread], ([d, s]: number[]) => {
+  const dockY = useTransform([dock, spread, centred], ([d, s, c]: number[]) => {
     if (!isNarrow || viewportHeight === null) return 0;
     const clearance = mix(dockSize / 2, dockRadius + dockIcon, s);
-    return d * (viewportHeight / 2 - DOCK_MARGIN - clearance);
+    return d * (1 - c) * (viewportHeight / 2 - DOCK_MARGIN - clearance);
   });
+
+  const dockX = useTransform([aside, spread], ([a, s]: number[]) => {
+    if (viewportWidth === null) return 0;
+    const clearance = mix(dockSize / 2, dockRadius + dockIcon, s);
+    const edge = Math.max(0, viewportWidth / 2 - DOCK_MARGIN - clearance);
+    return -a * (isNarrow ? edge : Math.min(edge, viewportWidth * ASIDE_SHIFT));
+  });
+  const dockOffsets = useMemo(() => [dockX, dockY], [dockX, dockY]);
 
   const orbitRadius = useTransform([dock, spread], ([d, s]: number[]) => mix(homeRadius, dockRadius, d) * s);
   const orbitIconSize = useTransform(dock, (d) => mix(homeIcon, dockIcon, d));
@@ -242,12 +269,16 @@ export default function Scene({
       const size = homeSize === null ? dockSize : mix(homeSize, dockSize, d);
       const eye = (size * CORE_OUTER) / EYE_VIEWBOX;
       const ring = (mix(homeRadius, dockRadius, d) + mix(homeIcon, dockIcon, d) / 2) * spread.get();
-      setIrisObstacle({ x: viewportWidth / 2, y: viewportHeight / 2 + dockY.get(), r: Math.max(eye, ring) });
+      setIrisObstacle({
+        x: viewportWidth / 2 + dockX.get(),
+        y: viewportHeight / 2 + dockY.get(),
+        r: Math.max(eye, ring),
+      });
     };
     publish();
-    const unsubscribes = [dock, spread, dockY].map((value) => value.on("change", publish));
+    const unsubscribes = [dock, spread, dockX, dockY].map((value) => value.on("change", publish));
     return () => unsubscribes.forEach((unsubscribe) => unsubscribe());
-  }, [isHome, viewportWidth, viewportHeight, homeSize, dockSize, homeRadius, dockRadius, homeIcon, dockIcon, dock, spread, dockY]);
+  }, [isHome, viewportWidth, viewportHeight, homeSize, dockSize, homeRadius, dockRadius, homeIcon, dockIcon, dock, spread, dockX, dockY]);
 
   const eyeParams = HOME_EYE;
 
@@ -282,7 +313,7 @@ export default function Scene({
 
   const travel = maxPupilOffset(eyeParams.spacing, eyeParams.stroke);
 
-  const { gx, gy } = useGaze(eyeContainerRef, dockY);
+  const { gx, gy } = useGaze(eyeContainerRef, dockOffsets);
   const pupilX = useTransform(gx, (v) => v * travel);
   const pupilY = useTransform(gy, (v) => v * travel);
   const ringX = useTransform(gx, (v) => v * travel * 0.35);
@@ -311,6 +342,7 @@ export default function Scene({
           style={{
             width: eyeSize,
             height: eyeSize,
+            x: dockX,
             y: dockY,
             touchAction: rotaryLive ? "none" : undefined,
           }}

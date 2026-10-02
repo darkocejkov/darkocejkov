@@ -112,6 +112,20 @@ module.exports = function (plop) {
     { type: "number", name: "order", message: "Display order:", default: 0 },
   ]);
 
+  addGenerator(plop, "video", "Add a video entry", "videos", "video", [
+    { type: "input", name: "name", message: "Video name:", validate: required("Name") },
+    slugPrompt("name"),
+    {
+      type: "input",
+      name: "videoSrc",
+      message: "R2 video path (under /video/):",
+      validate: (value) => /^\/video\/.+/.test(value) || "Use a bucket-relative /video/... path",
+    },
+    { type: "input", name: "description", message: "Description (optional):" },
+    { type: "input", name: "year", message: "Year (optional):" },
+    { type: "number", name: "order", message: "Display order:", default: 0 },
+  ]);
+
   addGenerator(plop, "experience", "Add an experience entry", "experience", "experience", [
     { type: "input", name: "title", message: "Role title:", validate: required("Title") },
     { type: "input", name: "company", message: "Company:", validate: required("Company") },

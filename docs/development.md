@@ -33,6 +33,17 @@ npm run dev
 Run `content:check` before committing content. It takes a couple of seconds and
 exits nonzero on any schema or unresolved-reference error.
 
+### Environment
+
+The `/connect` email form sends through [Resend](https://resend.com) from
+`/api/connect`. Without these set, the form answers with a "not set up" error.
+
+| Variable | Value |
+|---|---|
+| `RESEND_API_KEY` | Resend API key |
+| `CONTACT_TO` | Inbox that receives submissions |
+| `CONTACT_FROM` | Sender on a Resend-verified domain, e.g. `connect@darkocejkov.ca` |
+
 ## Writing content
 
 Every item is one MDX file whose **filename is its slug**. Frontmatter is

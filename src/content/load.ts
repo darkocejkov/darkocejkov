@@ -15,6 +15,7 @@ import {
   SkillFrontmatter,
   StatementFrontmatter,
   ThingFrontmatter,
+  VideoFrontmatter,
 } from "./schema";
 
 /**
@@ -41,6 +42,7 @@ export interface Entry<T> {
 export interface LoadedContent {
   experience: Entry<z.infer<typeof ExperienceFrontmatter>>[];
   artworks: Entry<z.infer<typeof ArtworkFrontmatter>>[];
+  videos: Entry<z.infer<typeof VideoFrontmatter>>[];
   education: Entry<z.infer<typeof EducationFrontmatter>>[];
   skills: Entry<z.infer<typeof SkillFrontmatter>>[];
   projects: Entry<z.infer<typeof ProjectFrontmatter>>[];
@@ -152,6 +154,7 @@ export function load(dir: string): LoadedContent {
 
   const experience = loadCollection(dir, "experience", ExperienceFrontmatter, issues);
   const artworks = loadCollection(dir, "art", ArtworkFrontmatter, issues);
+  const videos = loadCollection(dir, "videos", VideoFrontmatter, issues);
   const education = loadCollection(dir, "education", EducationFrontmatter, issues);
   const skills = loadCollection(dir, "skills", SkillFrontmatter, issues);
   const projects = loadCollection(dir, "projects", ProjectFrontmatter, issues);
@@ -170,6 +173,7 @@ export function load(dir: string): LoadedContent {
   return {
     experience,
     artworks,
+    videos,
     education,
     skills,
     projects,

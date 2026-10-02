@@ -24,36 +24,41 @@ skills:
     claude-code,
     agile,
   ]
+highlights:
+  - { value: "880", label: "PRs authored, 788 merged" }
+  - { value: "~700", label: "teammate PRs reviewed" }
+  - { value: "1% → 51%", label: "PRs shipping with tests" }
+  - { value: "22 → 10", label: "minute test pipeline" }
 ---
 
 Core contributor on the ground-up rewrite of STAT, a 13-year-old enterprise SEO
-product (ExtJS + Rails), onto Next.js, TypeScript and MUI. First hire on the new
-frontend team: worked from the first shared components through the MozCon demo,
+product (ExtJS + Rails), onto Next.js, TypeScript and MUI. **First hire on the new
+frontend team**: worked from the first shared components through the MozCon demo,
 closed beta (Oct 2024) and feature parity, then the 2025–2026 pivot to AI-search
-(GEO) features. Later led features end to end across the TypeScript frontend and
-Ruby backend, set the team's testing and code standards, and drove AI-tooling
-adoption. MUI featured my perspective on its developer experience in a
+(GEO) features. Later **led features end to end** across the TypeScript frontend and
+Ruby backend, **set the team's testing and code standards**, and **drove AI-tooling
+adoption**. MUI featured my perspective on its developer experience in a
 [customer story about Moz](https://mui.com/customers/moz/).
 
 At every point in this position, it was always important for me to figure out better ways
-to work. I figured out that I'm a serial DX dev, if there's something about my process that can be improved,
+to work. I figured out that **I'm a serial DX dev**, if there's something about my process that can be improved,
 I will think of a way to improve it. I developed scripts manually for template files and thought of better
 tooling to debug our problems. Once AI hit the IDE, it was game over and I just kept making little tools, plugins, and extensions.
 
 Here's the entirely of my work history, scraped from the github:
-- Authored 880 PRs (788 merged) across 7 repos and closed ~800 Jira issues; reviewed ~700 teammate PRs with hands-on testing and design checks
-- Built or started every core component in the app – data grids, charts, dashboards, comboboxes, menus, modals, notifications – plus the token-based theme system (~180 PRs); led the colour, typography and density overhaul (~60 issues) which the token system made near-trivial
-- Shipped AI Brand Visibility (GEO) features from mid-2025 – prompts, citations, sentiment, trials, cross-engine dashboards (~190 issues); wrote the cross-engine stories and a "legacy feature ports" epic to plan parallel work for teammates
+- **Authored 880 PRs (788 merged)** across 7 repos and closed ~800 Jira issues; reviewed ~700 teammate PRs with hands-on testing and design checks
+- **Built or started every core component in the app** – data grids, charts, dashboards, comboboxes, menus, modals, notifications – plus the token-based theme system (~180 PRs); led the colour, typography and density overhaul (~60 issues) which the token system made near-trivial
+- **Shipped AI Brand Visibility (GEO) features** from mid-2025 – prompts, citations, sentiment, trials, cross-engine dashboards (~190 issues); wrote the cross-engine stories and a "legacy feature ports" epic to plan parallel work for teammates
 - Delivered full-stack features across TypeScript and Ruby: AI Overviews report spanning 4 repos, homepage (frontend + Rails stats endpoint), SSO login, admin "login as user" with audit tracking, account management and billing screens
 - Built advanced keyword filtering (AND/OR filter groups) for the legacy ExtJS app by embedding a standalone React app via iframe + postMessage; demoed at MozCon alongside the rewrite
-- Led adoption of Jest + React Testing Library: configured the runner, wrote the team's testing guidelines, methodology and unit-testing contract, backfilled tests and planned a ~45-story coverage backlog; PRs with tests rose from 1 % (2024) to 51 % (2026)
-- Diagnosed CI out-of-memory failures with heap snapshots (leaked MUI icon imports in Jest workers) and fixed them via worker memory limits and import config; cut the test pipeline from 22 to 10 min (~55 %) and upgraded ESLint 7 → 9 with warnings separated from errors
+- Led adoption of Jest + React Testing Library: configured the runner, wrote the team's testing guidelines, methodology and unit-testing contract, backfilled tests and planned a ~45-story coverage backlog; **PRs with tests rose from 1 % (2024) to 51 % (2026)**
+- Diagnosed CI out-of-memory failures with heap snapshots (leaked MUI icon imports in Jest workers) and fixed them via worker memory limits and import config; **cut the test pipeline from 22 to 10 min (~55 %)** and upgraded ESLint 7 → 9 with warnings separated from errors
 - Added Sentry error monitoring end to end: SDK setup, per-environment sampling, sourcemap and release tracking in CI, and the Terraform / AWS secrets config behind it; added OpenTelemetry tracing (Honeycomb) while fixing a production error spike
 - Upgraded and hosted Storybook v8 behind company SSO on Cloudflare with a preview per branch, plus design-token stories (icons, palettes, typography); the team's design-review surface through 2026
 - Argued for and executed the merge of the separate component-library repo into the app (601 files); introduced yalc for cross-repo testing, plop code generators, and icon / cleanup / release-timeline scripts
 - Led ~10 technical spikes that became team decisions: state management (Zustand), real-time notifications (Pusher), navigation guard, shared filter logic, data-fetching cache conventions (React Query), layout and sticky headers
 - Joined on-call in 2026 and helped investigate ~11 production incidents using Honeycomb, Datadog and Sentry
-- Led team AI adoption as a member of the company AI core group: wrote the team's agent instructions and shared Claude Code skills (tests, stories, tickets, PR review) and the team's AI usage guidance
+- **Led team AI adoption** as a member of the company AI core group: wrote the team's agent instructions and shared Claude Code skills (tests, stories, tickets, PR review) and the team's AI usage guidance
 - Authored 66 Confluence pages including code-style and naming guidelines (one of the team's most-viewed pages) and ~12 discovery / proposal docs; wrote QA test scripts for major releases and logged ~30 bugs during 2023 QA
 - Helped run frontend technical interviews for future teammates; mentored newer engineers through code review (~620 review comments, 38 code suggestions)
 

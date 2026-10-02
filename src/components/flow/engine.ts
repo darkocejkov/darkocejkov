@@ -221,14 +221,24 @@ function buildFragment(fragment: PlacedFragment, y: number, lineHeight: number):
     inner.appendChild(clone);
     inner = clone;
   }
-  inner.textContent = fragment.text;
+  // Word-gap spaces sit outside styled elements so highlights and underlines hug the words.
+  const styled = fragment.chain.length > 0;
+  const lead = styled && fragment.text.startsWith(" ") ? " " : "";
+  const trail = styled && fragment.text.length > 1 && fragment.text.endsWith(" ") ? " " : "";
+  inner.textContent = fragment.text.slice(lead.length, fragment.text.length - trail.length);
   outer.removeAttribute("id");
-  outer.style.position = "absolute";
-  outer.style.left = `${fragment.x}px`;
-  outer.style.top = `${y}px`;
-  outer.style.lineHeight = `${lineHeight}px`;
-  outer.style.whiteSpace = "pre";
-  return outer;
+
+  let placed = outer;
+  if (lead || trail) {
+    placed = document.createElement("span");
+    placed.append(lead, outer, trail);
+  }
+  placed.style.position = "absolute";
+  placed.style.left = `${fragment.x}px`;
+  placed.style.top = `${y}px`;
+  placed.style.lineHeight = `${lineHeight}px`;
+  placed.style.whiteSpace = "pre";
+  return placed;
 }
 
 function write(item: FlowItem, lines: PlacedLine[], height: number) {

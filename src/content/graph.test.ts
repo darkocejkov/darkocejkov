@@ -62,6 +62,34 @@ describe("artworks", () => {
   });
 });
 
+describe("highlights", () => {
+  it("carries experience and education headline figures, defaulting to none", () => {
+    const graph = build({
+      "experience/a.mdx":
+        '---\ntitle: Dev\ncompany: A\nstartDate: 2024-01\nhighlights:\n  - { value: "880", label: "PRs" }\n---\n',
+      "education/b.mdx": "---\ntitle: BSc\ninstitution: B\nstartDate: 2016-09\n---\n",
+    });
+    expect(graph.experience[0].highlights).toEqual([{ value: "880", label: "PRs" }]);
+    expect(graph.education[0].highlights).toEqual([]);
+  });
+});
+
+describe("videos", () => {
+  it("loads videos from R2's /video/ folder, ordered", () => {
+    const graph = build({
+      "videos/b.mdx": '---\nname: b\nvideo:\n  src: "/video/b.mp4"\norder: 2\n---\n',
+      "videos/a.mdx": '---\nname: a\nvideo:\n  src: "/video/a clip.mp4"\norder: 1\n---\n',
+    });
+    expect(graph.videos.map((v) => v.video.src)).toEqual(["/video/a clip.mp4", "/video/b.mp4"]);
+  });
+
+  it("rejects a video outside /video/", () => {
+    expect(() =>
+      build({ "videos/a.mdx": '---\nname: a\nvideo:\n  src: "/art/a.mp4"\n---\n' }),
+    ).toThrow(/videos[\\/]a\.mdx[\s\S]*\/video\//);
+  });
+});
+
 describe("related and backlinks", () => {
   it("resolves related into article references", () => {
     const graph = build({
@@ -208,6 +236,16 @@ describe("sorting and derived fields", () => {
     expect(graph.experience.map((e) => e.slug)).toEqual(["now", "old"]);
     expect(graph.experience[0].isCurrent).toBe(true);
     expect(graph.experience[1].isCurrent).toBe(false);
+  });
+
+  it("puts the role that ended most recently first, even if it started earlier", () => {
+    const graph = build({
+      "experience/internship.mdx":
+        "---\ntitle: Intern\ncompany: A\nstartDate: 2021-05-07\nendDate: 2021-12-17\n---\n",
+      "experience/job.mdx":
+        "---\ntitle: Dev\ncompany: B\nstartDate: 2021-03-05\nendDate: 2023-02-24\n---\n",
+    });
+    expect(graph.experience.map((e) => e.slug)).toEqual(["job", "internship"]);
   });
 
   it("sorts projects by featured, then order, then start date", () => {

@@ -51,6 +51,14 @@ describe("content generators", () => {
         series: "Studies",
         order: 10,
       }],
+      ["video", {
+        name: "A video",
+        slug: "a-video",
+        videoSrc: "/video/a video.mp4",
+        description: "",
+        year: "2026",
+        order: 0,
+      }],
       ["experience", {
         title: "Developer",
         company: "Example Co",
@@ -91,6 +99,7 @@ describe("content generators", () => {
     expect(graph.articles[0].title).toBe('A "quoted" article');
     expect(graph.projects[0].slug).toBe("a-project");
     expect(graph.artworks[0].materials).toBe("Acrylic");
+    expect(graph.videos[0].video.src).toBe("/video/a video.mp4");
     expect(graph.experience[0].isCurrent).toBe(true);
     expect(graph.education[0].institution).toBe("Example University");
     expect(graph.skills[0].name).toBe("TypeScript");

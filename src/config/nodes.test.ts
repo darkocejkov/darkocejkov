@@ -12,7 +12,7 @@ describe("scene nodes", () => {
       "/experience",
       "/education",
       "/connect",
-      "/art",
+      "/media",
     ]);
 
     for (const node of [...NODES, HOME_NODE]) {
@@ -25,6 +25,6 @@ describe("scene nodes", () => {
     expect(NODES[nodeIndexForPath("/experience")].slug).toBe("experience");
     expect(NODES[nodeIndexForPath("/education/coursework")].slug).toBe("education");
     expect(NODES[nodeIndexForPath("/connect")].slug).toBe("connect");
-    expect(NODES[nodeIndexForPath("/art")].slug).toBe("art");
+    expect(NODES[nodeIndexForPath("/media")].slug).toBe("media");
   });
 });

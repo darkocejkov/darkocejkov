@@ -1,5 +1,5 @@
-import SocialIcon from "@/components/SocialIcon";
-import { FlowTitle } from "@/components/flow/Flow";
+import SocialArc from "@/components/SocialArc";
+import { FlowParagraph, FlowTitle } from "@/components/flow/Flow";
 import { assetUrl, getAbout, getLinks, getMetadata, getStatement } from "@/content";
 import { Mdx } from "@/content/mdx";
 
@@ -11,126 +11,92 @@ export function generateMetadata() {
   };
 }
 
-function Fact({ label, value }: { label: string; value: string | null | undefined }) {
-  if (!value) return null;
-  return (
-    <div>
-      <dt className="text-xs uppercase tracking-wide text-gray-400">{label}</dt>
-      <dd className="text-sm">{value}</dd>
-    </div>
-  );
-}
-
 export default function AboutPage() {
   const about = getAbout();
   const metadata = getMetadata();
   const statement = getStatement();
-  // My own accounts. Bookmarks live on /bookmarks.
   const links = getLinks("social");
-  const downloads = metadata.downloads;
-
   const portrait = about.portrait;
 
+  const facts = [
+    about.location && `based in ${about.location}`,
+    metadata.currently && `currently ${metadata.currently}`,
+    about.pronouns,
+  ].filter(Boolean);
+
   return (
-    <div className="max-w-2xl">
-      <div className="flex flex-wrap items-start gap-6">
-        {portrait && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={assetUrl(portrait.src)}
-            alt={portrait.alt}
-            width={96}
-            height={96}
-            className="rounded-lg object-cover"
-          />
-        )}
-        <div className="min-w-0">
-          <div className="flex flex-wrap items-center gap-3">
-            <FlowTitle>{about.displayName}</FlowTitle>
-            {metadata.lookingForWork && (
-              <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700">
-                Open to work
-              </span>
-            )}
-          </div>
-          {about.pronouns && <p className="mt-1 text-sm text-gray-400">{about.pronouns}</p>}
-          {about.headline && <p className="mt-1 text-gray-500">{about.headline}</p>}
-        </div>
-      </div>
+    <article className="max-w-3xl">
+      {portrait && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={assetUrl(portrait.src)}
+          alt={portrait.alt}
+          width={112}
+          height={112}
+          className="mb-8 h-28 w-28 rounded-full object-cover"
+        />
+      )}
 
-      {about.shortBio && <p className="mt-8 text-gray-600 dark:text-gray-400">{about.shortBio}</p>}
+      <FlowTitle>{about.displayName}</FlowTitle>
 
-      <div className="mt-6">
-        <Mdx source={about.body} />
-      </div>
+      {about.headline && (
+        <p className="mt-6 font-funnel text-[clamp(1.75rem,5vw,3.75rem)] font-light leading-none tracking-tight">
+          {about.headline}
+        </p>
+      )}
 
-      <dl className="mt-8 flex flex-wrap gap-x-10 gap-y-4 border-y border-gray-100 py-4 dark:border-gray-800">
-        <Fact label="Location" value={about.location} />
-        <Fact label="Currently" value={metadata.currently} />
-      </dl>
+      {facts.length > 0 && (
+        <p className="mt-6 font-mono text-sm lowercase text-gray-500">{facts.join(" · ")}</p>
+      )}
+
+      {about.shortBio && (
+        <FlowParagraph className="mt-20 max-w-2xl text-[clamp(1.5rem,3.4vw,2.5rem)] font-medium leading-tight tracking-tight">
+          {about.shortBio}
+        </FlowParagraph>
+      )}
+
+      <Mdx source={about.body} className="mt-10 max-w-xl text-lg" />
 
       {statement.body.trim() && (
-        <section className="mt-10">
-          <h2 className="font-funnel mb-3 text-sm font-semibold uppercase tracking-wide text-gray-400">
-            {statement.title}
-          </h2>
-          <Mdx source={statement.body} />
-        </section>
+        <figure className="my-28">
+          <Mdx
+            source={statement.body}
+            className="title-outline max-w-none font-funnel text-[clamp(2.5rem,8vw,6.5rem)] font-extrabold leading-[0.92] tracking-tighter text-transparent prose-p:my-0"
+          />
+        </figure>
       )}
 
-      {links.length > 0 && (
-        <section className="mt-10">
-          <h2 className="font-funnel mb-3 text-sm font-semibold uppercase tracking-wide text-gray-400">
-            Elsewhere
-          </h2>
-          <div className="flex flex-wrap items-center gap-4">
-            {links.map((link) => (
+      {metadata.downloads.length > 0 && (
+        <ul className="flex flex-wrap gap-x-12 gap-y-6">
+          {metadata.downloads.map((download) => (
+            <li key={download.file}>
               <a
-                key={link.slug}
-                href={link.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                title={link.title}
-                className="text-gray-500 transition-colors hover:text-brand-dark dark:hover:text-brand-white"
+                href={assetUrl(download.file)}
+                download
+                className="font-funnel text-3xl font-bold lowercase tracking-tight underline decoration-brand-orange decoration-4 underline-offset-8 hover:text-brand-orange"
               >
-                <SocialIcon url={link.url} title={link.title} iconKey={link.iconKey ?? null} />
-                <span className="sr-only">{link.title}</span>
+                {download.title} ↓
               </a>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {downloads.length > 0 && (
-        <section className="mt-10">
-          <h2 className="font-funnel mb-3 text-sm font-semibold uppercase tracking-wide text-gray-400">
-            Files
-          </h2>
-          <ul className="space-y-1 text-sm">
-            {downloads.map((download) => {
-              const href = assetUrl(download.file);
-              return (
-                <li key={download.file}>
-                  <a href={href} download className="underline underline-offset-2">
-                    {download.title}
-                  </a>
-                  {download.description && (
-                    <span className="ml-2 text-gray-400">{download.description}</span>
-                  )}
-                </li>
-              );
-            })}
-          </ul>
-        </section>
+              {download.description && (
+                <span className="mt-2 block text-sm text-gray-500">{download.description}</span>
+              )}
+            </li>
+          ))}
+        </ul>
       )}
 
       {about.email && (
-        <p className="mt-10 text-sm">
-          <a href={`mailto:${about.email}`} className="underline underline-offset-2">
+        <p className="mt-20">
+          <a
+            href={`mailto:${about.email}`}
+            className="break-all font-funnel text-[clamp(1.5rem,5vw,3.5rem)] font-bold tracking-tight hover:text-brand-orange"
+          >
             {about.email}
           </a>
         </p>
       )}
-    </div>
+
+      <SocialArc links={links} />
+    </article>
   );
 }

@@ -32,8 +32,8 @@ const SATURATION_FACTOR = 0.5;
  */
 export function useGaze<T extends HTMLElement>(
   ref: RefObject<T | null>,
-  /** A transform offset on the element; the centre is re-read when it changes. */
-  offset?: MotionValue<number>,
+  /** Transform offsets on the element; the centre is re-read when any changes. */
+  offsets?: readonly MotionValue<number>[],
 ): {
   gx: MotionValue<number>;
   gy: MotionValue<number>;
@@ -72,7 +72,7 @@ export function useGaze<T extends HTMLElement>(
     // observing its box catches the transition without polling for it.
     const observer = new ResizeObserver(measure);
     observer.observe(el);
-    const unsubscribeOffset = offset?.on("change", measure);
+    const unsubscribeOffsets = (offsets ?? []).map((offset) => offset.on("change", measure));
 
     function onMove(e: PointerEvent) {
       const { x, y } = gazeVector(
@@ -98,13 +98,13 @@ export function useGaze<T extends HTMLElement>(
 
     return () => {
       observer.disconnect();
-      unsubscribeOffset?.();
+      unsubscribeOffsets.forEach((unsubscribe) => unsubscribe());
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("resize", measure);
       window.removeEventListener("scroll", measure);
       document.removeEventListener("pointerleave", onLeave);
     };
-  }, [ref, rawX, rawY, reduced, offset]);
+  }, [ref, rawX, rawY, reduced, offsets]);
 
   return { gx, gy };
 }

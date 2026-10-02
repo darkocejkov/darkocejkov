@@ -11,6 +11,7 @@ import type {
   Skill,
   SiteLink,
   Thing,
+  Video,
 } from "./graph";
 import type { LinkType, MetadataFrontmatter } from "./schema";
 
@@ -30,6 +31,7 @@ export type {
   Statement,
   TagCount,
   Thing,
+  Video,
 } from "./graph";
 export type {
   Asset,
@@ -80,6 +82,10 @@ export function getEducation(): Education[] {
 
 export function getArtworks(): Artwork[] {
   return getGraph().artworks;
+}
+
+export function getVideos(): Video[] {
+  return getGraph().videos;
 }
 
 export function getSkills(): Skill[] {

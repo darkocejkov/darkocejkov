@@ -77,6 +77,13 @@ export type ProjectStage = z.infer<typeof ProjectStage>;
 export const LinkType = z.enum(["social", "bookmark"]);
 export type LinkType = z.infer<typeof LinkType>;
 
+/** A headline figure shown large above a writeup, e.g. `{ value: "880", label: "PRs authored" }`. */
+export const Highlight = z.object({
+  value: z.string().min(1),
+  label: z.string().min(1),
+});
+export type Highlight = z.infer<typeof Highlight>;
+
 export const ExperienceFrontmatter = z.object({
   title: z.string().min(1),
   company: z.string().min(1),
@@ -85,6 +92,7 @@ export const ExperienceFrontmatter = z.object({
   startDate: dateString,
   endDate: dateString.optional(),
   skills: uniqueList(slugRef),
+  highlights: z.array(Highlight).default([]),
 });
 export type ExperienceFrontmatter = z.infer<typeof ExperienceFrontmatter>;
 
@@ -93,6 +101,7 @@ export const EducationFrontmatter = z.object({
   institution: z.string().min(1),
   startDate: dateString,
   endDate: dateString.optional(),
+  highlights: z.array(Highlight).default([]),
 });
 export type EducationFrontmatter = z.infer<typeof EducationFrontmatter>;
 
@@ -143,6 +152,19 @@ export const ArtworkFrontmatter = z.object({
   tags: uniqueList(z.string()),
 });
 export type ArtworkFrontmatter = z.infer<typeof ArtworkFrontmatter>;
+
+export const VideoFrontmatter = z.object({
+  name: z.string().min(1),
+  video: z.object({
+    src: z.string().regex(/^\/video\/.+/, "must be an R2 path beginning with /video/"),
+    poster: z.string().regex(/^\/(art|assets)\/.+/, "must begin with /art/ or /assets/").optional(),
+  }),
+  description: z.string().optional(),
+  year: z.string().optional(),
+  order: z.number().int().default(0),
+  tags: uniqueList(z.string()),
+});
+export type VideoFrontmatter = z.infer<typeof VideoFrontmatter>;
 
 export const ArticleFrontmatter = z.object({
   title: z.string().min(1),

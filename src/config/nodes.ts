@@ -18,7 +18,7 @@ export const NODES: ReadonlyArray<SceneNode> = [
   { slug: "experience", href: "/experience", label: "Experience", icon: "\u25D0" },
   { slug: "education", href: "/education", label: "Education", icon: "\u25F7" },
   { slug: "connect", href: "/connect", label: "Connect", icon: "\u25D1" },
-  { slug: "art", href: "/art", label: "Art", icon: "\u25F1" },
+  { slug: "media", href: "/media", label: "Media", icon: "\u25F1" },
 ];
 
 /** Appended to the orbit on content routes, where it is the way back to "/". */

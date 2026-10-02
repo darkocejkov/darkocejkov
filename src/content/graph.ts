@@ -4,11 +4,13 @@ import type {
   Asset,
   ArtworkFrontmatter,
   EmploymentType,
+  Highlight,
   LinkType,
   MetadataFrontmatter,
   Proficiency,
   ProjectStage,
   ThingType,
+  VideoFrontmatter,
 } from "./schema";
 
 export interface Skill {
@@ -82,6 +84,7 @@ export interface Experience {
   endDate?: string;
   isCurrent: boolean;
   skills: Skill[];
+  highlights: Highlight[];
   body: string;
 }
 
@@ -91,10 +94,15 @@ export interface Education {
   institution: string;
   startDate: string;
   endDate?: string;
+  highlights: Highlight[];
   body: string;
 }
 
 export interface Artwork extends ArtworkFrontmatter {
+  slug: string;
+}
+
+export interface Video extends VideoFrontmatter {
   slug: string;
 }
 
@@ -152,6 +160,7 @@ export interface ContentGraph {
   experience: Experience[];
   education: Education[];
   artworks: Artwork[];
+  videos: Video[];
   skills: Skill[];
   projects: Project[];
   articles: Article[];
@@ -316,9 +325,16 @@ export function resolve(
       endDate: e.data.endDate,
       isCurrent: !e.data.endDate,
       skills: resolveSkills(e.file, e.data.skills),
+      highlights: e.data.highlights,
       body: e.body,
     }))
-    .sort((a, b) => byDateDesc(a.startDate, b.startDate));
+    // Most recently held first: current roles, then by end date, then start date.
+    .sort(
+      (a, b) =>
+        Number(b.isCurrent) - Number(a.isCurrent) ||
+        byDateDesc(a.endDate ?? "", b.endDate ?? "") ||
+        byDateDesc(a.startDate, b.startDate),
+    );
 
   const education: Education[] = loaded.education
     .map((e) => ({
@@ -327,11 +343,16 @@ export function resolve(
       institution: e.data.institution,
       startDate: e.data.startDate,
       endDate: e.data.endDate,
+      highlights: e.data.highlights,
       body: e.body,
     }))
     .sort((a, b) => byDateDesc(a.startDate, b.startDate));
 
   const artworks: Artwork[] = loaded.artworks
+    .map((entry) => ({ ...entry.data, slug: entry.slug }))
+    .sort((a, b) => a.order - b.order || a.name.localeCompare(b.name));
+
+  const videos: Video[] = loaded.videos
     .map((entry) => ({ ...entry.data, slug: entry.slug }))
     .sort((a, b) => a.order - b.order || a.name.localeCompare(b.name));
 
@@ -380,6 +401,7 @@ export function resolve(
     experience,
     education,
     artworks,
+    videos,
     skills,
     projects,
     articles,
